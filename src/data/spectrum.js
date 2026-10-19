@@ -1,0 +1,122 @@
+// Spectrograph data: one dated item per line, grouped into seven bands.
+// `t` is a decimal year used only for placement; `when` is the label shown to visitors.
+// Add `url` only when a public proof page exists.
+
+export const SPECTRUM_START = 2015;
+export const SPECTRUM_END = 2027;
+
+const doi = (id) => `https://doi.org/${id}`;
+
+export const spectrumBands = [
+  {
+    key: 'invent',
+    name: 'Invent',
+    sub: 'patent',
+    hue: '#ff5a52',
+    section: 'patent',
+    items: [
+      { t: 2024.49, when: 'Jun 2024', title: 'Audio prioritization, application filed', meta: 'Named inventor', url: 'https://patents.google.com/patent/US20260003563A1/en' },
+      { t: 2026.0, when: 'Jan 2026', title: 'US20260003563A1, published application', meta: 'Named inventor', url: 'https://patents.google.com/patent/US20260003563A1/en' },
+      { t: 2026.01, when: 'Jan 2026', title: 'WO2026005985A1, international publication', meta: 'Same patent family', url: 'https://patents.google.com/patent/WO2026005985A1/en' }
+    ]
+  },
+  {
+    key: 'publish',
+    name: 'Publish',
+    sub: 'journal papers',
+    hue: '#ff9a3d',
+    section: 'research',
+    items: [
+      { t: 2019.5, when: '2019', title: 'Growth and characterization of cadmium telluride', meta: 'IJFMR' },
+      { t: 2020.5, when: '2020', title: 'Advancements in electric bicycle technology', meta: 'Zenodo' },
+      { t: 2021.5, when: '2021', title: 'Advances in human-robot interaction', meta: 'IJIRMPS' },
+      { t: 2021.9, when: '2021', title: 'Robotics-enabled STEM education in K-12', meta: 'IJSREM' },
+      { t: 2022.3, when: '2022', title: 'User-centric IoT prototyping for smart agriculture', meta: 'IJIRMPS' },
+      { t: 2022.7, when: '2022', title: 'Rapid prototyping for smart shop tools', meta: 'URF Journals' },
+      { t: 2023.3, when: '2023', title: 'Rapid prototyping technologies and design frameworks', meta: 'JMSMR', url: doi('10.47363/JMSMR/2023(4)E115') },
+      { t: 2023.54, when: 'Jul 2023', title: 'Leveraging haptic feedback in mixed reality', meta: 'JEAST', url: doi('10.47363/JEAST/2023(5)E170') },
+      { t: 2023.8, when: '2023', title: 'Sensor fusion with user-centered design in robotics', meta: 'ISJEM' },
+      { t: 2024.2, when: '2024', title: 'Evolution of haptic feedback systems and UX', meta: 'JEAST' },
+      { t: 2024.4, when: '2024', title: 'Optimizing bio-inspired phototropic materials', meta: 'IJACT' },
+      { t: 2024.6, when: 'Aug 2024', title: 'Advancing telemedicine through adaptive UX', meta: 'ProMedSci' },
+      { t: 2024.62, when: 'Aug 2024', title: 'Healthcare IoT and rapid prototyping, systematic review', meta: 'ProMedSci' },
+      { t: 2024.64, when: 'Aug 2024', title: 'User-centered design in rapid robotic prototyping', meta: 'IJIRMPS', url: doi('10.5281/zenodo.14280144') },
+      { t: 2024.8, when: '2024', title: 'User-centered design in healthcare education technologies', meta: 'ProMedSci' },
+      { t: 2025.2, when: '2025', title: 'Governance challenges in AI-powered health assistants', meta: 'IJFMR' },
+      { t: 2025.5, when: '2025', title: 'Augmented reality enhances telemedicine training', meta: 'IJFMR' }
+    ]
+  },
+  {
+    key: 'review',
+    name: 'Review',
+    sub: 'peer review',
+    hue: '#f2d34a',
+    section: 'judging',
+    items: [
+      { t: 2026.14, when: 'Feb 22, 2026', title: 'BMC Health Services Research', meta: 'Peer reviewer, Springer Nature' },
+      { t: 2026.61, when: 'Aug 11, 2026', title: 'Discover Artificial Intelligence', meta: 'Peer reviewer, Springer Nature' },
+      { t: 2026.64, when: 'Aug 23, 2026', title: 'Discover Education', meta: 'Peer reviewer, Springer Nature' },
+      { t: 2026.65, when: 'Aug 23, 2026', title: 'Humanities and Social Sciences Communications', meta: 'Peer reviewer, Springer Nature' },
+      { t: 2026.69, when: 'Sep 10, 2026', title: 'Discover Education, re-review', meta: 'Peer reviewer, Springer Nature' },
+      { t: 2026.7, when: 'Sep 10, 2026', title: 'Discover Sustainability', meta: 'Peer reviewer, Springer Nature' },
+      { t: 2026.72, when: 'Sep 18, 2026', title: 'Discover Oncology', meta: 'Peer reviewer, Springer Nature' }
+    ]
+  },
+  {
+    key: 'judge',
+    name: 'Judge',
+    sub: 'hackathons',
+    hue: '#62d98a',
+    section: 'judging',
+    items: [
+      { t: 2026.18, when: 'Mar 8, 2026', title: 'HackMerced XI', meta: 'Judge, MLH and UC Merced' },
+      { t: 2026.32, when: 'Apr 26, 2026', title: 'LA Hacks 2026', meta: 'Invite-only judge, 1,000+ students' },
+      { t: 2026.81, when: 'Oct 23-25, 2026', title: 'Cal Hacks 13.0', meta: 'Accepted to judge, upcoming', future: true }
+    ]
+  },
+  {
+    key: 'honor',
+    name: 'Recognized',
+    sub: 'awards and keynote',
+    hue: '#4dd0e1',
+    section: 'awards',
+    items: [
+      { t: 2015.6, when: '2015', title: 'Robert W. Finch Memorial Scholarship', meta: 'Washington State University' },
+      { t: 2015.7, when: '2015-2018', title: 'International Merit Award', meta: 'Washington State University' },
+      { t: 2016.6, when: '2016', title: 'Guy E. Thornton Engineering Scholarship', meta: 'Washington State University' },
+      { t: 2016.8, when: '2016-2018', title: 'Harold Frank Engineering Entrepreneurship Kauffman Award', meta: 'Washington State University' },
+      { t: 2018.1, when: '2018', title: 'Crimson Code Hackathon, 1st place', meta: 'Washington State University', url: 'https://tiny.cc/crimsoncode2018' },
+      { t: 2025.45, when: 'Jun 2025', title: 'ICETAIA 2025, invited keynote', meta: 'A practical framework for rapid prototyping and fidelity' }
+    ]
+  },
+  {
+    key: 'belong',
+    name: 'Belong',
+    sub: 'memberships',
+    hue: '#6a8cff',
+    section: 'memberships',
+    items: [
+      { t: 2026.2, when: '2026', title: 'Sigma Xi', meta: 'Scientific research honor society' },
+      { t: 2026.3, when: '2026', title: 'IEEE Senior Member', meta: 'Elevated membership grade' }
+    ]
+  },
+  {
+    key: 'build',
+    name: 'Build',
+    sub: 'live projects',
+    hue: '#b07cff',
+    section: 'lab',
+    items: [
+      { t: 2024.5, when: '2024', title: 'Literature review assistant', meta: 'Open source, PRISMA pipeline', url: 'https://github.com/parthchandak02/literature-review-assistant' },
+      { t: 2026.51, when: '2026', title: 'wc26', meta: 'World Cup 2026 map', url: 'https://wc26.parthchandak.info' },
+      { t: 2026.52, when: '2026', title: 'tide', meta: '3D ocean from buoy data', url: 'https://tide.parthchandak.info' },
+      { t: 2026.53, when: '2026', title: 'orbit', meta: 'Product gravity field', url: 'https://orbit.parthchandak.info' },
+      { t: 2026.54, when: '2026', title: 'inkwell', meta: 'Ink simulation from live wind', url: 'https://inkwell.parthchandak.info' },
+      { t: 2026.55, when: '2026', title: 'aeris', meta: 'World weather dashboard', url: 'https://aeris.parthchandak.info' },
+      { t: 2026.56, when: '2026', title: 'eurusd', meta: 'Exchange rate road drive', url: 'https://eurusd.parthchandak.info' },
+      { t: 2026.75, when: '2026', title: 'jobwright', meta: 'Daily scored job list', url: 'https://github.com/parthchandak02/jobwright' }
+    ]
+  }
+];
+
+export const spectrumTotal = spectrumBands.reduce((n, b) => n + b.items.length, 0);

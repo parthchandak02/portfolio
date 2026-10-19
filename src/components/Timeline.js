@@ -67,6 +67,7 @@ const Timeline = ({
                   data-category={item.category?.toLowerCase() || 'other'}
                   data-index={index}
                   data-debug={`${item.category}-${index}`}
+                  id={index === 0 || sortedData[index - 1].category !== item.category ? item.category?.toLowerCase() : undefined}
                 >
                   <TimelineCard
                     title={item.title}
@@ -79,6 +80,7 @@ const Timeline = ({
                     location={item.location}
                     volume={item.volume}
                     url={item.url}
+                    video={item.video}
                     skills={item.skills || []}
                     lightMode={lightMode}
                     className="timeline__card"

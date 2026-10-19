@@ -15,6 +15,26 @@ import useScrollHighlight from './hooks/useScrollHighlight';
 import { timelineData } from './data/timelineData';
 import { TypewriterHighlightProvider } from './contexts/TypewriterHighlightContext';
 import ScrollTypewriterController from './components/ScrollTypewriterController';
+import Spectrograph from './components/Spectrograph';
+
+const VISITED_KEY = 'pc-has-visited';
+
+// First visit opens play mode; later visits open the record. Storage can be blocked, so default to play.
+const isReturningVisitor = () => {
+  try {
+    return window.localStorage.getItem(VISITED_KEY) === '1';
+  } catch (e) {
+    return false;
+  }
+};
+
+const markVisited = () => {
+  try {
+    window.localStorage.setItem(VISITED_KEY, '1');
+  } catch (e) {
+    // ignore: the visit just isn't remembered
+  }
+};
 
 /**
  * Main App component - Clean, modular structure following React 2024 best practices
@@ -37,8 +57,9 @@ export default function App() {
   // Filter state for the timeline - now supports multiple selected filters (toggle-based)
   const [activeFilters, setActiveFilters] = useState([]);
   
-  // Play mode state - toggle between interactive mode and resume reading mode (default: true for immediate fun experience)
-  const [isPlayMode, setIsPlayMode] = useState(true);
+  // Play mode state - toggle between interactive mode and resume reading mode.
+  // First visit: play mode. Returning visitors, and anyone arriving on a #section link, get the record.
+  const [isPlayMode, setIsPlayMode] = useState(() => !isReturningVisitor() && !window.location.hash);
   const togglePlayMode = () => {
     const newPlayMode = !isPlayMode;
     setIsPlayMode(newPlayMode);
@@ -56,13 +77,51 @@ export default function App() {
     }
   };
   
-  // Track which category section is currently visible for sidebar highlighting
-  const { visibleCategory } = useScrollHighlight('all');
-
   // Get unique categories for filter buttons (excluding 'all')
   const categories = useMemo(() => {
     return [...new Set(timelineData.map(item => item.category?.toLowerCase()).filter(Boolean))];
   }, []);
+
+  // Resume mode starts with the beam locked, matching what the toggle does at runtime
+  useEffect(() => {
+    markVisited();
+    if (!isPlayMode && !isLocked) {
+      toggleLock();
+    }
+    // Run once on mount only
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // #section links: show the record, then scroll the section into view
+  const [hash, setHash] = useState(() => window.location.hash.slice(1));
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash.slice(1));
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  useEffect(() => {
+    if (!hash || !categories.includes(hash)) return;
+    if (isPlayMode) {
+      togglePlayMode();
+      return;
+    }
+    setActiveFilters([]);
+    const timer = setTimeout(() => {
+      const target = document.getElementById(hash);
+      const scroller = document.querySelector('.main-content-scroll');
+      if (target && scroller) {
+        const top = scroller.scrollTop + target.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 100;
+        scroller.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      }
+    }, 150);
+    return () => clearTimeout(timer);
+    // togglePlayMode is recreated each render; hash and mode are the real triggers
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hash, isPlayMode]);
+
+  // Track which category section is currently visible for sidebar highlighting
+  const { visibleCategory } = useScrollHighlight('all');
 
   // Format filters for sidebar components
   const filters = useMemo(() => {
@@ -131,6 +190,9 @@ export default function App() {
           <div className="main-content-scroll">
             {/* Typewriter that always shows regardless of play mode */}
             <UITypewriter lightMode={lightMode} />
+
+            {/* Record spectrograph - visible in both modes */}
+            <Spectrograph lightMode={lightMode} />
             
             {/* Resume content - Hidden in play mode */}
             {!isPlayMode && (

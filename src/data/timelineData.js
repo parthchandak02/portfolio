@@ -116,7 +116,7 @@ export const timelineDataByCategory = {
         "date": "February 2022 - Present",
         "category": "experience",
         "location": "Foster City, CA",
-        "description": "Created a UX focused robot platform and creative lab for designing 20+ visual and sonic experience projects. Reduced design iteration and validation time from multiple weeks to 1-2 days (90% reduction). Tested 40+ digital and mechanical designs on various autonomous vehicle platforms to help in research and design validation. Created 15+ hardware and software prototypes, aiding and enhancing research and design studies.",
+        "description": "Build prototyping systems that let designers and researchers try ideas in the robotaxi cabin, from lights and sound to displays and controls, without waiting on engineering. Connect design tools to vehicle hardware so new variations can be tested quickly and in realistic conditions.",
         "typewriterTitle": "Creative Technologist",
         "typewriterPrefix": "I am a",
         "skills": [
@@ -129,13 +129,44 @@ export const timelineDataByCategory = {
         ]
     },
     {
+        "title": "Find My Zoox",
+        "company": "Zoox",
+        "companyLogo": "/logos/zoox-logo.png",
+        "date": "May 2026",
+        "category": "experience",
+        "location": "Zoox, public launch video",
+        "description": "Riders set a theme in the app and find their robotaxi by a personalized light and sound sequence. Helped prototype the lights and audio, and built the tooling that let designers try different color variations.",
+        "video": { "id": "fbEqWTsEZHA", "title": "Find My Zoox, Zoox on YouTube" },
+        "url": "https://www.youtube.com/watch?v=fbEqWTsEZHA",
+        "skills": [
+            "Prototyping",
+            "Design",
+            "User Experience"
+        ]
+    },
+    {
+        "title": "ZooxCast",
+        "company": "Zoox",
+        "companyLogo": "/logos/zoox-logo.png",
+        "date": "May 2026",
+        "category": "experience",
+        "location": "Zoox, public launch video",
+        "description": "Riders can stream their own audio over Bluetooth alongside Zoox's curated playlist. Helped designers test audio connections and prototyped ways to connect to the vehicle hardware.",
+        "video": { "id": "FBwjGXLNiBU", "title": "ZooxCast, Zoox on YouTube" },
+        "url": "https://www.youtube.com/watch?v=FBwjGXLNiBU",
+        "skills": [
+            "Prototyping",
+            "User Experience"
+        ]
+    },
+    {
         "title": "Manufacturing Engineer",
         "company": "Zoox",
         "companyLogo": "/logos/zoox-logo.png",
         "date": "October 2018 - January 2022",
         "category": "experience",
         "location": "Foster City, CA",
-        "description": "Tracked 12,000+ parts with custom built scripts leading to less than 10 part traceability errors. Created tools and processes for 40+ technicians, improving manufacturing quality, testing, and material workflows. Manufactured vehicle hardware for 10+ products in their life cycles, from DFMEA to OQC.",
+        "description": "Built part-tracking scripts that improved traceability, and created tools and processes that improved manufacturing quality, testing, and material workflows for technicians. Manufactured vehicle hardware across product life cycles, from DFMEA to OQC.",
         "skills": [
             "Python",
             "JavaScript",
@@ -244,13 +275,14 @@ export const timelineDataByCategory = {
   ],
   patent: [
     {
-        "title": "Audio Prioritization Patent (Pending)",
-        "date": "June 2024",
+        "title": "Audio Prioritization (US20260003563A1)",
+        "date": "Filed June 2024, published January 2026",
         "category": "patent",
         "company": "Zoox",
         "companyLogo": "/logos/zoox-logo.png",
-        "location": "Application #1/###,573; Ref. 1246-02850US1",
-        "description": "Innovative patent pending for audio prioritization technology, demonstrating cutting-edge research in autonomous vehicle audio systems and user experience optimization.",
+        "location": "US20260003563A1 and WO2026005985A1",
+        "url": "https://patents.google.com/patent/US20260003563A1/en",
+        "description": "Named inventor on a published patent application for context-aware audio prioritization in autonomous vehicles, covering how in-cabin audio behavior can be tested and tuned in realistic prototypes.",
         "typewriterTitle": "Inventor",
         "typewriterPrefix": "I am an ",
         "skills": [
@@ -385,6 +417,7 @@ export const timelineDataByCategory = {
         "date": "August 2024",
         "category": "research",
         "volume": "IJIRMPS, Volume 12, Issue 4",
+        "url": "https://doi.org/10.5281/zenodo.14280144",
         "description": "Framework for incorporating user-centered design principles in rapid prototyping of robotic systems, with emphasis on human-robot interaction.",
         "typewriterTitle": "Researcher",
         "typewriterPrefix": "I am a",
@@ -445,6 +478,7 @@ export const timelineDataByCategory = {
         "date": "July 2023",
         "category": "research",
         "volume": "JEAST, Volume 5, Issue 4",
+        "url": "https://doi.org/10.47363/JEAST/2023(5)E170",
         "description": "Investigation of haptic feedback systems in mixed reality environments and their impact on user experience and task performance.",
         "typewriterTitle": "Researcher",
         "typewriterPrefix": "I am a",
@@ -461,6 +495,7 @@ export const timelineDataByCategory = {
         "date": "2023",
         "category": "research",
         "volume": "JMSMR, Volume 4, Issue 1",
+        "url": "https://doi.org/10.47363/JMSMR/2023(4)E115",
         "description": "Comprehensive study of rapid prototyping methodologies and their application in modern design frameworks across multiple industries.",
         "typewriterTitle": "Researcher",
         "typewriterPrefix": "I am a",
@@ -575,6 +610,162 @@ export const timelineDataByCategory = {
             "Research",
             "Technology"
         ]
+    }
+  ],
+  judging: [
+    {
+        "title": "Peer Reviewer, Springer Nature",
+        "date": "February 2026 - September 2026",
+        "category": "judging",
+        "location": "BMC, Discover and Humanities and Social Sciences Communications journals",
+        "description": "Certified peer reviews for Springer Nature journals: BMC Health Services Research (Feb 22, 2026), Discover Artificial Intelligence (Aug 11), Discover Education (Aug 23 and Sep 10), Humanities and Social Sciences Communications (Aug 23), Discover Sustainability (Sep 10) and Discover Oncology (Sep 18).",
+        "typewriterTitle": "Reviewer",
+        "typewriterPrefix": "I am a",
+        "skills": [
+            "Research",
+            "Advisor"
+        ]
+    },
+    {
+        "title": "Cal Hacks 13.0 (Upcoming)",
+        "date": "October 23-25, 2026",
+        "category": "judging",
+        "location": "Berkeley, CA",
+        "description": "Accepted to judge Cal Hacks 13.0.",
+        "skills": [
+            "Advisor",
+            "Innovation"
+        ]
+    },
+    {
+        "title": "LA Hacks 2026, Judge",
+        "date": "April 26, 2026",
+        "category": "judging",
+        "location": "Los Angeles, CA",
+        "description": "Invite-only judge for a hackathon of 1,000+ students.",
+        "skills": [
+            "Advisor",
+            "Innovation"
+        ]
+    },
+    {
+        "title": "HackMerced XI, Judge",
+        "date": "March 8, 2026",
+        "category": "judging",
+        "location": "UC Merced",
+        "description": "Judged MLH and UC Merced hackathon projects.",
+        "skills": [
+            "Advisor",
+            "Innovation"
+        ]
+    }
+  ],
+  memberships: [
+    {
+        "title": "IEEE Senior Member",
+        "date": "2026",
+        "category": "memberships",
+        "description": "Elevated membership grade of the IEEE, awarded for professional achievement.",
+        "skills": [
+            "Technology"
+        ]
+    },
+    {
+        "title": "Sigma Xi, The Scientific Research Honor Society",
+        "date": "2026",
+        "category": "memberships",
+        "description": "Member of the scientific research honor society.",
+        "skills": [
+            "Research"
+        ]
+    },
+    {
+        "title": "Tau Beta Pi, Engineering Honor Society",
+        "category": "memberships",
+        "description": "Member of the engineering honor society.",
+        "skills": [
+            "Robotics"
+        ]
+    },
+    {
+        "title": "QuillBot Advisory Panel",
+        "category": "memberships",
+        "description": "Member of the advisory panel for the QuillBot writing tool.",
+        "skills": [
+            "Advisor"
+        ]
+    }
+  ],
+  lab: [
+    {
+        "title": "jobwright",
+        "date": "2026",
+        "category": "lab",
+        "location": "Open source",
+        "description": "One short list of jobs a day, picked for you and explained. Searches job boards each morning and scores each role against your own rules and past ratings, using Claude and Gemini.",
+        "url": "https://github.com/parthchandak02/jobwright",
+        "projectImage": "/images/lab/jobwright.png",
+        "skills": ["Python", "LLMs"]
+    },
+    {
+        "title": "eurusd",
+        "date": "2026",
+        "category": "lab",
+        "location": "Live on Cloudflare",
+        "description": "The euro to dollar exchange rate as a road you drive along.",
+        "url": "https://eurusd.parthchandak.info",
+        "projectImage": "/images/lab/eurusd.png",
+        "skills": ["JavaScript", "Finance"]
+    },
+    {
+        "title": "wc26",
+        "date": "2026",
+        "category": "lab",
+        "location": "Live on Cloudflare",
+        "description": "World Cup 2026 standings on an interactive world map. Filter by stage or confederation and tap a country for its group.",
+        "url": "https://wc26.parthchandak.info",
+        "projectImage": "/images/lab/wc26.png",
+        "skills": ["JavaScript", "Data Analysis"]
+    },
+    {
+        "title": "aeris",
+        "date": "2026",
+        "category": "lab",
+        "location": "Live on Cloudflare",
+        "description": "A scrollable world weather dashboard with live conditions across 12 cities on animated glass cards.",
+        "url": "https://aeris.parthchandak.info",
+        "projectImage": "/images/lab/aeris.png",
+        "skills": ["JavaScript", "Design"]
+    },
+    {
+        "title": "inkwell",
+        "date": "2026",
+        "category": "lab",
+        "location": "Live on Cloudflare",
+        "description": "An ink simulation driven by live San Francisco wind. Drag across the canvas to release drops that drift like pigment in water.",
+        "url": "https://inkwell.parthchandak.info",
+        "projectImage": "/images/lab/inkwell.png",
+        "skills": ["JavaScript", "Creativity"]
+    },
+    {
+        "title": "orbit",
+        "date": "2026",
+        "category": "lab",
+        "location": "Live on Cloudflare",
+        "description": "Products orbit in a gravity field where price sets mass, rating sets glow and stock sets the number of particles.",
+        "url": "https://orbit.parthchandak.info",
+        "projectImage": "/images/lab/orbit.png",
+        "skills": ["JavaScript", "Data Analysis"]
+    },
+    {
+        "title": "tide",
+        "date": "2026",
+        "category": "lab",
+        "location": "Live on Cloudflare",
+        "description": "A living 3D ocean surface driven by real marine buoy data from the San Francisco coast.",
+        "url": "https://tide.parthchandak.info",
+        "projectImage": "/images/lab/tide.png",
+        "skills": ["JavaScript", "Data Analysis"]
     }
   ],
   projects: [
@@ -702,7 +893,8 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Crimson Code Software Hackathon - 1st Place (Tier 1)",
-        "date": "2017",
+        "date": "2018",
+        "url": "https://tiny.cc/crimsoncode2018",
         "category": "awards",
         "company": "WSU",
         "companyLogo": "/logos/wsu-logo.png",
@@ -835,7 +1027,7 @@ export const timelineDataByCategory = {
 };
 
 // Single source of truth for category ordering
-export const categoryOrder = ['experience', 'education', 'patent', 'projects', 'speaking', 'awards', 'research', 'media', 'volunteering'];
+export const categoryOrder = ['experience', 'education', 'patent', 'judging', 'memberships', 'lab', 'projects', 'speaking', 'awards', 'research', 'media', 'volunteering'];
 
 // Flattened timeline data for backward compatibility (computed from categories)
 export const timelineData = (() => {
