@@ -1,70 +1,135 @@
-/* Spectrograph: collapsed barcode that expands into seven colored bands */
+/* Spectrograph: one strip that splits into seven glowing bands */
 .spectro {
   position: relative;
   z-index: 16;
+  flex-shrink: 0; /* the scroll container is a flex column and this card has overflow:hidden */
   pointer-events: auto;
-  width: min(880px, calc(100vw - 2rem));
+  width: 100%;
+  max-width: 880px;
   margin: 0 auto var(--space-400) auto;
-  padding: var(--space-200) var(--space-250) var(--space-250);
-  border-radius: 16px;
+  padding: var(--space-150) var(--space-250) var(--space-250);
+  border-radius: 18px;
   display: grid;
-  gap: var(--space-150);
+  gap: var(--space-100);
   font-family: var(--font-family-primary);
 }
 
-.spectro--dark { color: rgba(255, 255, 255, 0.92); --mute: rgba(255, 255, 255, 0.62); --rail: rgba(255, 255, 255, 0.07); --edge: rgba(255, 255, 255, 0.16); }
-.spectro--light { color: rgba(20, 20, 24, 0.92); --mute: rgba(20, 20, 24, 0.62); --rail: rgba(0, 0, 0, 0.05); --edge: rgba(0, 0, 0, 0.18); }
-
-.spectro__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-150); flex-wrap: wrap; font-size: 0.8rem; color: var(--mute); }
-.spectro__count b { color: inherit; font-weight: 600; }
-.spectro__toggle {
-  font: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: inherit;
-  padding: 0.35rem 0.85rem; border-radius: 999px; border: 1px solid var(--edge); background: var(--rail);
+.spectro--dark {
+  color: rgba(255, 255, 255, 0.92);
+  --mute: rgba(255, 255, 255, 0.6);
+  --well: rgba(0, 0, 0, 0.34);
+  --edge: rgba(255, 255, 255, 0.12);
+  --core: #ffffff;
+  --glow: 1;
+  --ink: 0;
 }
-.spectro__toggle:hover { border-color: #ff6b35; }
-.spectro__toggle:focus-visible, .spectro__line:focus-visible, .spectro__name:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; }
+.spectro--light {
+  color: rgba(20, 20, 24, 0.92);
+  --mute: rgba(20, 20, 24, 0.62);
+  --well: rgba(0, 0, 0, 0.05);
+  --edge: rgba(0, 0, 0, 0.14);
+  --glow: 0.4;
+  --ink: 0.62; /* how much black is mixed into band colors used as text and line cores */
+}
+
+.spectro__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-150); min-height: 40px; }
+.spectro__legend { flex: 1; display: flex; flex-wrap: wrap; gap: 2px 14px; margin: 0; padding: 0; list-style: none; font-size: 0.72rem; color: var(--mute); }
+.spectro__legend li::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--hue); box-shadow: 0 0 7px var(--hue); }
+
+/* Matches the round glass toggles elsewhere on the page */
+.spectro__toggle {
+  margin-left: auto;
+  width: 40px; height: 40px; padding: 0; flex: none;
+  border-radius: 50%; display: grid; place-items: center; color: inherit;
+}
+.spectro__toggle:focus-visible, .spectro__track:focus-visible, .spectro__name:focus-visible, .spectro__proof:focus-visible { outline: 2px solid #ff6b35; outline-offset: 3px; }
 
 .spectro__body { display: grid; gap: var(--space-100); }
-.spectro__track { position: relative; height: 34px; border-radius: 6px; background: var(--rail); border: 1px solid var(--edge); }
-.spectro__track--strip { height: 44px; }
 
-.spectro__line {
-  position: absolute; top: 3px; bottom: 3px; width: 3px; margin-left: -1.5px; padding: 0; border: 0; border-radius: 2px;
-  background: var(--hue); opacity: 0.92; cursor: pointer; display: block;
+/* The whole track is the touch target; the lines are only drawn marks */
+.spectro__track {
+  position: relative;
+  height: 48px;
+  border-radius: 10px;
+  background: var(--well);
+  border: 1px solid var(--edge);
+  cursor: crosshair;
+  touch-action: pan-y; /* vertical scroll still works; horizontal drag scrubs */
+  -webkit-tap-highlight-color: transparent;
 }
-.spectro__line::after { content: ""; position: absolute; inset: -3px -1px; }
-.spectro__line:hover, .spectro__line--on { opacity: 1; box-shadow: 0 0 0 2px currentColor, 0 0 12px var(--hue); z-index: 2; }
-.spectro__line--future { background: transparent; box-shadow: inset 0 0 0 1.5px var(--hue); }
+.spectro__track--tall { height: 60px; }
+.spectro__track::before { /* faint baseline the lines stand on, like the beam */
+  content: ""; position: absolute; left: 6px; right: 6px; top: 50%; height: 1px; background: var(--edge);
+}
+
+/* Slim lines with a white-hot core and a colored halo, like the light beam */
+.spectro__line {
+  position: absolute; top: 50%; width: 2px; height: calc(100% - 16px);
+  transform: translate(-50%, -50%);
+  border-radius: 2px; pointer-events: none;
+  background: linear-gradient(to bottom, transparent 0%, var(--hue) 20%, var(--core, color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000)) 50%, var(--hue) 80%, transparent 100%);
+  box-shadow:
+    0 0 3px 0 color-mix(in srgb, var(--hue) calc(100% * var(--glow) + 0%), transparent),
+    0 0 10px 1px color-mix(in srgb, var(--hue) calc(55% * var(--glow)), transparent);
+  opacity: 0.92;
+}
+.spectro__line--on {
+  width: 3px; height: calc(100% - 6px); opacity: 1; z-index: 2;
+  box-shadow: 0 0 6px 1px var(--hue), 0 0 20px 3px color-mix(in srgb, var(--hue) 70%, transparent);
+}
+.spectro__line--future { /* upcoming: outlined, no glow */
+  background: transparent; box-shadow: none; opacity: 0.9;
+  width: 3px; border: 1px solid var(--hue);
+}
 
 .spectro__axis { position: relative; height: 14px; font-size: 0.65rem; color: var(--mute); font-variant-numeric: tabular-nums; }
 .spectro__axis span { position: absolute; transform: translateX(-50%); }
-.spectro__axis span:first-child { transform: none; }
-.spectro__axis span:last-child { transform: translateX(-100%); }
+.spectro__axis span.is-first { transform: translateX(-4px); }
 
-.spectro__bands { display: grid; gap: 0; }
-.spectro__row { display: grid; grid-template-columns: 128px 1fr; align-items: center; gap: var(--space-150); padding: 6px 0; border-bottom: 1px solid var(--rail); }
-.spectro__row:last-of-type { border-bottom: 0; }
-.spectro__bands > .spectro__axis { margin-left: calc(128px + var(--space-150)); }
-.spectro__name { display: grid; gap: 1px; text-decoration: none; color: inherit; font-size: 0.78rem; line-height: 1.2; }
-.spectro__name b { color: var(--hue); font-weight: 700; font-size: 0.82rem; }
+.spectro__bands { display: grid; }
+.spectro__row { display: grid; grid-template-columns: 136px 1fr; align-items: center; gap: var(--space-100); padding: 5px 0; }
+.spectro__lane { min-width: 0; }
+.spectro__axis-wrap { margin-left: calc(136px + var(--space-100)); }
+.spectro__name { display: grid; gap: 1px; text-decoration: none; color: inherit; line-height: 1.2; }
+.spectro__name b { color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); font-weight: 700; font-size: 0.84rem; }
 .spectro__name span { color: var(--mute); font-size: 0.7rem; }
 .spectro__name:hover b { text-decoration: underline; }
 
 .spectro__readout {
-  min-height: 62px; padding: 0.6rem 0.8rem; border-radius: 10px; border: 1px solid var(--edge); background: var(--rail);
+  min-height: 78px; padding: 0.65rem 0.85rem; border-radius: 12px; border: 1px solid var(--edge); background: var(--well);
   display: grid; gap: 2px; align-content: center;
 }
-.spectro__kicker { font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hue); font-weight: 700; }
-.spectro__title { font-size: 0.95rem; font-weight: 700; }
-.spectro__meta { font-size: 0.78rem; color: var(--mute); }
+.spectro__kicker { font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); font-weight: 700; }
+.spectro__title { font-size: 0.95rem; font-weight: 700; line-height: 1.3; }
+.spectro__meta { font-size: 0.78rem; color: var(--mute); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.spectro__proof {
+  display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 2px;
+  color: #ff6b35; font-weight: 600; text-decoration: none;
+}
+.spectro--light .spectro__proof { color: #c2410c; }
+.spectro__proof:hover { text-decoration: underline; }
+
+.spectro__sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 @media (max-width: 720px) {
-  .spectro { padding: var(--space-150); }
-  .spectro__row { grid-template-columns: 1fr; gap: 4px; }
-  .spectro__bands > .spectro__axis { margin-left: 0; }
+  .spectro { padding: var(--space-100) var(--space-150) var(--space-200); border-radius: 16px; }
+  .spectro__row { grid-template-columns: 1fr; gap: 2px; padding: 4px 0 6px; }
+  .spectro__axis-wrap { margin-left: 0; }
   .spectro__name { display: flex; gap: 8px; align-items: baseline; }
+  .spectro__track { height: 52px; } /* comfortably above the 44px touch guideline */
+  .spectro__readout { min-height: 92px; }
+  .spectro__legend { font-size: 0.64rem; gap: 2px 9px; }
+  .spectro__legend li::before { width: 6px; height: 6px; margin-right: 4px; }
+  .spectro__toggle { width: 44px; height: 44px; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .spectro__line, .spectro__toggle { transition: box-shadow 0.15s, border-color 0.15s, opacity 0.15s; }
+  .spectro__line { transition: width 0.12s, height 0.12s, box-shadow 0.12s, opacity 0.12s; }
+}
+
+/* Any touch screen, including tablets wider than the phone breakpoint */
+@media (pointer: coarse) {
+  .spectro__toggle { width: 44px; height: 44px; }
+  .spectro__track { height: 52px; }
+  .spectro__track--tall { height: 60px; }
 }

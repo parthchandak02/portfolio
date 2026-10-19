@@ -1,77 +1,152 @@
-import { useMemo, useState } from 'react';
-import {
-  spectrumBands,
-  spectrumTotal,
-  SPECTRUM_START,
-  SPECTRUM_END
-} from '../data/spectrum';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FoldVertical, UnfoldVertical, ExternalLink } from 'lucide-react';
+import { spectrumBands } from '../data/spectrum';
 import './Spectrograph.css';
 
-const AXIS_YEARS = [2015, 2018, 2021, 2024, 2027];
-const pct = (t) => ((t - SPECTRUM_START) / (SPECTRUM_END - SPECTRUM_START)) * 100;
+// Time is not linear on the track: the sparse early years are compressed so the busy recent
+// years get room. Axis labels use the same mapping, so every position is still honest.
+const KNOTS = [
+  [2015, 0],
+  [2020, 0.14],
+  [2023, 0.34],
+  [2025, 0.62],
+  [2026, 0.8],
+  [2027, 1]
+];
+const AXIS_YEARS = [2015, 2020, 2023, 2025, 2026];
+const MIN_GAP = 3.5; // px between neighbouring lines
+const EDGE = 4; // px kept free at each end of a track
 
-// Nudge neighbours apart so every line stays clickable on a dense strip.
-// A forward pass spreads clusters right; a backward pass pulls the tail back inside the track.
-const MAX_POS = 99.4;
-const spread = (entries, gap) => {
-  const sorted = [...entries].sort((a, b) => a.item.t - b.item.t);
-  const pos = sorted.map((entry) => pct(entry.item.t));
-  for (let i = 1; i < pos.length; i += 1) {
-    if (pos[i] < pos[i - 1] + gap) pos[i] = pos[i - 1] + gap;
+const warp = (t) => {
+  for (let i = 1; i < KNOTS.length; i += 1) {
+    const [t1, f1] = KNOTS[i];
+    if (t <= t1) {
+      const [t0, f0] = KNOTS[i - 1];
+      return f0 + ((t - t0) / (t1 - t0)) * (f1 - f0);
+    }
   }
-  for (let i = pos.length - 1; i >= 0; i -= 1) {
-    const limit = i === pos.length - 1 ? MAX_POS : pos[i + 1] - gap;
-    if (pos[i] > limit) pos[i] = limit;
-  }
-  return sorted.map((entry, i) => ({ ...entry, p: pos[i] }));
+  return 1;
 };
 
-const Axis = () => (
-  <div className="spectro__axis" aria-hidden="true">
-    {AXIS_YEARS.map((year) => (
-      <span key={year} style={{ left: `${pct(year)}%` }}>{year}</span>
-    ))}
-  </div>
-);
-
-const Line = ({ entry, onActive, active }) => {
-  const { item, band, p } = entry;
-  const label = `${band.name}, ${item.when}, ${item.title}`;
-  const className = `spectro__line${item.future ? ' spectro__line--future' : ''}${active ? ' spectro__line--on' : ''}`;
-  const style = { left: `${p}%`, '--hue': band.hue };
-  const handlers = {
-    onMouseEnter: () => onActive(entry),
-    onFocus: () => onActive(entry)
-  };
-  if (item.url) {
-    return (
-      <a
-        className={className}
-        style={style}
-        href={item.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`${label}. Opens proof in a new tab`}
-        {...handlers}
-      />
-    );
+// Spread neighbours apart in pixels. A forward pass pushes clusters right; a backward pass
+// pulls the tail back inside the track. Order never changes.
+const place = (entries, width) => {
+  const sorted = [...entries].sort((a, b) => a.item.t - b.item.t);
+  const pos = sorted.map((e) => EDGE + warp(e.item.t) * (width - EDGE * 2));
+  for (let i = 1; i < pos.length; i += 1) {
+    if (pos[i] < pos[i - 1] + MIN_GAP) pos[i] = pos[i - 1] + MIN_GAP;
   }
+  for (let i = pos.length - 1; i >= 0; i -= 1) {
+    const limit = i === pos.length - 1 ? width - EDGE : pos[i + 1] - MIN_GAP;
+    if (pos[i] > limit) pos[i] = limit;
+  }
+  return sorted.map((e, i) => ({ ...e, x: pos[i] }));
+};
+
+const useWidth = () => {
+  const ref = useRef(null);
+  const [width, setWidth] = useState(720);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return undefined;
+    const measure = () => setWidth(Math.max(120, Math.round(node.getBoundingClientRect().width)));
+    measure();
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', measure);
+      return () => window.removeEventListener('resize', measure);
+    }
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, width];
+};
+
+const MIN_LABEL_GAP = 38; // px; labels closer than this to the previous one are dropped
+
+const Axis = () => {
+  const [ref, width] = useWidth();
+  let lastX = -Infinity;
+  const labels = AXIS_YEARS.map((year) => ({ year, x: EDGE + warp(year) * (width - EDGE * 2) })).filter((l) => {
+    if (l.x - lastX < MIN_LABEL_GAP) return false;
+    lastX = l.x;
+    return true;
+  });
   return (
-    <button
-      type="button"
-      className={className}
-      style={style}
-      aria-label={label}
-      onClick={() => onActive(entry)}
-      {...handlers}
-    />
+    <div className="spectro__axis" ref={ref} aria-hidden="true">
+      {labels.map((l, i) => (
+        <span key={l.year} className={i === 0 ? 'is-first' : ''} style={{ left: `${l.x}px` }}>
+          {l.year}
+        </span>
+      ))}
+    </div>
+  );
+};
+
+/**
+ * One row of lines. The whole track is the touch target: pointer position picks the nearest line
+ * (hover on desktop, drag or tap on a phone), and the arrow keys step through lines.
+ */
+const Track = ({ band, entries, active, onActive, tall = false }) => {
+  const [trackRef, width] = useWidth();
+  const placed = useMemo(() => place(entries, width), [entries, width]);
+
+  const pick = useCallback(
+    (clientX) => {
+      const rect = trackRef.current.getBoundingClientRect();
+      const x = clientX - rect.left;
+      let best = placed[0];
+      placed.forEach((p) => {
+        if (Math.abs(p.x - x) < Math.abs(best.x - x)) best = p;
+      });
+      onActive(best);
+    },
+    [placed, onActive, trackRef]
+  );
+
+  const step = (delta) => {
+    const index = placed.findIndex((p) => active && p.item === active.item);
+    const next = index === -1 ? (delta > 0 ? 0 : placed.length - 1) : Math.min(placed.length - 1, Math.max(0, index + delta));
+    onActive(placed[next]);
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+    else if (e.key === 'Home') { e.preventDefault(); onActive(placed[0]); }
+    else if (e.key === 'End') { e.preventDefault(); onActive(placed[placed.length - 1]); }
+    else if (e.key === 'Escape') onActive(null);
+  };
+
+  return (
+    <div
+      ref={trackRef}
+      className={`spectro__track${tall ? ' spectro__track--tall' : ''}`}
+      role="group"
+      tabIndex={0}
+      aria-label={`${band ? band.name : 'All bands'}: use left and right arrow keys to move between items`}
+      onPointerMove={(e) => pick(e.clientX)}
+      onPointerDown={(e) => pick(e.clientX)}
+      onKeyDown={onKeyDown}
+    >
+      {placed.map((p) => {
+        const on = active && active.item === p.item;
+        return (
+          <i
+            key={`${p.band.key}-${p.item.title}`}
+            className={`spectro__line${p.item.future ? ' spectro__line--future' : ''}${on ? ' spectro__line--on' : ''}`}
+            style={{ left: `${p.x}px`, '--hue': p.band.hue }}
+          />
+        );
+      })}
+    </div>
   );
 };
 
 /**
  * The prism splits one beam into a spectrum; this splits a record into seven bands.
- * Collapsed it is a single barcode strip, expanded it is one row per band.
- * Every count comes from src/data/spectrum.js, so lines and totals cannot disagree.
+ * Collapsed it is a single strip, expanded it is one row per band. Everything is drawn from
+ * src/data/spectrum.js, so adding an item there is all it takes.
  */
 const Spectrograph = ({ lightMode = false }) => {
   const [expanded, setExpanded] = useState(false);
@@ -81,13 +156,8 @@ const Spectrograph = ({ lightMode = false }) => {
     () => spectrumBands.flatMap((band) => band.items.map((item) => ({ item, band }))),
     []
   );
-  const strip = useMemo(() => spread(all, 0.4), [all]);
   const rows = useMemo(
-    () =>
-      spectrumBands.map((band) => ({
-        band,
-        lines: spread(band.items.map((item) => ({ item, band })), 0.55)
-      })),
+    () => spectrumBands.map((band) => ({ band, entries: band.items.map((item) => ({ item, band })) })),
     []
   );
 
@@ -97,69 +167,78 @@ const Spectrograph = ({ lightMode = false }) => {
       aria-label="Record spectrograph"
     >
       <div className="spectro__head">
-        <span className="spectro__count">
-          <b>{spectrumTotal} dated items</b>, {SPECTRUM_START} to 2026
-        </span>
+        {!expanded && (
+          <ul className="spectro__legend" aria-hidden="true">
+            {spectrumBands.map((b) => (
+              <li key={b.key} style={{ '--hue': b.hue }}>{b.name}</li>
+            ))}
+          </ul>
+        )}
         <button
           type="button"
-          className="spectro__toggle"
+          className="spectro__toggle glass glass-interactive"
           aria-expanded={expanded}
-          aria-controls="spectro-body"
-          onClick={() => setExpanded((v) => !v)}
+          aria-label={expanded ? 'Collapse to one strip' : 'Split into seven bands'}
+          title={expanded ? 'Collapse' : 'Split the beam'}
+          onClick={() => { setExpanded((v) => !v); setActive(null); }}
         >
-          {expanded ? 'Collapse' : 'Split the beam'}
+          {expanded ? <FoldVertical size={18} /> : <UnfoldVertical size={18} />}
         </button>
       </div>
 
-      <div id="spectro-body" className="spectro__body">
+      <div className="spectro__body">
         {!expanded && (
           <>
-            <div className="spectro__track spectro__track--strip">
-              {strip.map((entry) => (
-                <Line key={`${entry.band.key}-${entry.item.title}`} entry={entry} active={active === entry} onActive={setActive} />
-              ))}
-            </div>
+            <Track entries={all} active={active} onActive={setActive} tall />
             <Axis />
           </>
         )}
 
         {expanded && (
           <div className="spectro__bands">
-            {rows.map(({ band, lines }) => (
+            {rows.map(({ band, entries }) => (
               <div className="spectro__row" key={band.key} style={{ '--hue': band.hue }}>
                 <a className="spectro__name" href={`#${band.section}`}>
                   <b>{band.name}</b>
                   <span>{band.sub}</span>
                 </a>
-                <div className="spectro__track">
-                  {lines.map((entry) => (
-                    <Line key={entry.item.title} entry={entry} active={active === entry} onActive={setActive} />
-                  ))}
+                <div className="spectro__lane">
+                  <Track band={band} entries={entries} active={active} onActive={setActive} />
                 </div>
               </div>
             ))}
-            <Axis />
+            <div className="spectro__axis-wrap"><Axis /></div>
           </div>
         )}
 
         <div className="spectro__readout" style={{ '--hue': active ? active.band.hue : 'currentColor' }} aria-live="polite">
           {active ? (
             <>
-              <span className="spectro__kicker">
-                {active.band.name} · {active.item.when}
-                {active.item.future ? ' · upcoming' : ''}
-              </span>
+              <span className="spectro__kicker">{active.band.name} · {active.item.when}{active.item.future ? ' · upcoming' : ''}</span>
               <span className="spectro__title">{active.item.title}</span>
               <span className="spectro__meta">
                 {active.item.meta}
-                {active.item.url ? ' · click the line to open the proof' : ''}
+                {active.item.url && (
+                  <a className="spectro__proof" href={active.item.url} target="_blank" rel="noopener noreferrer">
+                    View proof <ExternalLink size={13} />
+                  </a>
+                )}
               </span>
             </>
           ) : (
-            <span className="spectro__meta">Hover, focus or tap any line. Each one is a dated item from the record.</span>
+            <span className="spectro__meta">Slide across the lines to read each one.</span>
           )}
         </div>
       </div>
+
+      {/* Plain list for screen readers: every item with its proof link */}
+      <ul className="spectro__sr">
+        {all.map(({ item, band }) => (
+          <li key={`${band.key}-${item.title}`}>
+            {band.name}, {item.when}: {item.url ? <a href={item.url}>{item.title}</a> : item.title}. {item.meta}.
+          </li>
+        ))}
+      </ul>
     </section>
   );
 };
