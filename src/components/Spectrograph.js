@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FoldVertical, UnfoldVertical, ExternalLink } from 'lucide-react';
+import { ChevronDown, ExternalLink } from 'lucide-react';
 import { spectrumBands } from '../data/spectrum';
 import './Spectrograph.css';
 
@@ -163,7 +163,7 @@ const Spectrograph = ({ lightMode = false }) => {
 
   return (
     <section
-      className={`spectro glass ${lightMode ? 'spectro--light' : 'spectro--dark'}`}
+      className={`spectro ${expanded ? 'spectro--expanded glass' : 'spectro--collapsed'} ${lightMode ? 'spectro--light' : 'spectro--dark'}`}
       aria-label="Record spectrograph"
     >
       <div className="spectro__head">
@@ -176,13 +176,13 @@ const Spectrograph = ({ lightMode = false }) => {
         )}
         <button
           type="button"
-          className="spectro__toggle glass glass-interactive"
+          className="spectro__toggle"
           aria-expanded={expanded}
           aria-label={expanded ? 'Collapse to one strip' : 'Split into seven bands'}
-          title={expanded ? 'Collapse' : 'Split the beam'}
+          title={expanded ? 'Collapse' : 'Split into seven bands'}
           onClick={() => { setExpanded((v) => !v); setActive(null); }}
         >
-          {expanded ? <FoldVertical size={18} /> : <UnfoldVertical size={18} />}
+          <ChevronDown size={20} strokeWidth={1.75} className="spectro__chevron" />
         </button>
       </div>
 
@@ -211,7 +211,7 @@ const Spectrograph = ({ lightMode = false }) => {
           </div>
         )}
 
-        <div className="spectro__readout" style={{ '--hue': active ? active.band.hue : 'currentColor' }} aria-live="polite">
+        <div className={`spectro__readout${active ? '' : ' is-idle'}`} style={{ '--hue': active ? active.band.hue : 'currentColor' }} aria-live="polite">
           {active ? (
             <>
               <span className="spectro__kicker">{active.band.name} · {active.item.when}{active.item.future ? ' · upcoming' : ''}</span>

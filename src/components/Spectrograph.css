@@ -35,15 +35,28 @@
 .spectro__legend { flex: 1; display: flex; flex-wrap: wrap; gap: 2px 14px; margin: 0; padding: 0; list-style: none; font-size: 0.72rem; color: var(--mute); }
 .spectro__legend li::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--hue); }
 
-/* Matches the round glass toggles elsewhere on the page */
+/* Seamless chevron: no circle, no glass. It just rotates. */
 .spectro__toggle {
-  margin-left: auto;
-  width: 40px; height: 40px; padding: 0; flex: none;
-  border-radius: 50%; display: grid; place-items: center; color: inherit;
+  margin-left: auto; flex: none;
+  width: 44px; height: 44px; padding: 0; border: 0; border-radius: 12px;
+  display: grid; place-items: center; cursor: pointer;
+  background: transparent; color: var(--mute);
+  -webkit-tap-highlight-color: transparent;
 }
+.spectro__toggle:hover { color: inherit; }
+.spectro__chevron { transition: transform 0.25s ease; }
+.spectro--expanded .spectro__chevron { transform: rotate(180deg); }
 .spectro__toggle:focus-visible, .spectro__track:focus-visible, .spectro__name:focus-visible, .spectro__proof:focus-visible { outline: 2px solid #ff6b35; outline-offset: 3px; }
 
 .spectro__body { display: grid; gap: var(--space-100); }
+
+/* Collapsed: no panel at all, just the legend, strip and a faint hint over the scene */
+.spectro--collapsed { background: none; border: 0; box-shadow: none; padding-left: 0; padding-right: 0; }
+.spectro--collapsed .spectro__track { background: rgba(0, 0, 0, 0.22); }
+.spectro--light.spectro--collapsed .spectro__track { background: rgba(255, 255, 255, 0.35); }
+.spectro__readout.is-idle { background: none; border-color: transparent; text-align: center; justify-items: center; }
+.spectro__readout.is-idle .spectro__meta { opacity: 0.7; }
+.spectro--collapsed .spectro__readout.is-idle .spectro__meta { visibility: hidden; } /* keep the space so selecting a line does not shift the page */
 
 /* The whole track is the touch target; the lines are only drawn marks */
 .spectro__track {
@@ -115,7 +128,6 @@
   .spectro__readout { min-height: 92px; }
   .spectro__legend { font-size: 0.64rem; gap: 2px 9px; }
   .spectro__legend li::before { width: 6px; height: 6px; margin-right: 4px; }
-  .spectro__toggle { width: 44px; height: 44px; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -124,7 +136,6 @@
 
 /* Any touch screen, including tablets wider than the phone breakpoint */
 @media (pointer: coarse) {
-  .spectro__toggle { width: 44px; height: 44px; }
   .spectro__track { height: 52px; }
   .spectro__track--tall { height: 60px; }
 }
