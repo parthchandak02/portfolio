@@ -1,4 +1,4 @@
-/* Spectrograph: one strip that splits into seven glowing bands */
+/* Spectrograph: one strip that splits into seven bands */
 .spectro {
   position: relative;
   z-index: 16;
@@ -19,22 +19,21 @@
   --mute: rgba(255, 255, 255, 0.6);
   --well: rgba(0, 0, 0, 0.34);
   --edge: rgba(255, 255, 255, 0.12);
-  --core: #ffffff;
-  --glow: 1;
   --ink: 0;
+  --tick-ink: 0;
 }
 .spectro--light {
   color: rgba(20, 20, 24, 0.92);
   --mute: rgba(20, 20, 24, 0.62);
   --well: rgba(0, 0, 0, 0.05);
   --edge: rgba(0, 0, 0, 0.14);
-  --glow: 0.4;
-  --ink: 0.62; /* how much black is mixed into band colors used as text and line cores */
+  --ink: 0.38; /* black mixed into band colors so text stays legible on white */
+  --tick-ink: 0.1; /* ticks stay vivid */
 }
 
 .spectro__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-150); min-height: 40px; }
 .spectro__legend { flex: 1; display: flex; flex-wrap: wrap; gap: 2px 14px; margin: 0; padding: 0; list-style: none; font-size: 0.72rem; color: var(--mute); }
-.spectro__legend li::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--hue); box-shadow: 0 0 7px var(--hue); }
+.spectro__legend li::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--hue); }
 
 /* Matches the round glass toggles elsewhere on the page */
 .spectro__toggle {
@@ -62,24 +61,20 @@
   content: ""; position: absolute; left: 6px; right: 6px; top: 50%; height: 1px; background: var(--edge);
 }
 
-/* Slim lines with a white-hot core and a colored halo, like the light beam */
+/* Flat, crisp ticks: solid color, rounded ends, no halo. Only the selected tick gets a soft ring. */
 .spectro__line {
-  position: absolute; top: 50%; width: 2px; height: calc(100% - 16px);
+  position: absolute; top: 50%; width: 2px; height: calc(100% - 24px);
   transform: translate(-50%, -50%);
   border-radius: 2px; pointer-events: none;
-  background: linear-gradient(to bottom, transparent 0%, var(--hue) 20%, var(--core, color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000)) 50%, var(--hue) 80%, transparent 100%);
-  box-shadow:
-    0 0 3px 0 color-mix(in srgb, var(--hue) calc(100% * var(--glow) + 0%), transparent),
-    0 0 10px 1px color-mix(in srgb, var(--hue) calc(55% * var(--glow)), transparent);
-  opacity: 0.92;
+  background: color-mix(in srgb, var(--hue) calc((1 - var(--tick-ink)) * 100%), #000);
+  opacity: 0.9;
 }
 .spectro__line--on {
-  width: 3px; height: calc(100% - 6px); opacity: 1; z-index: 2;
-  box-shadow: 0 0 6px 1px var(--hue), 0 0 20px 3px color-mix(in srgb, var(--hue) 70%, transparent);
+  width: 3px; height: calc(100% - 12px); opacity: 1; z-index: 2;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--hue) 22%, transparent);
 }
-.spectro__line--future { /* upcoming: outlined, no glow */
-  background: transparent; box-shadow: none; opacity: 0.9;
-  width: 3px; border: 1px solid var(--hue);
+.spectro__line--future { /* upcoming: outlined */
+  background: transparent; opacity: 1; width: 3px; border: 1.5px solid var(--hue);
 }
 
 .spectro__axis { position: relative; height: 14px; font-size: 0.65rem; color: var(--mute); font-variant-numeric: tabular-nums; }
