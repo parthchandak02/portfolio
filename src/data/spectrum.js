@@ -127,8 +127,10 @@ export const spectrumBands = [
     name: 'Memberships',
     hue: '#6a8cff',
     items: [
-      { t: 2026.2, when: '2026', title: 'Sigma Xi', meta: 'Scientific research honor society' },
-      { t: 2026.3, when: '2026', title: 'IEEE Senior Member', meta: 'Elevated membership grade' }
+      { t: 2018.33, when: 'May 2018', title: 'Tau Beta Pi', meta: 'Engineering honor society' },
+      { t: 2025.25, when: 'Apr 2025', title: 'QuillBot Product Advisory Panel', meta: 'Advisory panel member' },
+      { t: 2026.09, when: 'Feb 2026', title: 'IEEE Senior Member', meta: 'Elevated membership grade' },
+      { t: 2026.17, when: 'Mar 2026', title: 'Sigma Xi', meta: 'Scientific research honor society' }
     ]
   },
   {

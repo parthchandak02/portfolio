@@ -664,7 +664,7 @@ export const timelineDataByCategory = {
   memberships: [
     {
         "title": "IEEE Senior Member",
-        "date": "2026",
+        "date": "February 2026",
         "category": "memberships",
         "description": "Elevated membership grade of the IEEE, awarded for professional achievement.",
         "skills": [
@@ -673,7 +673,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Sigma Xi, The Scientific Research Honor Society",
-        "date": "2026",
+        "date": "March 2026",
         "category": "memberships",
         "description": "Member of the scientific research honor society.",
         "skills": [
@@ -682,6 +682,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Tau Beta Pi, Engineering Honor Society",
+        "date": "May 2018",
         "category": "memberships",
         "description": "Member of the engineering honor society.",
         "skills": [
@@ -689,9 +690,10 @@ export const timelineDataByCategory = {
         ]
     },
     {
-        "title": "QuillBot Advisory Panel",
+        "title": "QuillBot Product Advisory Panel",
+        "date": "April 2025",
         "category": "memberships",
-        "description": "Member of the advisory panel for the QuillBot writing tool.",
+        "description": "Member of the product advisory panel for the QuillBot writing tool.",
         "skills": [
             "Advisor"
         ]
