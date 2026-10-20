@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { bandForSection } from '../data/spectrum';
 import { timelineDataByCategory } from '../data/timelineData';
 import { useWidth } from './Spectrograph';
@@ -7,6 +7,15 @@ import './BandBar.css';
 const EDGE = 6;
 const MIN_GAP = 6; // px between neighbouring ticks
 const LAB_TITLES = new Set(timelineDataByCategory.lab.map((card) => card.title));
+
+// Everything that scrolls under the bar fades out before it reaches it. Each element is faded on its
+// own (not the whole scroll area) so the glass cards keep their blur of the scene behind them.
+const FADE_SELECTOR = '.ui-typewriter-container, .spectro, .timeline__item > *';
+const clearFade = (el) => {
+  el.classList.remove('is-top-fading');
+  el.style.removeProperty('--fade-cut');
+  el.style.removeProperty('--fade-ramp');
+};
 
 // The Lab is one block on the page, so its projects all jump to that block
 const elementFor = (card) => {
@@ -47,6 +56,7 @@ const BandBar = ({ category, title, lightMode = false }) => {
   const [trackRef, width] = useWidth();
   const [peek, setPeek] = useState(null); // tick under the pointer or keyboard focus
   const [lastBand, setLastBand] = useState(null);
+  const navRef = useRef(null);
 
   // Keep the last band's content on screen while the bar fades out
   if (band && band !== lastBand) setLastBand(band);
@@ -54,6 +64,48 @@ const BandBar = ({ category, title, lightMode = false }) => {
   const visible = Boolean(band);
 
   const placed = useMemo(() => (shown ? layout(shown.items, width) : []), [shown, width]);
+
+  // Fade content out as it approaches the bar, so cards never run under it
+  useEffect(() => {
+    if (!visible) return undefined;
+    const scroller = document.querySelector('.main-content-scroll');
+    const nav = navRef.current;
+    if (!scroller || !nav) return undefined;
+
+    const ramp = window.innerWidth <= 1024 ? 44 : 56;
+    let frame = 0;
+    let touched = new Set();
+
+    const apply = () => {
+      frame = 0;
+      const cutoff = nav.getBoundingClientRect().bottom + 6;
+      const els = Array.from(scroller.querySelectorAll(FADE_SELECTOR));
+      const rects = els.map((el) => el.getBoundingClientRect()); // read everything before writing
+      const next = new Set();
+      els.forEach((el, i) => {
+        const r = rects[i];
+        if (r.bottom > 0 && r.top < cutoff + ramp) {
+          el.style.setProperty('--fade-cut', `${cutoff - r.top}px`);
+          el.style.setProperty('--fade-ramp', `${ramp}px`);
+          el.classList.add('is-top-fading');
+          next.add(el);
+        }
+      });
+      touched.forEach((el) => { if (!next.has(el)) clearFade(el); });
+      touched = next;
+    };
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(apply); };
+
+    apply();
+    scroller.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    return () => {
+      scroller.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      if (frame) cancelAnimationFrame(frame);
+      touched.forEach(clearFade);
+    };
+  }, [visible]);
 
   if (!shown) return null;
 
@@ -82,6 +134,7 @@ const BandBar = ({ category, title, lightMode = false }) => {
 
   return (
     <nav
+      ref={navRef}
       className={`bandbar ${visible ? 'is-visible' : ''} ${lightMode ? 'bandbar--light' : 'bandbar--dark'}`}
       aria-label="Where you are in the record"
       aria-hidden={!visible}

@@ -27,17 +27,18 @@ const useScrollHighlight = (activeFilter) => {
     }
 
     const containerRect = scrollContainer.getBoundingClientRect();
-    // Reading happens in the upper part of the screen, so follow the card nearest that line
-    const viewportCenter = containerRect.top + containerRect.height * 0.35;
+    // Reading happens just under the band bar, which is also where jumps land a card.
+    // The card on that line is the one you are on.
+    const readingLine = containerRect.top + 170;
 
-    // Check if timeline is meaningfully visible
+    // The band bar belongs to the record: it shows once the timeline has scrolled up to the top of the
+    // screen (not while the hero is still there), and goes away again after the last card
     const timeline = document.querySelector('.timeline');
     if (timeline) {
       const timelineRect = timeline.getBoundingClientRect();
-      const timelineVisibleHeight = Math.min(timelineRect.bottom, containerRect.bottom) - Math.max(timelineRect.top, containerRect.top);
-      const timelineVisibilityRatio = timelineVisibleHeight / timelineRect.height;
-      
-      if (timelineVisibilityRatio < 0.05) {
+      const reachedTop = timelineRect.top < containerRect.top + 220;
+      const stillOnScreen = timelineRect.bottom > containerRect.top + 80;
+      if (!reachedTop || !stillOnScreen) {
         setVisible((prev) => (prev.category === 'all' ? prev : { category: 'all', title: null }));
         lastKeyRef.current = 'all|';
         return;
@@ -47,22 +48,26 @@ const useScrollHighlight = (activeFilter) => {
     let centermostCategory = 'all';
     let centermostTitle = null;
     let smallestDistance = Infinity;
+    let onLine = null;
 
-    // Find the category of the item closest to viewport center
     timelineItems.forEach((item) => {
       const rect = item.getBoundingClientRect();
-      const itemCenter = rect.top + rect.height * 0.5;
-      const distanceFromCenter = Math.abs(itemCenter - viewportCenter);
+      if (rect.top <= readingLine && rect.bottom >= readingLine) onLine = item;
 
+      // Otherwise (the line is in a gap) fall back to the closest card
+      const distance = Math.abs(rect.top + rect.height * 0.5 - readingLine);
       const itemVisibleHeight = Math.min(rect.bottom, containerRect.bottom) - Math.max(rect.top, containerRect.top);
-      const itemVisibilityRatio = itemVisibleHeight / rect.height;
-
-      if (itemVisibilityRatio > 0.15 && distanceFromCenter < smallestDistance) {
-        smallestDistance = distanceFromCenter;
+      if (itemVisibleHeight / rect.height > 0.15 && distance < smallestDistance) {
+        smallestDistance = distance;
         centermostCategory = item.getAttribute('data-category') || 'all';
         centermostTitle = item.getAttribute('data-title');
       }
     });
+
+    if (onLine) {
+      centermostCategory = onLine.getAttribute('data-category') || 'all';
+      centermostTitle = onLine.getAttribute('data-title');
+    }
 
     // Only update if category changed (reduce unnecessary re-renders)
     const key = `${centermostCategory}|${centermostTitle}`;

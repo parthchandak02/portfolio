@@ -8,8 +8,8 @@
   padding: 10px 16px 8px;
   border-radius: 18px;
   opacity: 0; pointer-events: none;
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
-  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
   font-family: var(--font-family-primary);
   transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -17,25 +17,25 @@
 
 .bandbar--dark {
   color: rgba(255, 255, 255, 0.92); --mute: rgba(255, 255, 255, 0.6); --edge: rgba(255, 255, 255, 0.12); --ink: 0;
-  background: linear-gradient(to bottom, rgba(14, 14, 18, 0.66), rgba(14, 14, 18, 0.42));
+  background: linear-gradient(to bottom, rgba(14, 14, 18, 0.5), rgba(14, 14, 18, 0.3));
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 .bandbar--light {
   color: rgba(20, 20, 24, 0.92); --mute: rgba(20, 20, 24, 0.62); --edge: rgba(0, 0, 0, 0.14); --ink: 0.38;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.55));
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4));
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
-.bandbar__inner { display: grid; gap: 4px; }
+.bandbar__inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; min-width: 0; }
 @media (prefers-reduced-motion: no-preference) {
   .bandbar__inner { animation: bandbar-swap 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
   .bandbar__line { transition: width 0.12s, height 0.12s, opacity 0.2s, box-shadow 0.12s; }
 }
 @keyframes bandbar-swap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-.bandbar__top { display: flex; align-items: baseline; gap: 10px; min-height: 22px; }
+.bandbar__top { display: flex; align-items: baseline; gap: 10px; min-height: 22px; min-width: 0; }
 .bandbar__name {
   flex: none; padding: 0; border: 0; background: none; cursor: pointer; font: inherit;
   font-size: 0.84rem; font-weight: 700; letter-spacing: 0.02em;
@@ -68,4 +68,10 @@
   .bandbar { left: 12px; right: 72px; width: auto; transform: translateY(-16px); padding: 8px 14px 6px; border-radius: 16px; }
   .bandbar.is-visible { transform: none; }
   .bandbar__track { height: 40px; }
+}
+
+/* Content fades out as it nears the bar, so it never runs underneath it */
+.is-top-fading {
+  -webkit-mask-image: linear-gradient(to bottom, transparent var(--fade-cut), #000 calc(var(--fade-cut) + var(--fade-ramp)));
+  mask-image: linear-gradient(to bottom, transparent var(--fade-cut), #000 calc(var(--fade-cut) + var(--fade-ramp)));
 }
