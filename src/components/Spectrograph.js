@@ -43,11 +43,23 @@ const place = (entries, width) => {
   return sorted.map((e, i) => ({ ...e, x: pos[i] }));
 };
 
-const useWidth = () => {
-  const ref = useRef(null);
+// Measures an element's width, and re-measures whenever the element is mounted, replaced or resized.
+// The returned ref still exposes `.current`, so callers can read the element for pointer maths.
+export const useWidth = () => {
+  const nodeRef = useRef(null);
+  const [node, setNode] = useState(null);
   const [width, setWidth] = useState(720);
+
+  const ref = useMemo(() => {
+    const setter = (el) => {
+      nodeRef.current = el;
+      setNode(el);
+    };
+    Object.defineProperty(setter, 'current', { get: () => nodeRef.current });
+    return setter;
+  }, []);
+
   useEffect(() => {
-    const node = ref.current;
     if (!node) return undefined;
     const measure = () => setWidth(Math.max(120, Math.round(node.getBoundingClientRect().width)));
     measure();
@@ -58,7 +70,8 @@ const useWidth = () => {
     const observer = new ResizeObserver(measure);
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [node]);
+
   return [ref, width];
 };
 

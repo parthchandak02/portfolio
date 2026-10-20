@@ -5,9 +5,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
  * (decoupled from card expansion logic for better performance)
  */
 const useScrollHighlight = (activeFilter) => {
-  const [visibleCategory, setVisibleCategory] = useState('all');
+  const [visible, setVisible] = useState({ category: 'all', title: null });
   const throttleRef = useRef(false);
-  const lastCategoryRef = useRef('all');
+  const lastKeyRef = useRef('all|');
 
   const updateVisibleCategory = useCallback(() => {
     if (throttleRef.current) return;
@@ -27,7 +27,8 @@ const useScrollHighlight = (activeFilter) => {
     }
 
     const containerRect = scrollContainer.getBoundingClientRect();
-    const viewportCenter = containerRect.top + containerRect.height * 0.5;
+    // Reading happens in the upper part of the screen, so follow the card nearest that line
+    const viewportCenter = containerRect.top + containerRect.height * 0.35;
 
     // Check if timeline is meaningfully visible
     const timeline = document.querySelector('.timeline');
@@ -37,12 +38,14 @@ const useScrollHighlight = (activeFilter) => {
       const timelineVisibilityRatio = timelineVisibleHeight / timelineRect.height;
       
       if (timelineVisibilityRatio < 0.05) {
-        setVisibleCategory('all');
+        setVisible((prev) => (prev.category === 'all' ? prev : { category: 'all', title: null }));
+        lastKeyRef.current = 'all|';
         return;
       }
     }
 
     let centermostCategory = 'all';
+    let centermostTitle = null;
     let smallestDistance = Infinity;
 
     // Find the category of the item closest to viewport center
@@ -57,20 +60,22 @@ const useScrollHighlight = (activeFilter) => {
       if (itemVisibilityRatio > 0.15 && distanceFromCenter < smallestDistance) {
         smallestDistance = distanceFromCenter;
         centermostCategory = item.getAttribute('data-category') || 'all';
+        centermostTitle = item.getAttribute('data-title');
       }
     });
 
     // Only update if category changed (reduce unnecessary re-renders)
-    if (centermostCategory !== lastCategoryRef.current) {
-      lastCategoryRef.current = centermostCategory;
-      setVisibleCategory(centermostCategory);
+    const key = `${centermostCategory}|${centermostTitle}`;
+    if (key !== lastKeyRef.current) {
+      lastKeyRef.current = key;
+      setVisible({ category: centermostCategory, title: centermostTitle });
     }
   }, []);
 
   useEffect(() => {
     // Reset when not in 'all' mode
     if (activeFilter !== 'all') {
-      setVisibleCategory(activeFilter);
+      setVisible({ category: activeFilter, title: null });
       return;
     }
 
@@ -100,7 +105,8 @@ const useScrollHighlight = (activeFilter) => {
   }, [activeFilter, updateVisibleCategory]);
 
   return {
-    visibleCategory
+    visibleCategory: visible.category,
+    visibleTitle: visible.title
   };
 };
 

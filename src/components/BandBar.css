@@ -1,0 +1,71 @@
+/* A fogged-glass bar pinned to the top: only the band you are in, as a row of ticks */
+.bandbar {
+  position: fixed;
+  top: 14px; left: 50%;
+  width: min(760px, calc(100vw - 220px));
+  transform: translate(-50%, -16px);
+  z-index: 40;
+  padding: 10px 16px 8px;
+  border-radius: 18px;
+  opacity: 0; pointer-events: none;
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  backdrop-filter: blur(20px) saturate(1.3);
+  font-family: var(--font-family-primary);
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.bandbar.is-visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+
+.bandbar--dark {
+  color: rgba(255, 255, 255, 0.92); --mute: rgba(255, 255, 255, 0.6); --edge: rgba(255, 255, 255, 0.12); --ink: 0;
+  background: linear-gradient(to bottom, rgba(14, 14, 18, 0.66), rgba(14, 14, 18, 0.42));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.bandbar--light {
+  color: rgba(20, 20, 24, 0.92); --mute: rgba(20, 20, 24, 0.62); --edge: rgba(0, 0, 0, 0.14); --ink: 0.38;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.55));
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.bandbar__inner { display: grid; gap: 4px; }
+@media (prefers-reduced-motion: no-preference) {
+  .bandbar__inner { animation: bandbar-swap 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  .bandbar__line { transition: width 0.12s, height 0.12s, opacity 0.2s, box-shadow 0.12s; }
+}
+@keyframes bandbar-swap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.bandbar__top { display: flex; align-items: baseline; gap: 10px; min-height: 22px; }
+.bandbar__name {
+  flex: none; padding: 0; border: 0; background: none; cursor: pointer; font: inherit;
+  font-size: 0.84rem; font-weight: 700; letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000);
+}
+.bandbar__name:hover { text-decoration: underline; }
+.bandbar__label { min-width: 0; font-size: 0.78rem; color: var(--mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.bandbar__track {
+  position: relative; height: 32px; cursor: pointer; touch-action: pan-y; border-radius: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.bandbar__track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--edge); }
+.bandbar__track:focus-visible, .bandbar__name:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; }
+
+.bandbar__line {
+  position: absolute; top: 50%; width: 2px; height: 14px; transform: translate(-50%, -50%);
+  border-radius: 2px; pointer-events: none; opacity: 0.4;
+  background: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000);
+}
+.bandbar__line.is-current { opacity: 1; height: 22px; }
+.bandbar__line.is-peek {
+  opacity: 1; height: 26px; width: 3px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--hue) 22%, transparent);
+}
+.bandbar__line.is-future { background: transparent; border: 1.5px solid var(--hue); opacity: 0.9; }
+
+@media (max-width: 1024px) {
+  /* leave room for the round toggles on the right */
+  .bandbar { left: 12px; right: 72px; width: auto; transform: translateY(-16px); padding: 8px 14px 6px; border-radius: 16px; }
+  .bandbar.is-visible { transform: none; }
+  .bandbar__track { height: 40px; }
+}

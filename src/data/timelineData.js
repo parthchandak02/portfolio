@@ -612,11 +612,11 @@ export const timelineDataByCategory = {
         ]
     }
   ],
-  judging: [
+  review: [
     {
         "title": "Peer Reviewer, Springer Nature",
         "date": "February 2026 - September 2026",
-        "category": "judging",
+        "category": "review",
         "location": "BMC, Discover and Humanities and Social Sciences Communications journals",
         "description": "Certified peer reviews for Springer Nature journals: BMC Health Services Research (Feb 22, 2026), Discover Artificial Intelligence (Aug 11), Discover Education (Aug 23 and Sep 10), Humanities and Social Sciences Communications (Aug 23), Discover Sustainability (Sep 10) and Discover Oncology (Sep 18).",
         "typewriterTitle": "Reviewer",
@@ -625,7 +625,9 @@ export const timelineDataByCategory = {
             "Research",
             "Advisor"
         ]
-    },
+    }
+  ],
+  judging: [
     {
         "title": "Cal Hacks 13.0 (Upcoming)",
         "date": "October 23-25, 2026",
@@ -1027,7 +1029,7 @@ export const timelineDataByCategory = {
 };
 
 // Single source of truth for category ordering
-export const categoryOrder = ['experience', 'education', 'patent', 'judging', 'memberships', 'lab', 'projects', 'speaking', 'awards', 'research', 'media', 'volunteering'];
+export const categoryOrder = ['experience', 'education', 'volunteering', 'patent', 'research', 'review', 'judging', 'awards', 'speaking', 'media', 'memberships', 'lab', 'projects'];
 
 // Flattened timeline data for backward compatibility (computed from categories)
 export const timelineData = (() => {

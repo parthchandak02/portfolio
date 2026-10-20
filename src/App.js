@@ -6,7 +6,7 @@ import LightToggle from './components/LightToggle';
 import LockToggle from './components/LockToggle';
 import PlayModeToggle from './components/PlayModeToggle';
 import Timeline from './components/Timeline';
-import LeftSidebar from './components/LeftSidebar';
+import BandBar from './components/BandBar';
 import RightSidebar from './components/RightSidebar';
 import UITypewriter from './components/UITypewriter';
 import useLightMode from './hooks/useLightMode';
@@ -53,9 +53,6 @@ export default function App() {
   const { lightMode, toggleLightMode } = useLightMode(false);
   // Single source of truth for all mouse state
   const { isLocked, toggleLock, viewportPosition } = useGlobalMouse();
-  
-  // Filter state for the timeline - now supports multiple selected filters (toggle-based)
-  const [activeFilters, setActiveFilters] = useState([]);
   
   // Play mode state - toggle between interactive mode and resume reading mode.
   // First visit: play mode. Returning visitors, and anyone arriving on a #section link, get the record.
@@ -106,7 +103,6 @@ export default function App() {
       togglePlayMode();
       return;
     }
-    setActiveFilters([]);
     const timer = setTimeout(() => {
       const target = document.getElementById(hash);
       const scroller = document.querySelector('.main-content-scroll');
@@ -120,29 +116,8 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash, isPlayMode]);
 
-  // Track which category section is currently visible for sidebar highlighting
-  const { visibleCategory } = useScrollHighlight('all');
-
-  // Format filters for sidebar components
-  const filters = useMemo(() => {
-    return categories.map(category => ({
-      key: category,
-      label: category.charAt(0).toUpperCase() + category.slice(1)
-    }));
-  }, [categories]);
-
-  // Toggle filter function - single-select behavior (radio button style)
-  const toggleFilter = (categoryKey) => {
-    setActiveFilters(prev => {
-      if (prev.includes(categoryKey)) {
-        // If clicking the active filter, turn it off (show all)
-        return [];
-      } else {
-        // Turn off all others and activate only this one
-        return [categoryKey];
-      }
-    });
-  };
+  // Which section and card is in view, for the sticky band bar
+  const { visibleCategory, visibleTitle } = useScrollHighlight('all');
 
   // Sync html and body background with light mode to prevent edge bleeding
   useEffect(() => {
@@ -157,15 +132,6 @@ export default function App() {
       <Layout 
         lightMode={lightMode}
         darkMode={!lightMode}
-        leftSidebar={!isPlayMode && categories.length > 1 ? (
-          <LeftSidebar
-            filters={filters}
-            activeFilters={activeFilters}
-            visibleCategory={visibleCategory}
-            onFilterToggle={toggleFilter}
-            lightMode={lightMode}
-          />
-        ) : null}
         rightSidebar={!isPlayMode ? (
           <RightSidebar
             lightMode={lightMode}
@@ -185,6 +151,7 @@ export default function App() {
           <LightToggle lightMode={lightMode} onToggle={toggleLightMode} />
           <LockToggle isLocked={isLocked} onToggle={toggleLock} />
           <PlayModeToggle isPlayMode={isPlayMode} onToggle={togglePlayMode} />
+          {!isPlayMode && <BandBar category={visibleCategory} title={visibleTitle} lightMode={lightMode} />}
           
           {/* Main Content Area - Typewriter always shows, other content conditional */}
           <div className="main-content-scroll">
@@ -208,8 +175,6 @@ export default function App() {
                 </div>
                 <Timeline 
                  data={timelineData}
-                 activeFilters={activeFilters}
-                 showFilters={false} // Filters are now handled by LeftSidebar
                  lightMode={lightMode}
                  className="timeline-in-scroll"
                />

@@ -66,7 +66,7 @@ const Timeline = ({
               if (item.category === 'lab') {
                 if (index !== firstLabIndex) return null;
                 return (
-                  <div key="lab" className="timeline__item" data-category="lab" data-index={index} id="lab">
+                  <div key="lab" className="timeline__item" data-category="lab" data-title="Lab" data-index={index} id="lab">
                     <LabShowcase items={labItems} lightMode={lightMode} />
                   </div>
                 );
@@ -77,6 +77,7 @@ const Timeline = ({
                   key={item.title} 
                   className="timeline__item"
                   data-category={item.category?.toLowerCase() || 'other'}
+                  data-title={item.title}
                   data-index={index}
                   data-debug={`${item.category}-${index}`}
                   id={index === 0 || sortedData[index - 1].category !== item.category ? item.category?.toLowerCase() : undefined}
