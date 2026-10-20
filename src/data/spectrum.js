@@ -19,6 +19,14 @@ const startOf = (date = '') => {
   return month === -1 ? year + 0.5 : year + month / 12;
 };
 
+// "February 2022 - Present" -> Infinity; "2016 - 2018" -> 2018.5; single dates end where they start
+export const endOf = (date = '') => {
+  if (/present/i.test(date)) return Infinity;
+  const years = date.match(/\d{4}/g);
+  return years ? Number(years[years.length - 1]) + 0.5 : 0;
+};
+export { startOf };
+
 // One line per card, placed by the card's own start date
 const fromCards = (categories) =>
   categories.flatMap((category) =>

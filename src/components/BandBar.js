@@ -130,9 +130,11 @@ const BandBar = ({ category, title, lightMode = false }) => {
     } else if (e.key === 'Escape') setPeek(null);
   };
 
-  const label = peek ? peek.item.title : title || shown.name;
+  const label = peek ? peek.item.title : title || '';
 
   return (
+    <>
+    <div className={`bandbar-veil ${visible ? 'is-visible' : ''} ${lightMode ? 'bandbar-veil--light' : 'bandbar-veil--dark'}`} aria-hidden="true" />
     <nav
       ref={navRef}
       className={`bandbar ${visible ? 'is-visible' : ''} ${lightMode ? 'bandbar--light' : 'bandbar--dark'}`}
@@ -175,6 +177,7 @@ const BandBar = ({ category, title, lightMode = false }) => {
         </div>
       </div>
     </nav>
+    </>
   );
 };
 

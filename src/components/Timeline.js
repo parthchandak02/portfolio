@@ -3,6 +3,7 @@ import TimelineCard from './TimelineCard';
 import LabShowcase from './LabShowcase';
 import { useTypewriterHighlight } from '../contexts/TypewriterHighlightContext';
 import { categoryOrder } from '../data/timelineData';
+import { bandForSection, spectrumBands, startOf, endOf } from '../data/spectrum';
 import './Timeline.css';
 
 const Timeline = ({ 
@@ -26,27 +27,24 @@ const Timeline = ({
     return data.filter(item => activeFilters.includes(item.category?.toLowerCase()));
   }, [data, activeFilters]);
   
-  // Sort data by category first (when no filters active), then by date within each category
+  // Cards follow the bands of the spectrograph (Career, Patent, Research, ...), so a band's cards sit together.
+  // Inside a band, newest first by start date; ties put the longer or ongoing one first.
+  const bandIndex = (item) => {
+    const band = bandForSection(item.category?.toLowerCase());
+    return band ? spectrumBands.indexOf(band) : spectrumBands.length;
+  };
   const sortedData = useMemo(() => {
     return [...filteredData].sort((a, b) => {
       if (activeFilters.length === 0) {
-        // Use imported category order for sorting when showing all
-        const aCategoryIndex = categoryOrder.indexOf(a.category?.toLowerCase() || '');
-        const bCategoryIndex = categoryOrder.indexOf(b.category?.toLowerCase() || '');
-        
-        // If categories are different, sort by category order
-        if (aCategoryIndex !== bCategoryIndex) {
-          return aCategoryIndex - bCategoryIndex;
-        }
+        const byBand = bandIndex(a) - bandIndex(b);
+        if (byBand) return byBand;
+        const byCategory = categoryOrder.indexOf(a.category?.toLowerCase()) - categoryOrder.indexOf(b.category?.toLowerCase());
+        if (a.category === 'lab' || b.category === 'lab') { if (byCategory) return byCategory; }
       }
-      
-      // Within same category (or when filters are active), sort by date (newest first)
-      const dateA = new Date(a.date || '1900-01-01');
-      const dateB = new Date(b.date || '1900-01-01');
-      return dateB - dateA;
+      return startOf(b.date) - startOf(a.date) || endOf(b.date) - endOf(a.date);
     });
   }, [filteredData, activeFilters]);
-  
+
   // The Lab renders as one card of tiles, in the place of its first item
   const labItems = sortedData.filter((item) => item.category === 'lab');
   const firstLabIndex = sortedData.findIndex((item) => item.category === 'lab');
@@ -80,7 +78,7 @@ const Timeline = ({
                   data-title={item.title}
                   data-index={index}
                   data-debug={`${item.category}-${index}`}
-                  id={index === 0 || sortedData[index - 1].category !== item.category ? item.category?.toLowerCase() : undefined}
+                  id={sortedData.findIndex((d) => d.category === item.category) === index ? item.category?.toLowerCase() : undefined}
                 >
                   <TimelineCard
                     title={item.title}

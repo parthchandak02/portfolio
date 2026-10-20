@@ -68,3 +68,13 @@
   -webkit-mask-image: linear-gradient(to bottom, transparent var(--fade-cut), #000 calc(var(--fade-cut) + var(--fade-ramp)));
   mask-image: linear-gradient(to bottom, transparent var(--fade-cut), #000 calc(var(--fade-cut) + var(--fade-ramp)));
 }
+
+/* Safety net behind the bar: solid page color where the bar sits, easing out below it, so a fast scroll can
+   never show card text in the strip above the bar */
+.bandbar-veil {
+  position: fixed; top: 0; left: 0; right: 0; height: 150px; z-index: 39;
+  pointer-events: none; opacity: 0; transition: opacity 0.35s ease;
+}
+.bandbar-veil.is-visible { opacity: 1; }
+.bandbar-veil--dark { background: linear-gradient(to bottom, #000 0, #000 92px, rgba(0, 0, 0, 0) 100%); }
+.bandbar-veil--light { background: linear-gradient(to bottom, #fff 0, #fff 92px, rgba(255, 255, 255, 0) 100%); }

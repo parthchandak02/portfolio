@@ -31,20 +31,14 @@ const useScrollHighlight = (activeFilter) => {
     // The card on that line is the one you are on.
     const readingLine = containerRect.top + 170;
 
-    // The band bar belongs to the record: it shows once the timeline has scrolled up to the top of the
-    // screen (not while the hero is still there), and goes away again after the last card
-    const timeline = document.querySelector('.timeline');
-    if (timeline) {
-      const timelineRect = timeline.getBoundingClientRect();
-      const reachedTop = timelineRect.top < containerRect.top + 220;
-      const stillOnScreen = timelineRect.bottom > containerRect.top + 80;
-      if (!reachedTop || !stillOnScreen) {
-        setVisible((prev) => (prev.category === 'all' ? prev : { category: 'all', title: null }));
-        lastKeyRef.current = 'all|';
-        return;
-      }
+    // The bar appears with the first scroll and then stays: no leaving and coming back
+    if (scrollContainer.scrollTop < 40) {
+      setVisible((prev) => (prev.category === 'all' ? prev : { category: 'all', title: null }));
+      lastKeyRef.current = 'all|';
+      return;
     }
 
+    const timelineRect = (line) => timelineItems[0].getBoundingClientRect().top > line;
     let centermostCategory = 'all';
     let centermostTitle = null;
     let smallestDistance = Infinity;
@@ -67,6 +61,11 @@ const useScrollHighlight = (activeFilter) => {
     if (onLine) {
       centermostCategory = onLine.getAttribute('data-category') || 'all';
       centermostTitle = onLine.getAttribute('data-title');
+    } else if (centermostCategory === 'all') {
+      // Above the first card (still in the hero) show the first band; below the last card keep the last
+      const edge = timelineRect(readingLine) ? timelineItems[0] : timelineItems[timelineItems.length - 1];
+      centermostCategory = edge.getAttribute('data-category') || 'all';
+      centermostTitle = timelineRect(readingLine) ? null : edge.getAttribute('data-title');
     }
 
     // Only update if category changed (reduce unnecessary re-renders)
