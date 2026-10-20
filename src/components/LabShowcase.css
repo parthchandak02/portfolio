@@ -1,0 +1,97 @@
+/* The Lab: one glass card of tall tiles resting under fog */
+.lab { padding: var(--space-300); border-radius: 22px; width: 100%; }
+.lab--dark { color: rgba(255, 255, 255, 0.92); --lab-mute: rgba(255, 255, 255, 0.6); }
+.lab--light { color: rgba(20, 20, 24, 0.92); --lab-mute: rgba(20, 20, 24, 0.6); }
+
+.lab__head { display: grid; gap: 2px; }
+.lab__title { margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: 0.01em; }
+.lab__caption { margin: 0; font-size: 0.82rem; color: var(--lab-mute); }
+.lab__hint--touch { display: none; }
+@media (hover: none) {
+  .lab__hint--mouse { display: none; }
+  .lab__hint--touch { display: inline; }
+}
+
+.lab__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: var(--space-250);
+}
+
+.lab-tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 4.4;
+  border-radius: 16px;
+  overflow: hidden;
+  clip-path: inset(0 round 16px); /* keeps the image and the blurred fog inside the rounded corners */
+  isolation: isolate;
+  color: #fff;
+  text-decoration: none;
+  background: #0b0b0e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.lab-tile:focus-visible { outline: 2px solid #ff6b35; outline-offset: 3px; }
+
+.lab-tile__img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 30%;
+  transform: scale(1.1);
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* The fog: frosted, darkened, with the project name resting low in it */
+.lab-tile__fog {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 2px;
+  padding: 14px;
+  border-radius: inherit;
+  background: linear-gradient(to top, rgba(12, 12, 16, 0.82) 0%, rgba(12, 12, 16, 0.42) 55%, rgba(12, 12, 16, 0.12) 100%);
+  -webkit-backdrop-filter: blur(9px) saturate(1.2);
+  backdrop-filter: blur(9px) saturate(1.2);
+  transition: opacity 0.6s ease;
+}
+.lab--light .lab-tile__fog {
+  color: rgba(20, 20, 24, 0.92);
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.5) 55%, rgba(255, 255, 255, 0.18) 100%);
+}
+.lab-tile__name { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.01em; }
+.lab-tile__tag { font-size: 0.7rem; opacity: 0.7; }
+
+/* What shows once the fog lifts */
+.lab-tile__reveal {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 44px 14px 14px;
+  background: linear-gradient(to top, rgba(8, 8, 10, 0.94) 0%, rgba(8, 8, 10, 0.7) 55%, transparent 100%);
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.5s ease 0.1s, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s;
+  pointer-events: none;
+}
+.lab-tile__desc {
+  font-size: 0.74rem; line-height: 1.4; color: rgba(255, 255, 255, 0.82);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.lab-tile__open { display: inline-flex; align-items: center; gap: 3px; margin-top: 2px; font-size: 0.74rem; font-weight: 600; color: #ff8a5c; }
+
+/* Fog lifts: tap (is-open), keyboard focus, or mouse hover */
+.lab-tile.is-open .lab-tile__fog, .lab-tile:focus-visible .lab-tile__fog { opacity: 0; }
+.lab-tile.is-open .lab-tile__img, .lab-tile:focus-visible .lab-tile__img { transform: scale(1); }
+.lab-tile.is-open .lab-tile__reveal, .lab-tile:focus-visible .lab-tile__reveal { opacity: 1; transform: none; }
+@media (hover: hover) {
+  .lab-tile:hover .lab-tile__fog { opacity: 0; }
+  .lab-tile:hover .lab-tile__img { transform: scale(1); }
+  .lab-tile:hover .lab-tile__reveal { opacity: 1; transform: none; }
+}
+
+@media (max-width: 560px) {
+  .lab { padding: var(--space-200); border-radius: 18px; }
+  .lab__grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-tile__img, .lab-tile__fog, .lab-tile__reveal { transition: none; }
+}

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import TimelineCard from './TimelineCard';
+import LabShowcase from './LabShowcase';
 import { useTypewriterHighlight } from '../contexts/TypewriterHighlightContext';
 import { categoryOrder } from '../data/timelineData';
 import './Timeline.css';
@@ -46,6 +47,10 @@ const Timeline = ({
     });
   }, [filteredData, activeFilters]);
   
+  // The Lab renders as one card of tiles, in the place of its first item
+  const labItems = sortedData.filter((item) => item.category === 'lab');
+  const firstLabIndex = sortedData.findIndex((item) => item.category === 'lab');
+
   return (
     <div className={`timeline ${lightMode ? 'timeline--light' : 'timeline--dark'} ${className}`} {...props}>
       
@@ -58,8 +63,15 @@ const Timeline = ({
         <div className="timeline__items">
           {sortedData.length > 0 ? (
             sortedData.map((item, index) => {
-              // REMOVED: Scroll-based expansion logic
-              
+              if (item.category === 'lab') {
+                if (index !== firstLabIndex) return null;
+                return (
+                  <div key="lab" className="timeline__item" data-category="lab" data-index={index} id="lab">
+                    <LabShowcase items={labItems} lightMode={lightMode} />
+                  </div>
+                );
+              }
+
               return (
                 <div 
                   key={item.title} 
