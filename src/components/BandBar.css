@@ -1,15 +1,12 @@
-/* A fogged-glass bar pinned to the top: only the band you are in, as a row of ticks */
+/* The band bar: no panel, just the band and its ticks floating at the top. Content fades out before it. */
 .bandbar {
   position: fixed;
   top: 14px; left: 50%;
   width: min(760px, calc(100vw - 220px));
   transform: translate(-50%, -16px);
   z-index: 40;
-  padding: 10px 16px 8px;
-  border-radius: 18px;
+  padding: 10px 4px 8px;
   opacity: 0; pointer-events: none;
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  backdrop-filter: blur(14px) saturate(1.2);
   font-family: var(--font-family-primary);
   transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -17,15 +14,11 @@
 
 .bandbar--dark {
   color: rgba(255, 255, 255, 0.92); --mute: rgba(255, 255, 255, 0.6); --edge: rgba(255, 255, 255, 0.12); --ink: 0;
-  background: linear-gradient(to bottom, rgba(14, 14, 18, 0.5), rgba(14, 14, 18, 0.3));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.55);
 }
 .bandbar--light {
   color: rgba(20, 20, 24, 0.92); --mute: rgba(20, 20, 24, 0.62); --edge: rgba(0, 0, 0, 0.14); --ink: 0.38;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4));
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.7);
 }
 
 .bandbar__inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; min-width: 0; }
@@ -65,7 +58,7 @@
 
 @media (max-width: 1024px) {
   /* leave room for the round toggles on the right */
-  .bandbar { left: 12px; right: 72px; width: auto; transform: translateY(-16px); padding: 8px 14px 6px; border-radius: 16px; }
+  .bandbar { left: 12px; right: 72px; width: auto; transform: translateY(-16px); padding: 8px 2px 6px; }
   .bandbar.is-visible { transform: none; }
   .bandbar__track { height: 40px; }
 }

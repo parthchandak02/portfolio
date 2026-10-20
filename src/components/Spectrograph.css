@@ -30,7 +30,6 @@
 
 /* Collapsed: the strip with the chevron beside it */
 .spectro__strip { display: grid; grid-template-columns: 1fr 44px; align-items: center; column-gap: 4px; row-gap: 6px; }
-.spectro__strip .spectro__axis { grid-column: 1; }
 
 /* Expanded: the chevron sits at the top right, then the lanes */
 .spectro__head { display: flex; justify-content: flex-end; margin-bottom: -8px; }
@@ -72,17 +71,12 @@
 /* While one line is selected, the rest step back so it reads clearly */
 .spectro--picking .spectro__line:not(.spectro__line--on):not(.spectro__line--future) { opacity: 0.36; }
 
-.spectro__axis { position: relative; height: 14px; font-size: 0.65rem; color: var(--mute); font-variant-numeric: tabular-nums; }
-.spectro__axis span { position: absolute; transform: translateX(-50%); }
-.spectro__axis span.is-first { transform: translateX(-4px); }
 
 .spectro__bands { display: grid; }
 .spectro__row { display: grid; grid-template-columns: 120px 1fr; align-items: center; gap: var(--space-150); padding: 2px 0; }
 .spectro__lane { min-width: 0; }
-.spectro__axis-wrap { margin-left: calc(120px + var(--space-150)); }
 .spectro__name { display: grid; gap: 1px; text-decoration: none; color: inherit; line-height: 1.2; }
 .spectro__name b { color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); font-weight: 700; font-size: 0.82rem; }
-.spectro__name span { color: var(--mute); font-size: 0.68rem; }
 .spectro__name:hover b { text-decoration: underline; }
 
 /* Lanes slide out of the strip one after another */
@@ -93,15 +87,16 @@
 @keyframes spectro-unfold { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: none; } }
 
 .spectro__readout {
-  min-height: 78px; padding: 0.65rem 0.85rem; border-radius: 12px; border: 1px solid var(--edge); background: var(--well);
-  display: grid; gap: 2px; align-content: center;
+  box-sizing: border-box; height: 104px; padding: 0.7rem 0.9rem; border-radius: 12px; border: 1px solid var(--edge); background: var(--well);
+  display: grid; grid-template-rows: auto 1fr auto; align-content: center; gap: 2px; overflow: hidden;
 }
-.spectro__readout.is-idle { background: none; border-color: transparent; text-align: center; justify-items: center; }
+.spectro__readout.is-idle { background: none; border-color: transparent; text-align: center; justify-items: center; grid-template-rows: 1fr; }
 .spectro__readout.is-idle .spectro__meta { opacity: 0.7; }
 .spectro--collapsed .spectro__readout.is-idle .spectro__meta { visibility: hidden; } /* keep the space so selecting a line does not shift the page */
 .spectro__kicker { font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); font-weight: 700; }
-.spectro__title { font-size: 0.95rem; font-weight: 700; line-height: 1.3; }
-.spectro__meta { font-size: 0.78rem; color: var(--mute); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.spectro__title { font-size: 0.95rem; font-weight: 700; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; align-self: center; }
+.spectro__metatext { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.spectro__meta { font-size: 0.78rem; color: var(--mute); display: flex; align-items: center; gap: 4px 12px; min-width: 0; }
 .spectro__proof { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 2px; color: #ff6b35; font-weight: 600; text-decoration: none; }
 .spectro--light .spectro__proof { color: #c2410c; }
 .spectro__proof:hover { text-decoration: underline; }
@@ -110,10 +105,7 @@
 
 @media (max-width: 720px) {
   .spectro__row { grid-template-columns: 1fr; gap: 0; padding: 4px 0 2px; }
-  .spectro__axis-wrap { margin-left: 0; }
-  .spectro__name { display: flex; gap: 8px; align-items: baseline; }
   .spectro__track--lane { height: 44px; }
-  .spectro__readout { min-height: 92px; }
 }
 
 /* Any touch screen, including tablets wider than the phone breakpoint */

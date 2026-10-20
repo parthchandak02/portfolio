@@ -13,7 +13,6 @@ const KNOTS = [
   [2026, 0.8],
   [2027, 1]
 ];
-const AXIS_YEARS = [2015, 2020, 2023, 2025, 2026];
 const MIN_GAP = 3.5; // px between neighbouring lines
 const EDGE = 4; // px kept free at each end of a track
 
@@ -73,27 +72,6 @@ export const useWidth = () => {
   }, [node]);
 
   return [ref, width];
-};
-
-const MIN_LABEL_GAP = 38; // px; labels closer than this to the previous one are dropped
-
-const Axis = () => {
-  const [ref, width] = useWidth();
-  let lastX = -Infinity;
-  const labels = AXIS_YEARS.map((year) => ({ year, x: EDGE + warp(year) * (width - EDGE * 2) })).filter((l) => {
-    if (l.x - lastX < MIN_LABEL_GAP) return false;
-    lastX = l.x;
-    return true;
-  });
-  return (
-    <div className="spectro__axis" ref={ref} aria-hidden="true">
-      {labels.map((l, i) => (
-        <span key={l.year} className={i === 0 ? 'is-first' : ''} style={{ left: `${l.x}px` }}>
-          {l.year}
-        </span>
-      ))}
-    </div>
-  );
 };
 
 /**
@@ -196,7 +174,6 @@ const Spectrograph = ({ lightMode = false }) => {
         <div className="spectro__strip">
           <Track entries={all} active={active} onActive={setActive} tall />
           {toggle}
-          <Axis />
         </div>
       )}
 
@@ -208,14 +185,12 @@ const Spectrograph = ({ lightMode = false }) => {
               <div className="spectro__row" key={band.key} style={{ '--hue': band.hue, '--i': i }}>
                 <a className="spectro__name" href={`#${band.section}`}>
                   <b>{band.name}</b>
-                  <span>{band.sub}</span>
                 </a>
                 <div className="spectro__lane">
                   <Track band={band} entries={entries} active={active} onActive={setActive} lane />
                 </div>
               </div>
             ))}
-            <div className="spectro__axis-wrap"><Axis /></div>
           </div>
         </>
       )}
@@ -226,7 +201,7 @@ const Spectrograph = ({ lightMode = false }) => {
             <span className="spectro__kicker">{active.band.name} · {active.item.when}{active.item.future ? ' · upcoming' : ''}</span>
             <span className="spectro__title">{active.item.title}</span>
             <span className="spectro__meta">
-              {active.item.meta}
+              <span className="spectro__metatext">{active.item.meta}</span>
               {active.item.url && (
                 <a className="spectro__proof" href={active.item.url} target="_blank" rel="noopener noreferrer">
                   View proof <ExternalLink size={13} />

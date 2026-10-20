@@ -5,7 +5,7 @@ import './LabShowcase.css';
 const openLabel = (url) => (url.includes('github.com') ? 'View on GitHub' : 'Open live site');
 
 /**
- * The Lab: one glass card holding tall portrait tiles. Each tile rests under frosted fog;
+ * The Lab: tall portrait tiles on the page itself, with no card around them. Each tile rests under frosted fog;
  * hovering (mouse), focusing (keyboard) or the first tap (touch) lifts the fog to show the
  * project, its description and a link. On touch, the second tap follows the link.
  */
@@ -31,15 +31,8 @@ const LabShowcase = ({ items = [], lightMode = false }) => {
   };
 
   return (
-    <div className={`lab glass glass-strong ${lightMode ? 'lab--light' : 'lab--dark'}`}>
-      <div className="lab__head">
-        <h3 className="lab__title">Lab</h3>
-        <p className="lab__caption">
-          Things I build and ship.
-          <span className="lab__hint lab__hint--mouse"> Hover a card to see it.</span>
-          <span className="lab__hint lab__hint--touch"> Tap a card to see it.</span>
-        </p>
-      </div>
+    <div className={`lab ${lightMode ? 'lab--light' : 'lab--dark'}`}>
+      <h3 className="lab__sr">Lab</h3>
 
       <div className="lab__grid">
         {items.map((item) => (

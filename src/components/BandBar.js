@@ -130,7 +130,7 @@ const BandBar = ({ category, title, lightMode = false }) => {
     } else if (e.key === 'Escape') setPeek(null);
   };
 
-  const label = peek ? peek.item.title : title && title !== 'Lab' ? title : shown.name;
+  const label = peek ? peek.item.title : title || shown.name;
 
   return (
     <nav

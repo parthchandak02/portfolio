@@ -40,16 +40,14 @@ export const spectrumBands = [
   {
     key: 'career',
     name: 'Career',
-    sub: 'roles and study',
     hue: '#e4dccf',
     sections: ['experience', 'education', 'volunteering'],
     items: careerItems
   },
   {
-    key: 'invent',
+    key: 'patent',
     sections: ['patent'],
-    name: 'Invent',
-    sub: 'patent',
+    name: 'Patent',
     hue: '#ff5a52',
     items: [
       { t: 2024.49, when: 'Jun 2024', title: 'Audio prioritization, application filed', meta: 'Named inventor', url: 'https://patents.google.com/patent/US20260003563A1/en' },
@@ -58,10 +56,9 @@ export const spectrumBands = [
     ]
   },
   {
-    key: 'publish',
+    key: 'research',
     sections: ['research'],
-    name: 'Publish',
-    sub: 'journal papers',
+    name: 'Research',
     hue: '#ff9a3d',
     items: [
       { t: 2019.5, when: '2019', title: 'Growth and characterization of cadmium telluride', meta: 'IJFMR' },
@@ -84,10 +81,9 @@ export const spectrumBands = [
     ]
   },
   {
-    key: 'review',
-    sections: ['review'],
-    name: 'Review',
-    sub: 'peer review',
+    key: 'judging',
+    sections: ['judging'],
+    name: 'Judging',
     hue: '#f2d34a',
     items: [
       { t: 2026.14, when: 'Feb 22, 2026', title: 'BMC Health Services Research', meta: 'Peer reviewer, Springer Nature' },
@@ -96,26 +92,16 @@ export const spectrumBands = [
       { t: 2026.65, when: 'Aug 23, 2026', title: 'Humanities and Social Sciences Communications', meta: 'Peer reviewer, Springer Nature' },
       { t: 2026.69, when: 'Sep 10, 2026', title: 'Discover Education, re-review', meta: 'Peer reviewer, Springer Nature' },
       { t: 2026.7, when: 'Sep 10, 2026', title: 'Discover Sustainability', meta: 'Peer reviewer, Springer Nature' },
-      { t: 2026.72, when: 'Sep 18, 2026', title: 'Discover Oncology', meta: 'Peer reviewer, Springer Nature' }
-    ]
-  },
-  {
-    key: 'judge',
-    sections: ['judging'],
-    name: 'Judge',
-    sub: 'hackathons',
-    hue: '#62d98a',
-    items: [
+      { t: 2026.72, when: 'Sep 18, 2026', title: 'Discover Oncology', meta: 'Peer reviewer, Springer Nature' },
       { t: 2026.18, when: 'Mar 8, 2026', title: 'HackMerced XI', meta: 'Judge, MLH and UC Merced' },
       { t: 2026.32, when: 'Apr 26, 2026', title: 'LA Hacks 2026', meta: 'Invite-only judge, 1,000+ students' },
       { t: 2026.81, when: 'Oct 23-25, 2026', title: 'Cal Hacks 13.0', meta: 'Accepted to judge, upcoming', future: true }
     ]
   },
   {
-    key: 'honor',
+    key: 'recognition',
     sections: ['awards', 'speaking', 'media'],
-    name: 'Recognized',
-    sub: 'awards, talks and press',
+    name: 'Recognition',
     hue: '#4dd0e1',
     items: [
       { t: 2015.6, when: '2015', title: 'Robert W. Finch Memorial Scholarship', meta: 'Washington State University' },
@@ -128,10 +114,9 @@ export const spectrumBands = [
     ]
   },
   {
-    key: 'belong',
+    key: 'memberships',
     sections: ['memberships'],
-    name: 'Belong',
-    sub: 'memberships',
+    name: 'Memberships',
     hue: '#6a8cff',
     items: [
       { t: 2026.2, when: '2026', title: 'Sigma Xi', meta: 'Scientific research honor society' },
@@ -139,10 +124,9 @@ export const spectrumBands = [
     ]
   },
   {
-    key: 'build',
+    key: 'projects',
     sections: ['lab', 'projects'],
-    name: 'Build',
-    sub: 'lab and projects',
+    name: 'Projects',
     hue: '#b07cff',
     items: [
       { t: 2026.51, when: '2026', title: 'wc26', meta: 'World Cup 2026 map', url: 'https://wc26.parthchandak.info' },
@@ -176,8 +160,8 @@ const findCard = (title) => {
   return bestScore >= 0.75 ? best.title : null;
 };
 
-// Lines that describe a group (one patent family, seven reviews) point at that group's single card
-const CARD_FOR_BAND = { invent: 'Audio Prioritization (US20260003563A1)', review: 'Peer Reviewer, Springer Nature' };
+// Lines that describe a group (one patent family, seven peer reviews) point at that group's single card
+const CARD_FOR_BAND = { patent: 'Audio Prioritization (US20260003563A1)' };
 const CARD_OVERRIDES = {
   'ICETAIA 2025, invited keynote': 'A Practical Framework for Rapid Prototyping and Fidelity in Product Development'
 };
@@ -185,6 +169,7 @@ const CARD_OVERRIDES = {
 spectrumBands.forEach((band) => {
   band.section = band.sections[0];
   band.items.forEach((item) => {
+    if (!item.card && item.meta.startsWith('Peer reviewer')) item.card = 'Peer Reviewer, Springer Nature';
     if (!item.card) item.card = CARD_FOR_BAND[band.key] || CARD_OVERRIDES[item.title] || findCard(item.title);
   });
 });

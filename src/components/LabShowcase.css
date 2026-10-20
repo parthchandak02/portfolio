@@ -1,22 +1,11 @@
 /* The Lab: one glass card of tall tiles resting under fog */
-.lab { padding: var(--space-300); border-radius: 22px; width: 100%; }
-.lab--dark { color: rgba(255, 255, 255, 0.92); --lab-mute: rgba(255, 255, 255, 0.6); }
-.lab--light { color: rgba(20, 20, 24, 0.92); --lab-mute: rgba(20, 20, 24, 0.6); }
-
-.lab__head { display: grid; gap: 2px; }
-.lab__title { margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: 0.01em; }
-.lab__caption { margin: 0; font-size: 0.82rem; color: var(--lab-mute); }
-.lab__hint--touch { display: none; }
-@media (hover: none) {
-  .lab__hint--mouse { display: none; }
-  .lab__hint--touch { display: inline; }
-}
+.lab { width: 100%; }
+.lab__sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 .lab__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 12px;
-  margin-top: var(--space-250);
 }
 
 .lab-tile {
@@ -88,7 +77,6 @@
 }
 
 @media (max-width: 560px) {
-  .lab { padding: var(--space-200); border-radius: 18px; }
   .lab__grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
 }
 
