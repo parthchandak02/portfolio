@@ -1,44 +1,24 @@
-/* Spectrograph: one strip that splits into seven bands */
+/* Spectrograph: one quiet strip that unfolds into seven lanes. No panels, so the scene stays visible. */
 .spectro {
   position: relative;
   z-index: 16;
-  flex-shrink: 0; /* the scroll container is a flex column and this card has overflow:hidden */
+  flex-shrink: 0;
   pointer-events: auto;
   width: 100%;
   max-width: 880px;
   margin: 0 auto var(--space-400) auto;
-  padding: var(--space-150) var(--space-250) var(--space-250);
-  border-radius: 18px;
+  padding: var(--space-100) 0 var(--space-200);
   display: grid;
   gap: var(--space-100);
   font-family: var(--font-family-primary);
 }
 
-.spectro--dark {
-  color: rgba(255, 255, 255, 0.92);
-  --mute: rgba(255, 255, 255, 0.6);
-  --well: rgba(0, 0, 0, 0.34);
-  --edge: rgba(255, 255, 255, 0.12);
-  --ink: 0;
-  --tick-ink: 0;
-}
-.spectro--light {
-  color: rgba(20, 20, 24, 0.92);
-  --mute: rgba(20, 20, 24, 0.62);
-  --well: rgba(0, 0, 0, 0.05);
-  --edge: rgba(0, 0, 0, 0.14);
-  --ink: 0.38; /* black mixed into band colors so text stays legible on white */
-  --tick-ink: 0.1; /* ticks stay vivid */
-}
-
-.spectro__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-150); min-height: 40px; }
-.spectro__legend { flex: 1; display: flex; flex-wrap: wrap; gap: 2px 14px; margin: 0; padding: 0; list-style: none; font-size: 0.72rem; color: var(--mute); }
-.spectro__legend li::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--hue); }
+.spectro--dark { color: rgba(255, 255, 255, 0.92); --mute: rgba(255, 255, 255, 0.58); --well: rgba(0, 0, 0, 0.24); --edge: rgba(255, 255, 255, 0.14); --ink: 0; --tick-ink: 0; }
+.spectro--light { color: rgba(20, 20, 24, 0.92); --mute: rgba(20, 20, 24, 0.62); --well: rgba(255, 255, 255, 0.4); --edge: rgba(0, 0, 0, 0.16); --ink: 0.38; --tick-ink: 0.1; }
 
 /* Seamless chevron: no circle, no glass. It just rotates. */
 .spectro__toggle {
-  margin-left: auto; flex: none;
-  width: 44px; height: 44px; padding: 0; border: 0; border-radius: 12px;
+  flex: none; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 12px;
   display: grid; place-items: center; cursor: pointer;
   background: transparent; color: var(--mute);
   -webkit-tap-highlight-color: transparent;
@@ -48,15 +28,12 @@
 .spectro--expanded .spectro__chevron { transform: rotate(180deg); }
 .spectro__toggle:focus-visible, .spectro__track:focus-visible, .spectro__name:focus-visible, .spectro__proof:focus-visible { outline: 2px solid #ff6b35; outline-offset: 3px; }
 
-.spectro__body { display: grid; gap: var(--space-100); }
+/* Collapsed: the strip with the chevron beside it */
+.spectro__strip { display: grid; grid-template-columns: 1fr 44px; align-items: center; column-gap: 4px; row-gap: 6px; }
+.spectro__strip .spectro__axis { grid-column: 1; }
 
-/* Collapsed: no panel at all, just the legend, strip and a faint hint over the scene */
-.spectro--collapsed { background: none; border: 0; box-shadow: none; padding-left: 0; padding-right: 0; }
-.spectro--collapsed .spectro__track { background: rgba(0, 0, 0, 0.22); }
-.spectro--light.spectro--collapsed .spectro__track { background: rgba(255, 255, 255, 0.35); }
-.spectro__readout.is-idle { background: none; border-color: transparent; text-align: center; justify-items: center; }
-.spectro__readout.is-idle .spectro__meta { opacity: 0.7; }
-.spectro--collapsed .spectro__readout.is-idle .spectro__meta { visibility: hidden; } /* keep the space so selecting a line does not shift the page */
+/* Expanded: the chevron sits at the top right, then the lanes */
+.spectro__head { display: flex; justify-content: flex-end; margin-bottom: -8px; }
 
 /* The whole track is the touch target; the lines are only drawn marks */
 .spectro__track {
@@ -70,9 +47,14 @@
   -webkit-tap-highlight-color: transparent;
 }
 .spectro__track--tall { height: 60px; }
-.spectro__track::before { /* faint baseline the lines stand on, like the beam */
-  content: ""; position: absolute; left: 6px; right: 6px; top: 50%; height: 1px; background: var(--edge);
+.spectro__track::before { /* faint baseline the lines stand on */
+  content: ""; position: absolute; left: 8px; right: 8px; top: 50%; height: 1px; background: var(--edge);
 }
+
+/* Lanes have no box at all: just a hairline with ticks on it */
+.spectro__track--lane { height: 44px; border: 0; background: none; border-radius: 6px; }
+.spectro__track--lane::before { left: 0; right: 0; }
+.spectro__track--lane .spectro__line { height: calc(100% - 18px); }
 
 /* Flat, crisp ticks: solid color, rounded ends, no halo. Only the selected tick gets a soft ring. */
 .spectro__line {
@@ -82,60 +64,61 @@
   background: color-mix(in srgb, var(--hue) calc((1 - var(--tick-ink)) * 100%), #000);
   opacity: 0.9;
 }
-.spectro__line--on {
-  width: 3px; height: calc(100% - 12px); opacity: 1; z-index: 2;
+.spectro__line--on, .spectro__track--lane .spectro__line--on {
+  width: 3px; height: calc(100% - 6px); opacity: 1; z-index: 2;
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--hue) 22%, transparent);
 }
-.spectro__line--future { /* upcoming: outlined */
-  background: transparent; opacity: 1; width: 3px; border: 1.5px solid var(--hue);
-}
+.spectro__line--future { background: transparent; opacity: 1; width: 3px; border: 1.5px solid var(--hue); }
+/* While one line is selected, the rest step back so it reads clearly */
+.spectro--picking .spectro__line:not(.spectro__line--on):not(.spectro__line--future) { opacity: 0.36; }
 
 .spectro__axis { position: relative; height: 14px; font-size: 0.65rem; color: var(--mute); font-variant-numeric: tabular-nums; }
 .spectro__axis span { position: absolute; transform: translateX(-50%); }
 .spectro__axis span.is-first { transform: translateX(-4px); }
 
 .spectro__bands { display: grid; }
-.spectro__row { display: grid; grid-template-columns: 136px 1fr; align-items: center; gap: var(--space-100); padding: 5px 0; }
+.spectro__row { display: grid; grid-template-columns: 120px 1fr; align-items: center; gap: var(--space-150); padding: 2px 0; }
 .spectro__lane { min-width: 0; }
-.spectro__axis-wrap { margin-left: calc(136px + var(--space-100)); }
+.spectro__axis-wrap { margin-left: calc(120px + var(--space-150)); }
 .spectro__name { display: grid; gap: 1px; text-decoration: none; color: inherit; line-height: 1.2; }
-.spectro__name b { color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); font-weight: 700; font-size: 0.84rem; }
-.spectro__name span { color: var(--mute); font-size: 0.7rem; }
+.spectro__name b { color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); font-weight: 700; font-size: 0.82rem; }
+.spectro__name span { color: var(--mute); font-size: 0.68rem; }
 .spectro__name:hover b { text-decoration: underline; }
+
+/* Lanes slide out of the strip one after another */
+@media (prefers-reduced-motion: no-preference) {
+  .spectro__row { animation: spectro-unfold 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--i) * 50ms); }
+  .spectro__line { transition: width 0.12s, height 0.12s, box-shadow 0.12s, opacity 0.18s; }
+}
+@keyframes spectro-unfold { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: none; } }
 
 .spectro__readout {
   min-height: 78px; padding: 0.65rem 0.85rem; border-radius: 12px; border: 1px solid var(--edge); background: var(--well);
   display: grid; gap: 2px; align-content: center;
 }
+.spectro__readout.is-idle { background: none; border-color: transparent; text-align: center; justify-items: center; }
+.spectro__readout.is-idle .spectro__meta { opacity: 0.7; }
+.spectro--collapsed .spectro__readout.is-idle .spectro__meta { visibility: hidden; } /* keep the space so selecting a line does not shift the page */
 .spectro__kicker { font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); font-weight: 700; }
 .spectro__title { font-size: 0.95rem; font-weight: 700; line-height: 1.3; }
 .spectro__meta { font-size: 0.78rem; color: var(--mute); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
-.spectro__proof {
-  display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 2px;
-  color: #ff6b35; font-weight: 600; text-decoration: none;
-}
+.spectro__proof { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 2px; color: #ff6b35; font-weight: 600; text-decoration: none; }
 .spectro--light .spectro__proof { color: #c2410c; }
 .spectro__proof:hover { text-decoration: underline; }
 
 .spectro__sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 @media (max-width: 720px) {
-  .spectro { padding: var(--space-100) var(--space-150) var(--space-200); border-radius: 16px; }
-  .spectro__row { grid-template-columns: 1fr; gap: 2px; padding: 4px 0 6px; }
+  .spectro__row { grid-template-columns: 1fr; gap: 0; padding: 4px 0 2px; }
   .spectro__axis-wrap { margin-left: 0; }
   .spectro__name { display: flex; gap: 8px; align-items: baseline; }
-  .spectro__track { height: 52px; } /* comfortably above the 44px touch guideline */
+  .spectro__track--lane { height: 44px; }
   .spectro__readout { min-height: 92px; }
-  .spectro__legend { font-size: 0.64rem; gap: 2px 9px; }
-  .spectro__legend li::before { width: 6px; height: 6px; margin-right: 4px; }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .spectro__line { transition: width 0.12s, height 0.12s, box-shadow 0.12s, opacity 0.12s; }
 }
 
 /* Any touch screen, including tablets wider than the phone breakpoint */
 @media (pointer: coarse) {
   .spectro__track { height: 52px; }
   .spectro__track--tall { height: 60px; }
+  .spectro__track--lane { height: 48px; }
 }

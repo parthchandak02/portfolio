@@ -87,7 +87,7 @@ const Axis = () => {
  * One row of lines. The whole track is the touch target: pointer position picks the nearest line
  * (hover on desktop, drag or tap on a phone), and the arrow keys step through lines.
  */
-const Track = ({ band, entries, active, onActive, tall = false }) => {
+const Track = ({ band, entries, active, onActive, tall = false, lane = false }) => {
   const [trackRef, width] = useWidth();
   const placed = useMemo(() => place(entries, width), [entries, width]);
 
@@ -121,7 +121,7 @@ const Track = ({ band, entries, active, onActive, tall = false }) => {
   return (
     <div
       ref={trackRef}
-      className={`spectro__track${tall ? ' spectro__track--tall' : ''}`}
+      className={`spectro__track${tall ? ' spectro__track--tall' : ''}${lane ? ' spectro__track--lane' : ''}`}
       role="group"
       tabIndex={0}
       aria-label={`${band ? band.name : 'All bands'}: use left and right arrow keys to move between items`}
@@ -161,74 +161,69 @@ const Spectrograph = ({ lightMode = false }) => {
     []
   );
 
+  const toggle = (
+    <button
+      type="button"
+      className="spectro__toggle"
+      aria-expanded={expanded}
+      aria-label={expanded ? 'Collapse to one strip' : 'Split into seven bands'}
+      title={expanded ? 'Collapse' : 'Split into seven bands'}
+      onClick={() => { setExpanded((v) => !v); setActive(null); }}
+    >
+      <ChevronDown size={20} strokeWidth={1.75} className="spectro__chevron" />
+    </button>
+  );
+
   return (
     <section
-      className={`spectro ${expanded ? 'spectro--expanded glass' : 'spectro--collapsed'} ${lightMode ? 'spectro--light' : 'spectro--dark'}`}
+      className={`spectro ${expanded ? 'spectro--expanded' : 'spectro--collapsed'} ${active ? 'spectro--picking' : ''} ${lightMode ? 'spectro--light' : 'spectro--dark'}`}
       aria-label="Record spectrograph"
     >
-      <div className="spectro__head">
-        {!expanded && (
-          <ul className="spectro__legend" aria-hidden="true">
-            {spectrumBands.map((b) => (
-              <li key={b.key} style={{ '--hue': b.hue }}>{b.name}</li>
-            ))}
-          </ul>
-        )}
-        <button
-          type="button"
-          className="spectro__toggle"
-          aria-expanded={expanded}
-          aria-label={expanded ? 'Collapse to one strip' : 'Split into seven bands'}
-          title={expanded ? 'Collapse' : 'Split into seven bands'}
-          onClick={() => { setExpanded((v) => !v); setActive(null); }}
-        >
-          <ChevronDown size={20} strokeWidth={1.75} className="spectro__chevron" />
-        </button>
-      </div>
+      {!expanded && (
+        <div className="spectro__strip">
+          <Track entries={all} active={active} onActive={setActive} tall />
+          {toggle}
+          <Axis />
+        </div>
+      )}
 
-      <div className="spectro__body">
-        {!expanded && (
-          <>
-            <Track entries={all} active={active} onActive={setActive} tall />
-            <Axis />
-          </>
-        )}
-
-        {expanded && (
+      {expanded && (
+        <>
+          <div className="spectro__head">{toggle}</div>
           <div className="spectro__bands">
-            {rows.map(({ band, entries }) => (
-              <div className="spectro__row" key={band.key} style={{ '--hue': band.hue }}>
+            {rows.map(({ band, entries }, i) => (
+              <div className="spectro__row" key={band.key} style={{ '--hue': band.hue, '--i': i }}>
                 <a className="spectro__name" href={`#${band.section}`}>
                   <b>{band.name}</b>
                   <span>{band.sub}</span>
                 </a>
                 <div className="spectro__lane">
-                  <Track band={band} entries={entries} active={active} onActive={setActive} />
+                  <Track band={band} entries={entries} active={active} onActive={setActive} lane />
                 </div>
               </div>
             ))}
             <div className="spectro__axis-wrap"><Axis /></div>
           </div>
-        )}
+        </>
+      )}
 
-        <div className={`spectro__readout${active ? '' : ' is-idle'}`} style={{ '--hue': active ? active.band.hue : 'currentColor' }} aria-live="polite">
-          {active ? (
-            <>
-              <span className="spectro__kicker">{active.band.name} · {active.item.when}{active.item.future ? ' · upcoming' : ''}</span>
-              <span className="spectro__title">{active.item.title}</span>
-              <span className="spectro__meta">
-                {active.item.meta}
-                {active.item.url && (
-                  <a className="spectro__proof" href={active.item.url} target="_blank" rel="noopener noreferrer">
-                    View proof <ExternalLink size={13} />
-                  </a>
-                )}
-              </span>
-            </>
-          ) : (
-            <span className="spectro__meta">Slide across the lines to read each one.</span>
-          )}
-        </div>
+      <div className={`spectro__readout${active ? '' : ' is-idle'}`} style={{ '--hue': active ? active.band.hue : 'currentColor' }} aria-live="polite">
+        {active ? (
+          <>
+            <span className="spectro__kicker">{active.band.name} · {active.item.when}{active.item.future ? ' · upcoming' : ''}</span>
+            <span className="spectro__title">{active.item.title}</span>
+            <span className="spectro__meta">
+              {active.item.meta}
+              {active.item.url && (
+                <a className="spectro__proof" href={active.item.url} target="_blank" rel="noopener noreferrer">
+                  View proof <ExternalLink size={13} />
+                </a>
+              )}
+            </span>
+          </>
+        ) : (
+          <span className="spectro__meta">Slide across the lines to read each one.</span>
+        )}
       </div>
 
       {/* Plain list for screen readers: every item with its proof link */}
