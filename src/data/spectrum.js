@@ -129,13 +129,7 @@ export const spectrumBands = [
     name: 'Projects',
     hue: '#b07cff',
     items: [
-      { t: 2026.51, when: '2026', title: 'wc26', meta: 'World Cup 2026 map', url: 'https://wc26.parthchandak.info' },
-      { t: 2026.52, when: '2026', title: 'tide', meta: '3D ocean from buoy data', url: 'https://tide.parthchandak.info' },
-      { t: 2026.53, when: '2026', title: 'orbit', meta: 'Product gravity field', url: 'https://orbit.parthchandak.info' },
-      { t: 2026.54, when: '2026', title: 'inkwell', meta: 'Ink simulation from live wind', url: 'https://inkwell.parthchandak.info' },
-      { t: 2026.55, when: '2026', title: 'aeris', meta: 'World weather dashboard', url: 'https://aeris.parthchandak.info' },
-      { t: 2026.56, when: '2026', title: 'eurusd', meta: 'Exchange rate road drive', url: 'https://eurusd.parthchandak.info' },
-      { t: 2026.75, when: '2026', title: 'jobwright', meta: 'Daily scored job list', url: 'https://github.com/parthchandak02/jobwright' },
+      ...fromCards(['lab']),
       ...fromCards(['projects'])
     ]
   }

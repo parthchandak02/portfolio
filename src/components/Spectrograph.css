@@ -26,65 +26,56 @@
 .spectro__toggle:hover { color: inherit; }
 .spectro__chevron { transition: transform 0.25s ease; }
 .spectro--expanded .spectro__chevron { transform: rotate(180deg); }
-.spectro__toggle:focus-visible, .spectro__track:focus-visible, .spectro__name:focus-visible, .spectro__proof:focus-visible { outline: 2px solid #ff6b35; outline-offset: 3px; }
+.spectro__toggle:focus-visible, .spectro__track:focus-visible, .spectro__proof:focus-visible { outline: 2px solid #ff6b35; outline-offset: 3px; }
 
-/* Collapsed: the strip with the chevron beside it */
-.spectro__strip { display: grid; grid-template-columns: 1fr 44px; align-items: center; column-gap: 4px; row-gap: 6px; }
+/* The strip and the lanes share one stage. The chevron is pinned to its top right corner in both states. */
+.spectro__stage { position: relative; padding-right: 48px; }
+.spectro__toggle { position: absolute; top: 0; right: 0; z-index: 3; }
 
-/* Expanded: the chevron sits at the top right, then the lanes */
-.spectro__head { display: flex; justify-content: flex-end; margin-bottom: -8px; }
+/* Each layout sits in a grid row that animates between 0fr and 1fr, so one folds away as the other opens */
+.spectro__fold { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease; }
+.spectro__foldinner { min-height: 0; overflow: hidden; padding: 4px 0; margin: -4px 0; }
+.spectro--expanded .spectro__fold--strip, .spectro--collapsed .spectro__fold--bands { grid-template-rows: 0fr; opacity: 0; pointer-events: none; }
+.spectro__fold--strip .spectro__track { height: 44px; }
 
-/* The whole track is the touch target; the lines are only drawn marks */
+/* Tracks have no box at all: just a hairline with ticks on it. The whole track is the touch target. */
 .spectro__track {
   position: relative;
-  height: 48px;
-  border-radius: 10px;
-  background: var(--well);
-  border: 1px solid var(--edge);
+  height: 44px;
+  border-radius: 6px;
   cursor: crosshair;
   touch-action: pan-y; /* vertical scroll still works; horizontal drag scrubs */
   -webkit-tap-highlight-color: transparent;
 }
-.spectro__track--tall { height: 60px; }
-.spectro__track::before { /* faint baseline the lines stand on */
-  content: ""; position: absolute; left: 8px; right: 8px; top: 50%; height: 1px; background: var(--edge);
-}
-
-/* Lanes have no box at all: just a hairline with ticks on it */
-.spectro__track--lane { height: 44px; border: 0; background: none; border-radius: 6px; }
-.spectro__track--lane::before { left: 0; right: 0; }
-.spectro__track--lane .spectro__line { height: calc(100% - 18px); }
+.spectro__track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--edge); }
+.spectro__track .spectro__line { height: calc(100% - 14px); }
 
 /* Flat, crisp ticks: solid color, rounded ends, no halo. Only the selected tick gets a soft ring. */
 .spectro__line {
-  position: absolute; top: 50%; width: 2px; height: calc(100% - 24px);
+  position: absolute; top: 50%; width: 2px;
   transform: translate(-50%, -50%);
   border-radius: 2px; pointer-events: none;
   background: color-mix(in srgb, var(--hue) calc((1 - var(--tick-ink)) * 100%), #000);
   opacity: 0.9;
 }
-.spectro__line--on, .spectro__track--lane .spectro__line--on {
-  width: 3px; height: calc(100% - 6px); opacity: 1; z-index: 2;
+.spectro__line--on, .spectro__track .spectro__line--on {
+  width: 3px; height: calc(100% - 4px); opacity: 1; z-index: 2;
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--hue) 22%, transparent);
 }
 .spectro__line--future { background: transparent; opacity: 1; width: 3px; border: 1.5px solid var(--hue); }
 /* While one line is selected, the rest step back so it reads clearly */
 .spectro--picking .spectro__line:not(.spectro__line--on):not(.spectro__line--future) { opacity: 0.36; }
 
+.spectro__row { padding: 2px 0; }
 
-.spectro__bands { display: grid; }
-.spectro__row { display: grid; grid-template-columns: 120px 1fr; align-items: center; gap: var(--space-150); padding: 2px 0; }
-.spectro__lane { min-width: 0; }
-.spectro__name { display: grid; gap: 1px; text-decoration: none; color: inherit; line-height: 1.2; }
-.spectro__name b { color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); font-weight: 700; font-size: 0.82rem; }
-.spectro__name:hover b { text-decoration: underline; }
-
-/* Lanes slide out of the strip one after another */
+/* Lanes drop out of the strip one after another */
 @media (prefers-reduced-motion: no-preference) {
-  .spectro__row { animation: spectro-unfold 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--i) * 50ms); }
+  .spectro__row { transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .spectro--collapsed .spectro__row { opacity: 0; transform: translateY(-14px); }
+  .spectro--expanded .spectro__row { transition-delay: calc(var(--i) * 45ms); }
   .spectro__line { transition: width 0.12s, height 0.12s, box-shadow 0.12s, opacity 0.18s; }
 }
-@keyframes spectro-unfold { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .spectro__fold { transition: none; } }
 
 .spectro__readout {
   box-sizing: border-box; height: 104px; padding: 0.7rem 0.9rem; border-radius: 12px; border: 1px solid var(--edge); background: var(--well);
@@ -103,14 +94,8 @@
 
 .spectro__sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
-@media (max-width: 720px) {
-  .spectro__row { grid-template-columns: 1fr; gap: 0; padding: 4px 0 2px; }
-  .spectro__track--lane { height: 44px; }
-}
-
 /* Any touch screen, including tablets wider than the phone breakpoint */
 @media (pointer: coarse) {
-  .spectro__track { height: 52px; }
-  .spectro__track--tall { height: 60px; }
-  .spectro__track--lane { height: 48px; }
+  .spectro__track { height: 48px; }
+  .spectro__fold--strip .spectro__track { height: 52px; }
 }

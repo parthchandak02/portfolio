@@ -1,4 +1,5 @@
 // Timeline data - using clean data structure with centralized icon mapping
+import { labProjects } from './lab';
 import { 
   // Navigation icons from Lucide React
   Code, Database, GitBranch, Cpu, Terminal, Settings, Zap,
@@ -696,78 +697,7 @@ export const timelineDataByCategory = {
         ]
     }
   ],
-  lab: [
-    {
-        "title": "jobwright",
-        "date": "2026",
-        "category": "lab",
-        "location": "Open source",
-        "description": "One short list of jobs a day, picked for you and explained. Searches job boards each morning and scores each role against your own rules and past ratings, using Claude and Gemini.",
-        "url": "https://github.com/parthchandak02/jobwright",
-        "projectImage": "/images/lab/jobwright.png",
-        "skills": ["Python", "LLMs"]
-    },
-    {
-        "title": "eurusd",
-        "date": "2026",
-        "category": "lab",
-        "location": "Live on Cloudflare",
-        "description": "The euro to dollar exchange rate as a road you drive along.",
-        "url": "https://eurusd.parthchandak.info",
-        "projectImage": "/images/lab/eurusd.png",
-        "skills": ["JavaScript", "Finance"]
-    },
-    {
-        "title": "wc26",
-        "date": "2026",
-        "category": "lab",
-        "location": "Live on Cloudflare",
-        "description": "World Cup 2026 standings on an interactive world map. Filter by stage or confederation and tap a country for its group.",
-        "url": "https://wc26.parthchandak.info",
-        "projectImage": "/images/lab/wc26.png",
-        "skills": ["JavaScript", "Data Analysis"]
-    },
-    {
-        "title": "aeris",
-        "date": "2026",
-        "category": "lab",
-        "location": "Live on Cloudflare",
-        "description": "A scrollable world weather dashboard with live conditions across 12 cities on animated glass cards.",
-        "url": "https://aeris.parthchandak.info",
-        "projectImage": "/images/lab/aeris.png",
-        "skills": ["JavaScript", "Design"]
-    },
-    {
-        "title": "inkwell",
-        "date": "2026",
-        "category": "lab",
-        "location": "Live on Cloudflare",
-        "description": "An ink simulation driven by live San Francisco wind. Drag across the canvas to release drops that drift like pigment in water.",
-        "url": "https://inkwell.parthchandak.info",
-        "projectImage": "/images/lab/inkwell.png",
-        "skills": ["JavaScript", "Creativity"]
-    },
-    {
-        "title": "orbit",
-        "date": "2026",
-        "category": "lab",
-        "location": "Live on Cloudflare",
-        "description": "Products orbit in a gravity field where price sets mass, rating sets glow and stock sets the number of particles.",
-        "url": "https://orbit.parthchandak.info",
-        "projectImage": "/images/lab/orbit.png",
-        "skills": ["JavaScript", "Data Analysis"]
-    },
-    {
-        "title": "tide",
-        "date": "2026",
-        "category": "lab",
-        "location": "Live on Cloudflare",
-        "description": "A living 3D ocean surface driven by real marine buoy data from the San Francisco coast.",
-        "url": "https://tide.parthchandak.info",
-        "projectImage": "/images/lab/tide.png",
-        "skills": ["JavaScript", "Data Analysis"]
-    }
-  ],
+  lab: labProjects,
   projects: [
     {
         "title": "LLM Assisted Research Platform",
