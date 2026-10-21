@@ -29,6 +29,7 @@ const PlayModeToggle = ({ isPlayMode, onToggle }) => {
           </span>
         )}
       </span>
+      <span className="ui-hint" aria-hidden="true">{isPlayMode ? 'Read the record' : 'Play with the prism'}</span>
     </button>
   );
 };

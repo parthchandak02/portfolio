@@ -130,9 +130,34 @@ const Track = ({ band, placed, active, onActive, top, height }) => {
  * Collapsed it is a single strip, expanded it is one row per band. Everything is drawn from
  * src/data/spectrum.js, so adding an item there is all it takes.
  */
+// The opening: the record arrives split into its eight lanes, holds a moment, then folds into one strip.
+// A spark then carries the fold to the button that undoes it, so the control explains itself.
+const INTRO_HOLD = 2600; // ms the lanes stay open; covers their draw-in and a beat to take them in
+const FOLD_MS = 1150; // ms for the fold to finish, matching the collapse transitions in Spectrograph.css
+const SPARK_MS = 900;
+const HINT_MS = 3600; // ms the button labels stay up after the spark lands
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Points along a curve from a to b that bows upward, for the spark's flight
+const arc = (a, b, steps = 12) => {
+  const c = { x: a.x + (b.x - a.x) * 0.25, y: Math.min(a.y, b.y) - 90 };
+  return Array.from({ length: steps + 1 }, (_, i) => {
+    const t = i / steps;
+    const u = 1 - t;
+    return { x: u * u * a.x + 2 * u * t * c.x + t * t * b.x, y: u * u * a.y + 2 * u * t * c.y + t * t * b.y, t };
+  });
+};
+
 const Spectrograph = ({ lightMode = false, handedOver = false }) => {
-  const [expanded, setExpanded] = useState(false);
+  // Section links and reduced motion skip the show and start folded
+  const [intro, setIntro] = useState(() => typeof window !== 'undefined' && !window.location.hash && !prefersReducedMotion());
+  const [expanded, setExpanded] = useState(intro);
+  const [hint, setHint] = useState(false);
   const [active, setActive] = useState(null);
+  const toggleRef = useRef(null);
+  const timersRef = useRef([]);
 
   const all = useMemo(
     () => spectrumBands.flatMap((band) => band.items.map((item) => ({ item, band }))),
@@ -164,23 +189,93 @@ const Spectrograph = ({ lightMode = false, handedOver = false }) => {
   const [slot, setSlot] = useState(null);
   useEffect(() => setSlot(document.querySelector('.layout__ui')), []);
 
+  // The spark leaves the strip's right end and lands on the toggle; then every button shows its label
+  const showHints = useCallback(() => {
+    const ui = document.querySelector('.layout__ui');
+    setHint(true);
+    if (ui) ui.classList.add('layout__ui--hints');
+    timersRef.current.push(setTimeout(() => {
+      setHint(false);
+      if (ui) ui.classList.remove('layout__ui--hints');
+    }, HINT_MS));
+  }, []);
+
+  const sendSpark = useCallback(() => {
+    const stage = stageRef.current;
+    const button = toggleRef.current;
+    if (!stage || !button || button.classList.contains('is-away')) return;
+    const s = stage.getBoundingClientRect();
+    const b = button.getBoundingClientRect();
+    if (s.bottom < 0 || s.top > window.innerHeight) { showHints(); return; }
+    const from = { x: s.right - 6, y: s.top + rowH / 2 };
+    const to = { x: b.left + b.width / 2, y: b.top + b.height / 2 };
+    // A head and a short tail of fading trailers, all on the same arc
+    const path = arc(from, to);
+    [0, 1, 2, 3].forEach((k) => {
+      const spark = document.createElement('i');
+      spark.className = k ? 'spectro-spark spectro-spark--trail' : 'spectro-spark';
+      spark.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(spark);
+      const fade = 1 - k * 0.24;
+      const flight = spark.animate(
+        path.map((p) => ({
+          offset: p.t,
+          transform: `translate(${p.x}px, ${p.y}px) scale(${(0.5 + Math.sin(p.t * Math.PI) * 0.7) * fade})`,
+          opacity: (p.t < 0.08 ? p.t / 0.08 : 1) * fade
+        })),
+        { duration: SPARK_MS, delay: k * 40, easing: 'cubic-bezier(0.45, 0, 0.25, 1)', fill: 'both' }
+      );
+      flight.onfinish = () => {
+        spark.remove();
+        if (!k) showHints();
+      };
+    });
+  }, [stageRef, rowH, showHints]);
+
+  // Run the opening once. Touching the toggle during it hands control straight to the visitor.
+  useEffect(() => {
+    if (!intro) return undefined;
+    const timers = timersRef.current;
+    timers.push(setTimeout(() => { setExpanded(false); setIntro(false); }, INTRO_HOLD));
+    timers.push(setTimeout(sendSpark, INTRO_HOLD + FOLD_MS));
+    return () => timers.forEach(clearTimeout);
+    // Once, on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => () => {
+    timersRef.current.forEach(clearTimeout);
+    document.querySelectorAll('.spectro-spark').forEach((el) => el.remove());
+  }, []);
+
+  const onToggle = () => {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+    setIntro(false);
+    setHint(false);
+    const ui = document.querySelector('.layout__ui');
+    if (ui) ui.classList.remove('layout__ui--hints');
+    setExpanded((v) => !v);
+    setActive(null);
+  };
+
   const toggle = (
     <button
+      ref={toggleRef}
       type="button"
-      className={`spectro-toggle glass glass-interactive${handedOver ? ' is-away' : ''}`}
+      className={`spectro-toggle glass glass-interactive${handedOver ? ' is-away' : ''}${hint ? ' is-hint' : ''}`}
       aria-expanded={expanded}
-      aria-label={expanded ? 'Collapse to one strip' : 'Split into eight bands'}
-      title={expanded ? 'Collapse' : 'Split into eight bands'}
+      aria-label={expanded ? 'Fold into one strip' : 'Split into eight bands'}
       tabIndex={handedOver ? -1 : 0}
-      onClick={() => { setExpanded((v) => !v); setActive(null); }}
+      onClick={onToggle}
     >
       <ChevronDown size={18} strokeWidth={1.75} className="spectro__chevron" />
+      <span className="ui-hint" aria-hidden="true">{expanded ? 'Fold into one strip' : 'Split into eight bands'}</span>
     </button>
   );
 
   return (
     <section
-      className={`spectro ${expanded ? 'spectro--expanded' : 'spectro--collapsed'} ${active ? 'spectro--picking' : ''} ${lightMode ? 'spectro--light' : 'spectro--dark'}`}
+      className={`spectro ${expanded ? 'spectro--expanded' : 'spectro--collapsed'}${intro ? ' spectro--intro' : ''} ${active ? 'spectro--picking' : ''} ${lightMode ? 'spectro--light' : 'spectro--dark'}`}
       aria-label="Record spectrograph"
     >
       {slot && createPortal(toggle, slot)}

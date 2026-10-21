@@ -11,6 +11,7 @@ const LockToggle = ({ isLocked, onToggle }) => {
       <span className="lock-toggle__icon">
         {isLocked ? <Lock size={18} /> : <Unlock size={18} />}
       </span>
+      <span className="ui-hint" aria-hidden="true">{isLocked ? 'Let the beam follow you' : 'Hold the beam still'}</span>
     </button>
   );
 };
