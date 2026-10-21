@@ -228,7 +228,7 @@ const Spectrograph = ({ lightMode = false, handedOver = false }) => {
       <div className={`spectro__readout${active ? '' : ' is-idle'}`} style={{ '--hue': active ? active.band.hue : 'currentColor' }} aria-live="polite">
         {active ? (
           <>
-            <span className="spectro__kicker">{active.band.name} · {active.item.when}{active.item.future ? ' · upcoming' : ''}</span>
+            <span className="spectro__kicker">{active.band.name} · {active.item.when}</span>
             <span className="spectro__title">{active.item.title}</span>
             <span className="spectro__meta">
               <span className="spectro__metatext">{active.item.meta}</span>

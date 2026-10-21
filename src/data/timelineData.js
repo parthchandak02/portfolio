@@ -690,11 +690,11 @@ export const timelineDataByCategory = {
         ]
     },
     {
-        "title": "Cal Hacks 13.0 (Upcoming)",
+        "title": "Cal Hacks 13.0, Judge",
         "date": "October 23-25, 2026",
         "category": "judging",
         "location": "Berkeley, CA",
-        "description": "Accepted to judge Cal Hacks 13.0.",
+        "description": "Judge at Cal Hacks 13.0.",
         "skills": [
             "Advisor",
             "Innovation"

@@ -103,7 +103,7 @@ export const spectrumBands = [
       { t: 2026.72, when: 'Sep 18, 2026', title: 'Discover Oncology', meta: 'Peer reviewer, Springer Nature' },
       { t: 2026.18, when: 'Mar 8, 2026', title: 'HackMerced XI', meta: 'Judge, MLH and UC Merced' },
       { t: 2026.32, when: 'Apr 26, 2026', title: 'LA Hacks 2026', meta: 'Invite-only judge, 1,000+ students' },
-      { t: 2026.81, when: 'Oct 23-25, 2026', title: 'Cal Hacks 13.0', meta: 'Accepted to judge, upcoming', future: true }
+      { t: 2026.81, when: 'Oct 23-25, 2026', title: 'Cal Hacks 13.0', meta: 'Judge, UC Berkeley', future: true }
     ]
   },
   {
