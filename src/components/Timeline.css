@@ -198,3 +198,12 @@
     padding: 32px 16px;
   }
 }
+/* The card whose line is lit on the band bar: its edge picks up the band's colour, softly */
+.timeline__item[data-current] > .timeline-card,
+.timeline__item[data-current] > .lab-tile {
+  border-color: color-mix(in srgb, var(--band-hue) 55%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--band-hue) 18%, transparent),
+    0 0 28px color-mix(in srgb, var(--band-hue) 12%, transparent),
+    var(--glass-shadow-base);
+}

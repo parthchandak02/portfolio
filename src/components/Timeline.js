@@ -13,6 +13,7 @@ const Timeline = ({
   showFilters = false, // Now controlled by parent
   activeFilters = [], // Now receives array of active filters instead of single activeFilter
   lightMode = false,
+  currentTitle = null, // the card whose line is lit on the band bar
   ...props 
 }) => {
   const { getCurrentHighlights } = useTypewriterHighlight();
@@ -73,6 +74,8 @@ const Timeline = ({
   }, [sortedData, firstLabIndex]);
 
   const itemAttrs = (item, index) => ({
+    style: { '--band-hue': bandForSection(item.category?.toLowerCase())?.hue || '#ff6b35' },
+    'data-current': currentTitle === item.title ? 'true' : undefined,
     'data-category': item.category?.toLowerCase() || 'other',
     'data-title': item.title,
     'data-index': index,

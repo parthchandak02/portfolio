@@ -118,6 +118,8 @@ export default function App() {
 
   // Which section and card is in view, for the sticky band bar
   const { visibleCategory, visibleTitle } = useScrollHighlight('all');
+  // Once the band bar takes over from the strip, the round buttons step aside; they belong to the top screen
+  const handedOver = !isPlayMode && visibleCategory !== 'all';
 
   // Sync html and body background with light mode to prevent edge bleeding
   useEffect(() => {
@@ -146,7 +148,7 @@ export default function App() {
         />
         
         {/* UI Overlay Layer */}
-        <div className="layout__ui">
+        <div className={`layout__ui${handedOver ? ' layout__ui--reading' : ''}`}>
           {/* Fixed UI Components */}
           <LightToggle lightMode={lightMode} onToggle={toggleLightMode} />
           <LockToggle isLocked={isLocked} onToggle={toggleLock} />
@@ -159,7 +161,7 @@ export default function App() {
             <UITypewriter lightMode={lightMode} />
 
             {/* Record spectrograph - visible in both modes */}
-            <Spectrograph lightMode={lightMode} handedOver={!isPlayMode && visibleCategory !== 'all'} />
+            <Spectrograph lightMode={lightMode} handedOver={handedOver} />
             
             {/* Resume content - Hidden in play mode */}
             {!isPlayMode && (
@@ -176,6 +178,7 @@ export default function App() {
                 <Timeline 
                  data={timelineData}
                  lightMode={lightMode}
+                 currentTitle={handedOver ? visibleTitle : null}
                  className="timeline-in-scroll"
                />
               </>
