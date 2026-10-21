@@ -110,11 +110,31 @@ export const iconMap = {
 export const timelineDataByCategory = {
   experience: [
     {
+        "title": "Senior Creative Technologist",
+        "company": "Zoox",
+        "companyLogo": "/logos/zoox-logo.png",
+        "projectImage": "/images/zoox-main.png",
+        "date": "October 2026 - Present",
+        "category": "experience",
+        "location": "Foster City, CA",
+        "description": "Promoted to Senior Creative Technologist. Continue to build the prototyping systems that let designers and researchers try ideas in the robotaxi cabin, from lights and sound to displays and controls, and test them in realistic conditions.",
+        "typewriterTitle": "Creative Technologist",
+        "typewriterPrefix": "I am a",
+        "skills": [
+            "Microcontrollers",
+            "Figma",
+            "Blender",
+            "SolidWorks",
+            "ProtoPie",
+            "Linux"
+        ]
+    },
+    {
         "title": "Creative Technologist",
         "company": "Zoox",
         "companyLogo": "/logos/zoox-logo.png",
         "projectImage": "/images/zoox-main.png",
-        "date": "February 2022 - Present",
+        "date": "February 2022 - October 2026",
         "category": "experience",
         "location": "Foster City, CA",
         "description": "Build prototyping systems that let designers and researchers try ideas in the robotaxi cabin, from lights and sound to displays and controls, without waiting on engineering. Connect design tools to vehicle hardware so new variations can be tested quickly and in realistic conditions.",
