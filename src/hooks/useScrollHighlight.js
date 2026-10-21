@@ -9,16 +9,11 @@ export const STICK_AT = 20;
 
 const useScrollHighlight = (activeFilter) => {
   const [visible, setVisible] = useState({ category: 'all', title: null });
-  const throttleRef = useRef(false);
+  const frameRef = useRef(0);
   const lastKeyRef = useRef('all|');
 
-  const updateVisibleCategory = useCallback(() => {
-    if (throttleRef.current) return;
-    throttleRef.current = true;
-    requestAnimationFrame(() => {
-      setTimeout(() => { throttleRef.current = false; }, 120); // Moderate throttle for sidebar updates
-    });
-
+  const measure = useCallback(() => {
+    frameRef.current = 0;
     const timelineItems = document.querySelectorAll('.timeline__item[data-category]');
     if (timelineItems.length === 0) {
       return;
@@ -82,6 +77,12 @@ const useScrollHighlight = (activeFilter) => {
     }
   }, []);
 
+  // At most one measurement per frame, always of the latest scroll position. (Dropping events instead
+  // left the bar showing at the top after a fast flick up: the event that reached the top was thrown away.)
+  const updateVisibleCategory = useCallback(() => {
+    if (!frameRef.current) frameRef.current = requestAnimationFrame(measure);
+  }, [measure]);
+
   useEffect(() => {
     // Reset when not in 'all' mode
     if (activeFilter !== 'all') {
@@ -111,6 +112,8 @@ const useScrollHighlight = (activeFilter) => {
         scrollContainer.removeEventListener('scroll', updateVisibleCategory);
       }
       window.removeEventListener('resize', updateVisibleCategory);
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      frameRef.current = 0;
     };
   }, [activeFilter, updateVisibleCategory]);
 

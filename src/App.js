@@ -159,7 +159,7 @@ export default function App() {
             <UITypewriter lightMode={lightMode} />
 
             {/* Record spectrograph - visible in both modes */}
-            <Spectrograph lightMode={lightMode} />
+            <Spectrograph lightMode={lightMode} handedOver={!isPlayMode && visibleCategory !== 'all'} />
             
             {/* Resume content - Hidden in play mode */}
             {!isPlayMode && (

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { STICK_AT } from '../hooks/useScrollHighlight';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 import { spectrumBands } from '../data/spectrum';
 import './Spectrograph.css';
@@ -141,7 +140,7 @@ const Track = ({ band, entries, active, onActive }) => {
  * Collapsed it is a single strip, expanded it is one row per band. Everything is drawn from
  * src/data/spectrum.js, so adding an item there is all it takes.
  */
-const Spectrograph = ({ lightMode = false }) => {
+const Spectrograph = ({ lightMode = false, handedOver = false }) => {
   const [expanded, setExpanded] = useState(false);
   const [active, setActive] = useState(null);
 
@@ -155,25 +154,10 @@ const Spectrograph = ({ lightMode = false }) => {
   );
 
   // The toggle is one more round button in the column with the other three, so it lives in the fixed UI
-  // layer. It steps aside once the strip has handed over to the band bar.
-  const sectionRef = useRef(null);
+  // layer. It steps aside while the band bar has the spot; that is decided once, in useScrollHighlight,
+  // so the strip and the bar can never both be showing.
   const [slot, setSlot] = useState(null);
-  const [handedOver, setHandedOver] = useState(false);
-
-  useEffect(() => {
-    setSlot(document.querySelector('.layout__ui'));
-    const scroller = document.querySelector('.main-content-scroll');
-    const section = sectionRef.current;
-    if (!scroller || !section) return undefined;
-    const check = () => setHandedOver(section.getBoundingClientRect().top <= scroller.getBoundingClientRect().top + STICK_AT);
-    check();
-    scroller.addEventListener('scroll', check, { passive: true });
-    window.addEventListener('resize', check);
-    return () => {
-      scroller.removeEventListener('scroll', check);
-      window.removeEventListener('resize', check);
-    };
-  }, []);
+  useEffect(() => setSlot(document.querySelector('.layout__ui')), []);
 
   const toggle = (
     <button
@@ -191,7 +175,6 @@ const Spectrograph = ({ lightMode = false }) => {
 
   return (
     <section
-      ref={sectionRef}
       className={`spectro ${expanded ? 'spectro--expanded' : 'spectro--collapsed'} ${active ? 'spectro--picking' : ''} ${lightMode ? 'spectro--light' : 'spectro--dark'}`}
       aria-label="Record spectrograph"
     >
