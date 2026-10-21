@@ -324,11 +324,27 @@ export const timelineDataByCategory = {
         ]
     }
   ],
-  volunteering: [
+  impact: [
+    {
+        "title": "BuildOn Nepal School Project - $55K Fundraising Lead",
+        "date": "January 2025",
+        "company": "BuildOn",
+        "companyLogo": "/logos/buildon-logo.png",
+        "category": "impact",
+        "location": "Nepal",
+        "url": "https://buildon-nepal-trek.vercel.app",
+        "projectImage": "/images/buildon-nepal-trek.png",
+        "description": "Raised $55,000 to build a school in Nepal, directly impacting 210+ students (including 108 girls) in a community of 2250 farmers. Led fundraising strategy and participated in construction trek.",
+        "skills": [
+            "Fundraising",
+            "Travel",
+            "School Building"
+        ]
+    },
     {
         "title": "Manager, Team Innovation Program",
         "date": "May 2025 - Present",
-        "category": "volunteering",
+        "category": "impact",
         "company": "Mentor Discover Inspire",
         "companyLogo": "/logos/mdi-logo.png",
         "location": "Mentor Discover Inspire",
@@ -344,7 +360,7 @@ export const timelineDataByCategory = {
     {
         "title": "Team Leader",
         "date": "May 2025 - Present",
-        "category": "volunteering",
+        "category": "impact",
         "company": "Mentor Discover Inspire",
         "companyLogo": "/logos/mdi-logo.png",
         "location": "Mentor Discover Inspire",
@@ -708,24 +724,8 @@ export const timelineDataByCategory = {
   lab: labProjects,
   projects: [
     {
-        "title": "BuildOn Nepal School Project - $55K Fundraising Lead",
-        "date": "January 2025",
-        "company": "BuildOn",
-        "companyLogo": "/logos/buildon-logo.png",
-        "category": "projects",
-        "location": "Nepal",
-        "url": "https://buildon-nepal-trek.vercel.app",
-        "projectImage": "/images/buildon-nepal-trek.png",
-        "description": "Raised $55,000 to build a school in Nepal, directly impacting 210+ students (including 108 girls) in a community of 2250 farmers. Led fundraising strategy and participated in construction trek.",
-        "skills": [
-            "Fundraising",
-            "Travel",
-            "School Building"
-        ]
-    },
-    {
         "title": "LLM Assisted Research Platform",
-        "date": "January 2026 - September 2026",
+        "date": "December 2024 - September 2026",
         "category": "projects",
         "description": "AI-powered literature review assistant that streamlines academic research workflows. Leverages large language models to automate paper analysis, extract key insights, and synthesize research findings across multiple documents.",
         "url": "https://github.com/parthchandak02/literature-review-assistant",
@@ -770,10 +770,10 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Calendar and Alarm Productivity System",
-        "date": "September 2024 - October 2024",
+        "date": "September 2024 - October 2026",
         "category": "projects",
         "description": "Advanced productivity system combining intelligent calendar management with context-aware alarm systems for optimized time management and task completion.",
-        "url": "https://github.com/parthchandak02/cal-tag-app",
+        "url": "https://github.com/parthchandak02/calarm",
         "typewriterTitle": "Programmer",
         "typewriterPrefix": "I am a",
         "skills": [
@@ -784,7 +784,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Boeing: Damping Ratios of Piloted Systems",
-        "date": "2018",
+        "date": "September 2017",
         "category": "projects",
         "location": "Boeing Collaboration, WSU",
         "company": "Boeing",
@@ -801,7 +801,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Center for Materials Research - ACRT Furnace System",
-        "date": "2018",
+        "date": "May 2018",
         "category": "projects",
         "location": "WSU Materials Research",
         "company": "WSU",
@@ -817,7 +817,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "IEEE Hardware Hackathon - Sunlight-Following Robot",
-        "date": "2017",
+        "date": "October 2017",
         "category": "projects",
         "location": "Washington State University",
         "company": "WSU",
@@ -981,7 +981,7 @@ export const timelineDataByCategory = {
 };
 
 // Single source of truth for category ordering
-export const categoryOrder = ['experience', 'education', 'volunteering', 'patent', 'research', 'judging', 'awards', 'speaking', 'media', 'memberships', 'lab', 'projects'];
+export const categoryOrder = ['experience', 'education', 'patent', 'research', 'judging', 'impact', 'awards', 'speaking', 'media', 'memberships', 'lab', 'projects'];
 
 // Flattened timeline data for backward compatibility (computed from categories)
 export const timelineData = (() => {

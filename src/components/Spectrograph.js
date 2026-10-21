@@ -136,7 +136,7 @@ const Track = ({ band, entries, active, onActive }) => {
 };
 
 /**
- * The prism splits one beam into a spectrum; this splits a record into seven bands.
+ * The prism splits one beam into a spectrum; this splits a record into eight bands, red through violet.
  * Collapsed it is a single strip, expanded it is one row per band. Everything is drawn from
  * src/data/spectrum.js, so adding an item there is all it takes.
  */
@@ -164,8 +164,8 @@ const Spectrograph = ({ lightMode = false, handedOver = false }) => {
       type="button"
       className={`spectro-toggle glass glass-interactive${handedOver ? ' is-away' : ''}`}
       aria-expanded={expanded}
-      aria-label={expanded ? 'Collapse to one strip' : 'Split into seven bands'}
-      title={expanded ? 'Collapse' : 'Split into seven bands'}
+      aria-label={expanded ? 'Collapse to one strip' : 'Split into eight bands'}
+      title={expanded ? 'Collapse' : 'Split into eight bands'}
       tabIndex={handedOver ? -1 : 0}
       onClick={() => { setExpanded((v) => !v); setActive(null); }}
     >
