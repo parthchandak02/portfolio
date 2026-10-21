@@ -1,0 +1,86 @@
+/* The band bar: no panel, just the band and its ticks floating at the top. Content fades out before it. */
+.bandbar {
+  position: fixed;
+  top: 14px; left: 50%;
+  width: min(760px, calc(100vw - 220px));
+  transform: translate(-50%, 0);
+  z-index: 40;
+  padding: 10px 4px 8px;
+  opacity: 0; pointer-events: none;
+  font-family: var(--font-family-primary);
+  transition: opacity 0.2s ease;
+}
+.bandbar.is-visible { opacity: 1; pointer-events: auto; }
+
+.bandbar--dark {
+  color: rgba(255, 255, 255, 0.92); --mute: rgba(255, 255, 255, 0.6); --edge: rgba(255, 255, 255, 0.12); --ink: 0;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.55);
+}
+.bandbar--light {
+  color: rgba(20, 20, 24, 0.92); --mute: rgba(20, 20, 24, 0.62); --edge: rgba(0, 0, 0, 0.14); --ink: 0.38;
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.7);
+}
+
+.bandbar__inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; min-width: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .bandbar__inner { animation: bandbar-swap 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  .bandbar__line { transition: width 0.12s, height 0.12s, opacity 0.2s, box-shadow 0.12s; }
+}
+@keyframes bandbar-swap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.bandbar__top { display: flex; align-items: baseline; gap: 10px; min-height: 22px; min-width: 0; }
+.bandbar__name {
+  flex: none; padding: 0; border: 0; background: none; cursor: pointer; font: inherit;
+  font-size: 0.84rem; font-weight: 700; letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000);
+}
+.bandbar__name:hover { text-decoration: underline; }
+.bandbar__label { min-width: 0; font-size: 0.78rem; color: var(--mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.bandbar__track {
+  position: relative; height: 32px; cursor: pointer; touch-action: pan-y; border-radius: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.bandbar__track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--edge); }
+.bandbar__track:focus-visible, .bandbar__name:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; }
+
+.bandbar__line {
+  position: absolute; top: 50%; width: 2px; height: 14px; transform: translate(-50%, -50%);
+  border-radius: 2px; pointer-events: none; opacity: 0.4;
+  background: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000);
+}
+.bandbar__line.is-current { opacity: 1; height: 22px; }
+.bandbar__line.is-peek {
+  opacity: 1; height: 26px; width: 3px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--hue) 22%, transparent);
+}
+.bandbar__line.is-future { background: transparent; border: 1.5px solid var(--hue); opacity: 0.9; }
+
+@media (max-width: 1024px) {
+  /* leave room for the round toggles on the right */
+  .bandbar { left: 12px; right: 72px; width: auto; transform: none; padding: 8px 2px 6px; }
+  .bandbar__track { height: 40px; }
+}
+
+/* Content fades out as it nears the bar, so it never runs underneath it */
+.is-top-fading {
+  -webkit-mask-image: linear-gradient(to bottom, transparent var(--fade-cut), #000 calc(var(--fade-cut) + var(--fade-ramp)));
+  mask-image: linear-gradient(to bottom, transparent var(--fade-cut), #000 calc(var(--fade-cut) + var(--fade-ramp)));
+}
+
+/* Safety net behind the bar: solid page color where the bar sits, easing out below it, so a fast scroll can
+   never show card text in the strip above the bar */
+.bandbar-veil {
+  position: fixed; top: 0; left: 0; right: 0; height: 150px; z-index: 39;
+  pointer-events: none; opacity: 0; transition: opacity 0.2s ease;
+}
+.bandbar-veil.is-visible { opacity: 1; }
+.bandbar-veil--dark { background: linear-gradient(to bottom, #000 0, #000 92px, rgba(0, 0, 0, 0) 100%); }
+.bandbar-veil--light { background: linear-gradient(to bottom, #fff 0, #fff 92px, rgba(255, 255, 255, 0) 100%); }
+
+/* The hand-off between the hero strip and the bar: stand-in lines fly between the two while the real
+   ones wait out of sight */
+.bandbar-morph { position: fixed; inset: 0; z-index: 45; pointer-events: none; }
+.bandbar-morph__line { position: absolute; top: 0; left: 0; width: 2px; border-radius: 2px; will-change: transform, height, opacity; }
+.bandbar.is-morphing .bandbar__line { opacity: 0 !important; transition: none; }
+.spectro.is-morphing .spectro__line { opacity: 0 !important; transition: none; }

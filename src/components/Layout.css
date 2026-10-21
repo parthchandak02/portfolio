@@ -124,3 +124,9 @@
     max-width: calc(100vw - 90px); /* Ultra-conservative spacing for very small phones like iPhone SE */
   }
 } 
+/* The light, lock and play buttons belong to the top screen; they step aside once reading starts */
+.layout__ui--reading .light-toggle,
+.layout__ui--reading .lock-toggle,
+.layout__ui--reading .play-mode-toggle {
+  opacity: 0; transform: translateX(12px); pointer-events: none; visibility: hidden;
+}

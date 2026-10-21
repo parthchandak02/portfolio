@@ -1,6 +1,6 @@
 # Hi, I'm Parth Chandak 👋
 
-I'm a **Creative Technologist at Zoox**, where I design and prototype experiences for autonomous vehicles. My work sits at the intersection of hardware, software, and design—building UX-focused platforms that reduce iteration time from weeks to days while helping shape the future of transportation.
+I'm a **Senior Creative Technologist at Zoox**, where I design and prototype experiences for autonomous vehicles. My work sits at the intersection of hardware, software, and design—building UX-focused platforms that reduce iteration time from weeks to days while helping shape the future of transportation.
 
 Before diving into creative technology, I spent years as a Manufacturing Engineer at Zoox and worked on Tesla's Supercharger infrastructure. I hold a **BS in Mechanical Engineering** from Washington State University (with minors in Computer Science and Mathematics) and studied **UX Design at UC Berkeley Extension**.
 

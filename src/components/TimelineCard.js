@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ExternalLink, FileText, MapPin, Calendar } from 'lucide-react';
+import { ExternalLink, FileText, MapPin, Calendar, Play } from 'lucide-react';
 import { iconMap } from '../data/timelineData';
 import './TimelineCard.css';
 
@@ -14,16 +14,21 @@ const TimelineCard = ({
   location,
   volume,
   url, // New URL field for external links
+  video, // Optional { id, title } for a click-to-load YouTube embed
   skills = [], // Skill/technology icons for this card
   isTypewriterHighlighted = false,
   lightMode = false,
   className = '',
-  ...props 
+  defaultExpanded = false, // Opened from a tile: starts open
+  onCollapse, // Opened from a tile: collapsing turns it back into the tile
+  ...props
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [clickedIcons, setClickedIcons] = useState(new Set()); // Track clicked nav icons
-  
+  const [videoPlaying, setVideoPlaying] = useState(false); // Embed only loads after the visitor asks for it
+
   const handleHeaderClick = () => {
+    if (isExpanded && onCollapse) { onCollapse(); return; }
     setIsExpanded((prev) => !prev);
   };
 
@@ -131,6 +136,36 @@ const TimelineCard = ({
             </div>
           )}
           
+          {/* Video - a thumbnail until clicked, so no third-party code loads up front */}
+          {video && (
+            <div className="timeline-card__video">
+              {videoPlaying ? (
+                <iframe
+                  className="timeline-card__video-frame"
+                  src={`https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&rel=0`}
+                  title={video.title}
+                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                  allowFullScreen
+                />
+              ) : (
+                <button
+                  type="button"
+                  className="timeline-card__video-button"
+                  onClick={(e) => { e.stopPropagation(); setVideoPlaying(true); }}
+                  aria-label={`Play video: ${video.title}`}
+                >
+                  <img
+                    src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
+                    alt=""
+                    className="timeline-card__video-thumb"
+                    loading="lazy"
+                  />
+                  <span className="timeline-card__video-play"><Play size={22} fill="currentColor" /></span>
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Description */}
           {description && (
             <p className="timeline-card__description">{description}</p>

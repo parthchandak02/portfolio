@@ -6,7 +6,7 @@ import LightToggle from './components/LightToggle';
 import LockToggle from './components/LockToggle';
 import PlayModeToggle from './components/PlayModeToggle';
 import Timeline from './components/Timeline';
-import LeftSidebar from './components/LeftSidebar';
+import BandBar from './components/BandBar';
 import RightSidebar from './components/RightSidebar';
 import UITypewriter from './components/UITypewriter';
 import useLightMode from './hooks/useLightMode';
@@ -15,6 +15,26 @@ import useScrollHighlight from './hooks/useScrollHighlight';
 import { timelineData } from './data/timelineData';
 import { TypewriterHighlightProvider } from './contexts/TypewriterHighlightContext';
 import ScrollTypewriterController from './components/ScrollTypewriterController';
+import Spectrograph from './components/Spectrograph';
+
+const VISITED_KEY = 'pc-has-visited';
+
+// First visit opens play mode; later visits open the record. Storage can be blocked, so default to play.
+const isReturningVisitor = () => {
+  try {
+    return window.localStorage.getItem(VISITED_KEY) === '1';
+  } catch (e) {
+    return false;
+  }
+};
+
+const markVisited = () => {
+  try {
+    window.localStorage.setItem(VISITED_KEY, '1');
+  } catch (e) {
+    // ignore: the visit just isn't remembered
+  }
+};
 
 /**
  * Main App component - Clean, modular structure following React 2024 best practices
@@ -34,11 +54,9 @@ export default function App() {
   // Single source of truth for all mouse state
   const { isLocked, toggleLock, viewportPosition } = useGlobalMouse();
   
-  // Filter state for the timeline - now supports multiple selected filters (toggle-based)
-  const [activeFilters, setActiveFilters] = useState([]);
-  
-  // Play mode state - toggle between interactive mode and resume reading mode (default: true for immediate fun experience)
-  const [isPlayMode, setIsPlayMode] = useState(true);
+  // Play mode state - toggle between interactive mode and resume reading mode.
+  // First visit: play mode. Returning visitors, and anyone arriving on a #section link, get the record.
+  const [isPlayMode, setIsPlayMode] = useState(() => !isReturningVisitor() && !window.location.hash);
   const togglePlayMode = () => {
     const newPlayMode = !isPlayMode;
     setIsPlayMode(newPlayMode);
@@ -56,34 +74,52 @@ export default function App() {
     }
   };
   
-  // Track which category section is currently visible for sidebar highlighting
-  const { visibleCategory } = useScrollHighlight('all');
-
   // Get unique categories for filter buttons (excluding 'all')
   const categories = useMemo(() => {
     return [...new Set(timelineData.map(item => item.category?.toLowerCase()).filter(Boolean))];
   }, []);
 
-  // Format filters for sidebar components
-  const filters = useMemo(() => {
-    return categories.map(category => ({
-      key: category,
-      label: category.charAt(0).toUpperCase() + category.slice(1)
-    }));
-  }, [categories]);
+  // Resume mode starts with the beam locked, matching what the toggle does at runtime
+  useEffect(() => {
+    markVisited();
+    if (!isPlayMode && !isLocked) {
+      toggleLock();
+    }
+    // Run once on mount only
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Toggle filter function - single-select behavior (radio button style)
-  const toggleFilter = (categoryKey) => {
-    setActiveFilters(prev => {
-      if (prev.includes(categoryKey)) {
-        // If clicking the active filter, turn it off (show all)
-        return [];
-      } else {
-        // Turn off all others and activate only this one
-        return [categoryKey];
+  // #section links: show the record, then scroll the section into view
+  const [hash, setHash] = useState(() => window.location.hash.slice(1));
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash.slice(1));
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  useEffect(() => {
+    if (!hash || !categories.includes(hash)) return;
+    if (isPlayMode) {
+      togglePlayMode();
+      return;
+    }
+    const timer = setTimeout(() => {
+      const target = document.getElementById(hash);
+      const scroller = document.querySelector('.main-content-scroll');
+      if (target && scroller) {
+        const top = scroller.scrollTop + target.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 100;
+        scroller.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
       }
-    });
-  };
+    }, 150);
+    return () => clearTimeout(timer);
+    // togglePlayMode is recreated each render; hash and mode are the real triggers
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hash, isPlayMode]);
+
+  // Which section and card is in view, for the sticky band bar
+  const { visibleCategory, visibleTitle } = useScrollHighlight('all');
+  // Once the band bar takes over from the strip, the round buttons step aside; they belong to the top screen
+  const handedOver = !isPlayMode && visibleCategory !== 'all';
 
   // Sync html and body background with light mode to prevent edge bleeding
   useEffect(() => {
@@ -98,15 +134,6 @@ export default function App() {
       <Layout 
         lightMode={lightMode}
         darkMode={!lightMode}
-        leftSidebar={!isPlayMode && categories.length > 1 ? (
-          <LeftSidebar
-            filters={filters}
-            activeFilters={activeFilters}
-            visibleCategory={visibleCategory}
-            onFilterToggle={toggleFilter}
-            lightMode={lightMode}
-          />
-        ) : null}
         rightSidebar={!isPlayMode ? (
           <RightSidebar
             lightMode={lightMode}
@@ -121,16 +148,20 @@ export default function App() {
         />
         
         {/* UI Overlay Layer */}
-        <div className="layout__ui">
+        <div className={`layout__ui${handedOver ? ' layout__ui--reading' : ''}`}>
           {/* Fixed UI Components */}
           <LightToggle lightMode={lightMode} onToggle={toggleLightMode} />
           <LockToggle isLocked={isLocked} onToggle={toggleLock} />
           <PlayModeToggle isPlayMode={isPlayMode} onToggle={togglePlayMode} />
+          {!isPlayMode && <BandBar category={visibleCategory} title={visibleTitle} lightMode={lightMode} />}
           
           {/* Main Content Area - Typewriter always shows, other content conditional */}
           <div className="main-content-scroll">
             {/* Typewriter that always shows regardless of play mode */}
             <UITypewriter lightMode={lightMode} />
+
+            {/* Record spectrograph - visible in both modes */}
+            <Spectrograph lightMode={lightMode} handedOver={handedOver} />
             
             {/* Resume content - Hidden in play mode */}
             {!isPlayMode && (
@@ -146,9 +177,8 @@ export default function App() {
                 </div>
                 <Timeline 
                  data={timelineData}
-                 activeFilters={activeFilters}
-                 showFilters={false} // Filters are now handled by LeftSidebar
                  lightMode={lightMode}
+                 currentTitle={handedOver ? visibleTitle : null}
                  className="timeline-in-scroll"
                />
               </>

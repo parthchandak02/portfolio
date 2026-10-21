@@ -1,4 +1,5 @@
 // Timeline data - using clean data structure with centralized icon mapping
+import { labProjects } from './lab';
 import { 
   // Navigation icons from Lucide React
   Code, Database, GitBranch, Cpu, Terminal, Settings, Zap,
@@ -62,6 +63,7 @@ export const iconMap = {
   'Innovation': Lightbulb,
   'Leadership': Crown,
   'Relationships': HeartHandshake,
+  'Community Service': HeartHandshake,
   'Collaboration': Handshake,
   'Research': Microscope,
   'User Experience': User,
@@ -109,14 +111,13 @@ export const iconMap = {
 export const timelineDataByCategory = {
   experience: [
     {
-        "title": "Creative Technologist",
+        "title": "Senior Creative Technologist",
         "company": "Zoox",
         "companyLogo": "/logos/zoox-logo.png",
-        "projectImage": "/images/zoox-main.png",
-        "date": "February 2022 - Present",
+        "date": "October 2026 - Present",
         "category": "experience",
         "location": "Foster City, CA",
-        "description": "Created a UX focused robot platform and creative lab for designing 20+ visual and sonic experience projects. Reduced design iteration and validation time from multiple weeks to 1-2 days (90% reduction). Tested 40+ digital and mechanical designs on various autonomous vehicle platforms to help in research and design validation. Created 15+ hardware and software prototypes, aiding and enhancing research and design studies.",
+        "description": "Build the prototyping systems that let designers and researchers try ideas in the robotaxi cabin, from lights and sound to displays and controls, and test them in realistic conditions.",
         "typewriterTitle": "Creative Technologist",
         "typewriterPrefix": "I am a",
         "skills": [
@@ -129,13 +130,68 @@ export const timelineDataByCategory = {
         ]
     },
     {
+        "title": "Creative Technologist",
+        "company": "Zoox",
+        "companyLogo": "/logos/zoox-logo.png",
+        "projectImage": "/images/zoox-main.png",
+        "date": "February 2022 - October 2026",
+        "category": "experience",
+        "location": "Foster City, CA",
+        "description": "Build prototyping systems that let designers and researchers try ideas in the robotaxi cabin, from lights and sound to displays and controls, without waiting on engineering. Connect design tools to vehicle hardware so new variations can be tested quickly and in realistic conditions.",
+        "typewriterTitle": "Creative Technologist",
+        "typewriterPrefix": "I am a",
+        "skills": [
+            "Microcontrollers",
+            "Figma",
+            "Blender",
+            "SolidWorks",
+            "ProtoPie",
+            "Linux"
+        ]
+    },
+    {
+        "title": "Find My Zoox",
+        "company": "Zoox",
+        "companyLogo": "/logos/zoox-logo.png",
+        "date": "May 2026",
+        "category": "experience",
+        "location": "Zoox, public launch video",
+        "description": "Riders set a theme in the app and find their robotaxi by a personalized light and sound sequence. Helped prototype the lights and audio, and built the tooling that let designers try different color variations.",
+        "video": { "id": "fbEqWTsEZHA", "title": "Find My Zoox, Zoox on YouTube" },
+        "url": "https://www.youtube.com/watch?v=fbEqWTsEZHA",
+        "typewriterTitle": "Prototyper",
+        "typewriterPrefix": "I am a",
+        "skills": [
+            "Prototyping",
+            "Design",
+            "User Experience"
+        ]
+    },
+    {
+        "title": "ZooxCast",
+        "company": "Zoox",
+        "companyLogo": "/logos/zoox-logo.png",
+        "date": "May 2026",
+        "category": "experience",
+        "location": "Zoox, public launch video",
+        "description": "Riders can stream their own audio over Bluetooth alongside Zoox's curated playlist. Helped designers test audio connections and prototyped ways to connect to the vehicle hardware.",
+        "video": { "id": "FBwjGXLNiBU", "title": "ZooxCast, Zoox on YouTube" },
+        "url": "https://www.youtube.com/watch?v=FBwjGXLNiBU",
+        "typewriterTitle": "Prototyper",
+        "typewriterPrefix": "I am a",
+        "skills": [
+            "Prototyping",
+            "User Experience"
+        ]
+    },
+    {
         "title": "Manufacturing Engineer",
         "company": "Zoox",
         "companyLogo": "/logos/zoox-logo.png",
         "date": "October 2018 - January 2022",
         "category": "experience",
         "location": "Foster City, CA",
-        "description": "Tracked 12,000+ parts with custom built scripts leading to less than 10 part traceability errors. Created tools and processes for 40+ technicians, improving manufacturing quality, testing, and material workflows. Manufactured vehicle hardware for 10+ products in their life cycles, from DFMEA to OQC.",
+        "description": "Built part-tracking scripts that improved traceability, and created tools and processes that improved manufacturing quality, testing, and material workflows for technicians. Manufactured vehicle hardware across product life cycles, from DFMEA to OQC.",
         "skills": [
             "Python",
             "JavaScript",
@@ -244,13 +300,14 @@ export const timelineDataByCategory = {
   ],
   patent: [
     {
-        "title": "Audio Prioritization Patent (Pending)",
-        "date": "June 2024",
+        "title": "Audio Prioritization (US20260003563A1)",
+        "date": "Filed June 2024, published January 2026",
         "category": "patent",
         "company": "Zoox",
         "companyLogo": "/logos/zoox-logo.png",
-        "location": "Application #1/###,573; Ref. 1246-02850US1",
-        "description": "Innovative patent pending for audio prioritization technology, demonstrating cutting-edge research in autonomous vehicle audio systems and user experience optimization.",
+        "location": "US20260003563A1 and WO2026005985A1",
+        "url": "https://patents.google.com/patent/US20260003563A1/en",
+        "description": "Named inventor on a published patent application for context-aware audio prioritization in autonomous vehicles, covering how in-cabin audio behavior can be tested and tuned in realistic prototypes.",
         "typewriterTitle": "Inventor",
         "typewriterPrefix": "I am an ",
         "skills": [
@@ -263,6 +320,7 @@ export const timelineDataByCategory = {
     {
         "title": "A Practical Framework for Rapid Prototyping and Fidelity in Product Development",
         "date": "June 2025",
+        "projectImage": "/images/keynote-rapid-prototyping-fidelity.jpg",
         "category": "speaking",
         "location": "ICETAIA Conference",
         "description": "Keynote presentation on innovative rapid prototyping methodologies and fidelity frameworks for modern product development, sharing insights from autonomous vehicle development.",
@@ -271,14 +329,52 @@ export const timelineDataByCategory = {
         ]
     }
   ],
-  volunteering: [
+  impact: [
+    {
+        "title": "Rebuilding Together: Fence and Handrail Build",
+        "date": "April 2024",
+        "company": "Rebuilding Together",
+        "category": "impact",
+        "url": "https://photos.app.goo.gl/N2Gx6HM6KmrSNWds8",
+        "projectImage": "/images/impact/rebuilding-together-2024.jpg",
+        "description": "Built a fence under the guidance of the Rebuilding Together team, installed a new microwave, added a handrail to the stairs down to the yard, cleared the area and mowed the grass.",
+        "skills": [
+            "Community Service"
+        ]
+    },
+    {
+        "title": "Catholic Worker House: Kitchen and Sheds",
+        "date": "October 2023",
+        "company": "Catholic Worker House",
+        "category": "impact",
+        "url": "https://photos.app.goo.gl/PVaDbtecgY5weSYJ9",
+        "projectImage": "/images/impact/catholic-worker-house-2023.jpg",
+        "description": "Painted the kitchen, built shelves in the food and tool sheds, and refurbished the landscaping.",
+        "skills": [
+            "Community Service"
+        ]
+    },
+    {
+        "title": "Rebuilding Together: Yard Rebuild",
+        "date": "April 2023",
+        "company": "Rebuilding Together",
+        "category": "impact",
+        "url": "https://photos.app.goo.gl/smkP4AQiFjMZa9FA9",
+        "projectImage": "/images/impact/rebuilding-together-2023.jpg",
+        "description": "Redid an entire yard: removed the grass, laid down over 200 lbs of crushed gravel, installed rails, worked on the house interior and cleaned up the backyard.",
+        "skills": [
+            "Community Service"
+        ]
+    },
     {
         "title": "BuildOn Nepal School Project - $55K Fundraising Lead",
         "date": "January 2025",
         "company": "BuildOn",
         "companyLogo": "/logos/buildon-logo.png",
-        "category": "volunteering",
+        "category": "impact",
         "location": "Nepal",
+        "url": "https://buildon-nepal-trek.vercel.app",
+        "projectImage": "/images/buildon-nepal-trek.png",
         "description": "Raised $55,000 to build a school in Nepal, directly impacting 210+ students (including 108 girls) in a community of 2250 farmers. Led fundraising strategy and participated in construction trek.",
         "skills": [
             "Fundraising",
@@ -289,7 +385,7 @@ export const timelineDataByCategory = {
     {
         "title": "Manager, Team Innovation Program",
         "date": "May 2025 - Present",
-        "category": "volunteering",
+        "category": "impact",
         "company": "Mentor Discover Inspire",
         "companyLogo": "/logos/mdi-logo.png",
         "location": "Mentor Discover Inspire",
@@ -305,7 +401,7 @@ export const timelineDataByCategory = {
     {
         "title": "Team Leader",
         "date": "May 2025 - Present",
-        "category": "volunteering",
+        "category": "impact",
         "company": "Mentor Discover Inspire",
         "companyLogo": "/logos/mdi-logo.png",
         "location": "Mentor Discover Inspire",
@@ -385,6 +481,7 @@ export const timelineDataByCategory = {
         "date": "August 2024",
         "category": "research",
         "volume": "IJIRMPS, Volume 12, Issue 4",
+        "url": "https://doi.org/10.5281/zenodo.14280144",
         "description": "Framework for incorporating user-centered design principles in rapid prototyping of robotic systems, with emphasis on human-robot interaction.",
         "typewriterTitle": "Researcher",
         "typewriterPrefix": "I am a",
@@ -445,6 +542,7 @@ export const timelineDataByCategory = {
         "date": "July 2023",
         "category": "research",
         "volume": "JEAST, Volume 5, Issue 4",
+        "url": "https://doi.org/10.47363/JEAST/2023(5)E170",
         "description": "Investigation of haptic feedback systems in mixed reality environments and their impact on user experience and task performance.",
         "typewriterTitle": "Researcher",
         "typewriterPrefix": "I am a",
@@ -461,6 +559,7 @@ export const timelineDataByCategory = {
         "date": "2023",
         "category": "research",
         "volume": "JMSMR, Volume 4, Issue 1",
+        "url": "https://doi.org/10.47363/JMSMR/2023(4)E115",
         "description": "Comprehensive study of rapid prototyping methodologies and their application in modern design frameworks across multiple industries.",
         "typewriterTitle": "Researcher",
         "typewriterPrefix": "I am a",
@@ -577,10 +676,100 @@ export const timelineDataByCategory = {
         ]
     }
   ],
+  judging: [
+    {
+        "title": "Peer Reviewer, Springer Nature",
+        "date": "February 2026 - September 2026",
+        "category": "judging",
+        "location": "BMC, Discover and Humanities and Social Sciences Communications journals",
+        "description": "Certified peer reviews for Springer Nature journals: BMC Health Services Research (Feb 22, 2026), Discover Artificial Intelligence (Aug 11), Discover Education (Aug 23 and Sep 10), Humanities and Social Sciences Communications (Aug 23), Discover Sustainability (Sep 10) and Discover Oncology (Sep 18).",
+        "typewriterTitle": "Reviewer",
+        "typewriterPrefix": "I am a",
+        "skills": [
+            "Research",
+            "Advisor"
+        ]
+    },
+    {
+        "title": "Cal Hacks 13.0, Judge",
+        "date": "October 23-25, 2026",
+        "projectImage": "/images/judging/cal-hacks-13.jpg",
+        "category": "judging",
+        "location": "San Francisco, CA",
+        "description": "Judge at Cal Hacks 13.0.",
+        "skills": [
+            "Advisor",
+            "Innovation"
+        ]
+    },
+    {
+        "title": "LA Hacks 2026, Judge",
+        "date": "April 26, 2026",
+        "projectImage": "/images/judging/la-hacks-2026.jpg",
+        "category": "judging",
+        "location": "Los Angeles, CA",
+        "description": "Invite-only judge for a hackathon of 1,000+ students.",
+        "skills": [
+            "Advisor",
+            "Innovation"
+        ]
+    },
+    {
+        "title": "HackMerced XI, Judge",
+        "date": "March 8, 2026",
+        "projectImage": "/images/judging/hackmerced-xi-judges.jpg",
+        "category": "judging",
+        "location": "UC Merced",
+        "description": "Judged MLH and UC Merced hackathon projects.",
+        "skills": [
+            "Advisor",
+            "Innovation"
+        ]
+    }
+  ],
+  memberships: [
+    {
+        "title": "IEEE Senior Member",
+        "date": "February 2026",
+        "category": "memberships",
+        "description": "Elevated membership grade of the IEEE, awarded for professional achievement.",
+        "skills": [
+            "Technology"
+        ]
+    },
+    {
+        "title": "Sigma Xi, The Scientific Research Honor Society",
+        "date": "March 2026",
+        "category": "memberships",
+        "description": "Member of the scientific research honor society.",
+        "skills": [
+            "Research"
+        ]
+    },
+    {
+        "title": "Tau Beta Pi, Engineering Honor Society",
+        "date": "May 2018",
+        "category": "memberships",
+        "description": "Member of the engineering honor society.",
+        "skills": [
+            "Robotics"
+        ]
+    },
+    {
+        "title": "QuillBot Product Advisory Panel",
+        "date": "April 2025",
+        "category": "memberships",
+        "description": "Member of the product advisory panel for the QuillBot writing tool.",
+        "skills": [
+            "Advisor"
+        ]
+    }
+  ],
+  lab: labProjects,
   projects: [
     {
         "title": "LLM Assisted Research Platform",
-        "date": "2024",
+        "date": "December 2024 - September 2026",
         "category": "projects",
         "description": "AI-powered literature review assistant that streamlines academic research workflows. Leverages large language models to automate paper analysis, extract key insights, and synthesize research findings across multiple documents.",
         "url": "https://github.com/parthchandak02/literature-review-assistant",
@@ -595,7 +784,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Google Apps Script AI Integration Framework",
-        "date": "2024",
+        "date": "February 2025",
         "category": "projects",
         "companyLogo": "/logos/gapps-script.png",
         "description": "Framework for integrating AI capabilities into Google Workspace applications using Apps Script and Gemini API. Enables automated document processing, intelligent data analysis, and workflow optimization.",
@@ -611,7 +800,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Financial Trading API for Interactive Brokers (IBKR)",
-        "date": "2024",
+        "date": "March 2025 - July 2026",
         "category": "projects",
         "companyLogo": "/logos/ibkr-logo.png",
         "description": "Comprehensive REST API for Interactive Brokers platform enabling automated trading, portfolio management, and real-time market data integration.",
@@ -625,10 +814,11 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Calendar and Alarm Productivity System",
-        "date": "2024",
+        "date": "September 2024 - October 2026",
+        "projectImage": "/images/calarm-live-activity.jpg",
         "category": "projects",
         "description": "Advanced productivity system combining intelligent calendar management with context-aware alarm systems for optimized time management and task completion.",
-        "url": "https://github.com/parthchandak02/cal-tag-app",
+        "url": "https://github.com/parthchandak02/calarm",
         "typewriterTitle": "Programmer",
         "typewriterPrefix": "I am a",
         "skills": [
@@ -639,7 +829,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Boeing: Damping Ratios of Piloted Systems",
-        "date": "2018",
+        "date": "September 2017",
         "category": "projects",
         "location": "Boeing Collaboration, WSU",
         "company": "Boeing",
@@ -656,7 +846,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Center for Materials Research - ACRT Furnace System",
-        "date": "2018",
+        "date": "May 2018",
         "category": "projects",
         "location": "WSU Materials Research",
         "company": "WSU",
@@ -672,7 +862,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "IEEE Hardware Hackathon - Sunlight-Following Robot",
-        "date": "2017",
+        "date": "October 2017",
         "category": "projects",
         "location": "Washington State University",
         "company": "WSU",
@@ -702,7 +892,9 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Crimson Code Software Hackathon - 1st Place (Tier 1)",
-        "date": "2017",
+        "date": "March 2018",
+        "projectImage": "/images/crimson-code-2018-caffeine-cycle.png",
+        "url": "https://tiny.cc/crimsoncode2018",
         "category": "awards",
         "company": "WSU",
         "companyLogo": "/logos/wsu-logo.png",
@@ -741,6 +933,7 @@ export const timelineDataByCategory = {
     {
         "title": "User-Centered Design Approaches for Manufacturing Systems",
         "date": "2025",
+        "projectImage": "/images/media/ucd-manufacturing-zoox.jpg",
         "category": "media",
         "location": "Analytics Insight",
         "description": "Featured article discussing innovative approaches to user-centered design in modern manufacturing systems and Industry 4.0 applications.",
@@ -754,6 +947,7 @@ export const timelineDataByCategory = {
     {
         "title": "The Creative Technologist: Bridging Engineering, UX, and Robotics",
         "date": "2025",
+        "projectImage": "/images/media/creative-technologist-deccan.jpg",
         "category": "media",
         "location": "Deccan Chronicle",
         "description": "Profile piece highlighting the intersection of engineering, user experience design, and robotics in autonomous vehicle development.",
@@ -767,6 +961,8 @@ export const timelineDataByCategory = {
     {
         "title": "Bridging the Trust Gap Between Humans and Autonomous Systems",
         "date": "2025",
+        "projectImage": "/images/media/bridging-trust-gap.jpg",
+        "url": "https://www.freepressjournal.in/latest-news/bridging-the-trust-gap-between-humans-autonomous-systems-through-intuitive-interfaces",
         "category": "media",
         "location": "Free Press Journal",
         "description": "Analysis of trust-building strategies in human-autonomous system interactions, drawing from automotive industry experience.",
@@ -780,6 +976,7 @@ export const timelineDataByCategory = {
     {
         "title": "Leveraging Mixed Reality and Haptic Feedback for Immersive User Experiences",
         "date": "2024",
+        "projectImage": "/images/media/mixed-reality-haptics.jpg",
         "category": "media",
         "location": "The Hans India",
         "description": "Technical discussion of mixed reality applications and haptic feedback systems in creating immersive user experiences.",
@@ -793,6 +990,7 @@ export const timelineDataByCategory = {
     {
         "title": "Rapid Prototyping Methodologies for Complex Systems",
         "date": "2023",
+        "projectImage": "/images/media/rapid-prototyping-complex-systems.jpg",
         "category": "media",
         "location": "Indiahood",
         "description": "In-depth coverage of rapid prototyping techniques for complex engineering systems, from concept to testing phases.",
@@ -806,6 +1004,7 @@ export const timelineDataByCategory = {
     {
         "title": "Advancing Human-Robot Interaction Through Intuitive Interfaces",
         "date": "2022",
+        "projectImage": "/images/media/advancing-hri-indiacsr.jpg",
         "category": "media",
         "location": "India CSR",
         "description": "Discussion of innovative interface design approaches for improving human-robot interaction in various applications.",
@@ -819,6 +1018,7 @@ export const timelineDataByCategory = {
     {
         "title": "Freedom to Soar",
         "date": "2018",
+        "projectImage": "/images/media/freedom-to-soar-wsu.jpg",
         "category": "media",
         "company": "WSU",
         "companyLogo": "/logos/wsu-logo.png",
@@ -835,7 +1035,7 @@ export const timelineDataByCategory = {
 };
 
 // Single source of truth for category ordering
-export const categoryOrder = ['experience', 'education', 'patent', 'projects', 'speaking', 'awards', 'research', 'media', 'volunteering'];
+export const categoryOrder = ['experience', 'education', 'patent', 'research', 'judging', 'impact', 'awards', 'speaking', 'media', 'memberships', 'lab', 'projects'];
 
 // Flattened timeline data for backward compatibility (computed from categories)
 export const timelineData = (() => {

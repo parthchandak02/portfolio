@@ -116,6 +116,11 @@
   /* Removed padding-left for clean layout without dots */
 }
 
+/* A run of picture cards shown as tiles; an opened one takes the whole row */
+.timeline__tiles { margin-bottom: 32px; }
+.timeline__tiles .timeline__item { margin-bottom: 0; }
+.timeline__tiles .timeline__item--open { grid-column: 1 / -1; }
+
 /* Timeline dots removed for cleaner design */
 
 /* Timeline Card within Timeline */
@@ -192,4 +197,13 @@
     margin-left: 0; /* Was -32px - compensating for padding that no longer exists */
     padding: 32px 16px;
   }
+}
+/* The card whose line is lit on the band bar: its edge picks up the band's colour, softly */
+.timeline__item[data-current] > .timeline-card,
+.timeline__item[data-current] > .lab-tile {
+  border-color: color-mix(in srgb, var(--band-hue) 55%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--band-hue) 18%, transparent),
+    0 0 28px color-mix(in srgb, var(--band-hue) 12%, transparent),
+    var(--glass-shadow-base);
 }
