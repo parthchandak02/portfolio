@@ -111,13 +111,3 @@
 @media (prefers-reduced-motion: reduce) {
   .lab-tile__img, .lab-tile__fog, .lab-tile__reveal { transition: none; }
 }
-
-/* A logo instead of a photo: whole, centred and small, so the glass still reads as glass */
-.lab-tile .lab-tile__img--logo {
-  inset: 18% 22% 38%; width: 56%; height: 44%;
-  object-fit: contain; object-position: center;
-  opacity: 0.4; filter: none; transform: none;
-}
-.lab-tile.is-open .lab-tile__img--logo, .lab-tile:focus-visible .lab-tile__img--logo { opacity: 0.9; transform: none; }
-@media (hover: hover) { .lab-tile:hover .lab-tile__img--logo { opacity: 0.9; transform: none; } }
-.lab--light .lab-tile__img--logo { filter: invert(1); }

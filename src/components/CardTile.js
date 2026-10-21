@@ -1,16 +1,10 @@
 import { Maximize2, Play } from 'lucide-react';
 import './LabShowcase.css';
 
-// Impact cards tile even without a photo, showing their organisation's logo instead
-const LOGO_TILE_CATEGORIES = new Set(['impact']);
-const logoTile = (item) => !item.projectImage && !item.video && LOGO_TILE_CATEGORIES.has(item.category) && item.companyLogo;
-
-// The picture a card shows as a tile: its own image, else its video's still, else (Impact only) its logo.
-// Cards without one stay wide.
+// The picture a card shows as a tile: its own image, else its video's still. Cards without one stay wide.
 export const tileImageFor = (item) => {
   if (item.projectImage) return item.projectImage;
   if (item.video) return `https://i.ytimg.com/vi/${item.video.id}/hqdefault.jpg`;
-  if (logoTile(item)) return item.companyLogo;
   return null;
 };
 
@@ -25,7 +19,7 @@ const CardTile = ({ item, highlighted = false, onOpen }) => (
     onClick={onOpen}
     aria-label={`${item.title}, ${item.date}. Open the full card`}
   >
-    <img className={`lab-tile__img${logoTile(item) ? ' lab-tile__img--logo' : ''}`} src={tileImageFor(item)} alt="" loading="lazy" />
+    <img className="lab-tile__img" src={tileImageFor(item)} alt="" loading="lazy" />
     {item.video && <span className="lab-tile__badge" aria-hidden="true"><Play size={12} fill="currentColor" /></span>}
 
     <span className="lab-tile__fog" aria-hidden="true">

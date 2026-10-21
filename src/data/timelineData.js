@@ -63,6 +63,7 @@ export const iconMap = {
   'Innovation': Lightbulb,
   'Leadership': Crown,
   'Relationships': HeartHandshake,
+  'Community Service': HeartHandshake,
   'Collaboration': Handshake,
   'Research': Microscope,
   'User Experience': User,
@@ -159,6 +160,8 @@ export const timelineDataByCategory = {
         "description": "Riders set a theme in the app and find their robotaxi by a personalized light and sound sequence. Helped prototype the lights and audio, and built the tooling that let designers try different color variations.",
         "video": { "id": "fbEqWTsEZHA", "title": "Find My Zoox, Zoox on YouTube" },
         "url": "https://www.youtube.com/watch?v=fbEqWTsEZHA",
+        "typewriterTitle": "Prototyper",
+        "typewriterPrefix": "I am a",
         "skills": [
             "Prototyping",
             "Design",
@@ -175,6 +178,8 @@ export const timelineDataByCategory = {
         "description": "Riders can stream their own audio over Bluetooth alongside Zoox's curated playlist. Helped designers test audio connections and prototyped ways to connect to the vehicle hardware.",
         "video": { "id": "FBwjGXLNiBU", "title": "ZooxCast, Zoox on YouTube" },
         "url": "https://www.youtube.com/watch?v=FBwjGXLNiBU",
+        "typewriterTitle": "Prototyper",
+        "typewriterPrefix": "I am a",
         "skills": [
             "Prototyping",
             "User Experience"
@@ -325,6 +330,42 @@ export const timelineDataByCategory = {
     }
   ],
   impact: [
+    {
+        "title": "Rebuilding Together: Fence and Handrail Build",
+        "date": "April 2024",
+        "company": "Rebuilding Together",
+        "category": "impact",
+        "url": "https://photos.app.goo.gl/N2Gx6HM6KmrSNWds8",
+        "projectImage": "/images/impact/rebuilding-together-2024.jpg",
+        "description": "Built a fence under the guidance of the Rebuilding Together team, installed a new microwave, added a handrail to the stairs down to the yard, cleared the area and mowed the grass.",
+        "skills": [
+            "Community Service"
+        ]
+    },
+    {
+        "title": "Catholic Worker House: Kitchen and Sheds",
+        "date": "October 2023",
+        "company": "Catholic Worker House",
+        "category": "impact",
+        "url": "https://photos.app.goo.gl/PVaDbtecgY5weSYJ9",
+        "projectImage": "/images/impact/catholic-worker-house-2023.jpg",
+        "description": "Painted the kitchen, built shelves in the food and tool sheds, and refurbished the landscaping.",
+        "skills": [
+            "Community Service"
+        ]
+    },
+    {
+        "title": "Rebuilding Together: Yard Rebuild",
+        "date": "April 2023",
+        "company": "Rebuilding Together",
+        "category": "impact",
+        "url": "https://photos.app.goo.gl/smkP4AQiFjMZa9FA9",
+        "projectImage": "/images/impact/rebuilding-together-2023.jpg",
+        "description": "Redid an entire yard: removed the grass, laid down over 200 lbs of crushed gravel, installed rails, worked on the house interior and cleaned up the backyard.",
+        "skills": [
+            "Community Service"
+        ]
+    },
     {
         "title": "BuildOn Nepal School Project - $55K Fundraising Lead",
         "date": "January 2025",
