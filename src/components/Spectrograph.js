@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { STICK_AT } from '../hooks/useScrollHighlight';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 import { spectrumBands } from '../data/spectrum';
 import './Spectrograph.css';
@@ -152,28 +154,51 @@ const Spectrograph = ({ lightMode = false }) => {
     []
   );
 
+  // The toggle is one more round button in the column with the other three, so it lives in the fixed UI
+  // layer. It steps aside once the strip has handed over to the band bar.
+  const sectionRef = useRef(null);
+  const [slot, setSlot] = useState(null);
+  const [handedOver, setHandedOver] = useState(false);
+
+  useEffect(() => {
+    setSlot(document.querySelector('.layout__ui'));
+    const scroller = document.querySelector('.main-content-scroll');
+    const section = sectionRef.current;
+    if (!scroller || !section) return undefined;
+    const check = () => setHandedOver(section.getBoundingClientRect().top <= scroller.getBoundingClientRect().top + STICK_AT);
+    check();
+    scroller.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+    return () => {
+      scroller.removeEventListener('scroll', check);
+      window.removeEventListener('resize', check);
+    };
+  }, []);
+
   const toggle = (
     <button
       type="button"
-      className="spectro__toggle"
+      className={`spectro-toggle glass glass-interactive${handedOver ? ' is-away' : ''}`}
       aria-expanded={expanded}
       aria-label={expanded ? 'Collapse to one strip' : 'Split into seven bands'}
       title={expanded ? 'Collapse' : 'Split into seven bands'}
+      tabIndex={handedOver ? -1 : 0}
       onClick={() => { setExpanded((v) => !v); setActive(null); }}
     >
-      <ChevronDown size={20} strokeWidth={1.75} className="spectro__chevron" />
+      <ChevronDown size={18} strokeWidth={1.75} className="spectro__chevron" />
     </button>
   );
 
   return (
     <section
+      ref={sectionRef}
       className={`spectro ${expanded ? 'spectro--expanded' : 'spectro--collapsed'} ${active ? 'spectro--picking' : ''} ${lightMode ? 'spectro--light' : 'spectro--dark'}`}
       aria-label="Record spectrograph"
     >
       {/* Both layouts stay mounted and trade height, so the strip unfolds into lanes instead of swapping.
           The chevron never moves. */}
+      {slot && createPortal(toggle, slot)}
       <div className="spectro__stage">
-        {toggle}
         <div className="spectro__fold spectro__fold--strip" inert={expanded}>
           <div className="spectro__foldinner">
             <Track entries={all} active={active} onActive={setActive} />

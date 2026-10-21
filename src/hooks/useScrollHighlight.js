@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
  * Custom hook to track the visible category for sidebar highlighting
  * (decoupled from card expansion logic for better performance)
  */
+// The hero strip hands over to the band bar once its top reaches this many px below the top of the screen
+export const STICK_AT = 20;
+
 const useScrollHighlight = (activeFilter) => {
   const [visible, setVisible] = useState({ category: 'all', title: null });
   const throttleRef = useRef(false);
@@ -31,8 +34,11 @@ const useScrollHighlight = (activeFilter) => {
     // The card on that line is the one you are on.
     const readingLine = containerRect.top + 170;
 
-    // The bar appears with the first scroll and then stays: no leaving and coming back
-    if (scrollContainer.scrollTop < 40) {
+    // The bar takes over from the hero strip at the strip's own spot: while the strip is still on its way
+    // up the bar stays away, and scrolling back up hands the spot back to the strip
+    const strip = document.querySelector('.spectro');
+    const stuck = strip ? strip.getBoundingClientRect().top <= containerRect.top + STICK_AT : scrollContainer.scrollTop > 40;
+    if (!stuck) {
       setVisible((prev) => (prev.category === 'all' ? prev : { category: 'all', title: null }));
       lastKeyRef.current = 'all|';
       return;

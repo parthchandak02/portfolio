@@ -3,14 +3,14 @@
   position: fixed;
   top: 14px; left: 50%;
   width: min(760px, calc(100vw - 220px));
-  transform: translate(-50%, -16px);
+  transform: translate(-50%, 0);
   z-index: 40;
   padding: 10px 4px 8px;
   opacity: 0; pointer-events: none;
   font-family: var(--font-family-primary);
-  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: opacity 0.2s ease;
 }
-.bandbar.is-visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.bandbar.is-visible { opacity: 1; pointer-events: auto; }
 
 .bandbar--dark {
   color: rgba(255, 255, 255, 0.92); --mute: rgba(255, 255, 255, 0.6); --edge: rgba(255, 255, 255, 0.12); --ink: 0;
@@ -58,8 +58,7 @@
 
 @media (max-width: 1024px) {
   /* leave room for the round toggles on the right */
-  .bandbar { left: 12px; right: 72px; width: auto; transform: translateY(-16px); padding: 8px 2px 6px; }
-  .bandbar.is-visible { transform: none; }
+  .bandbar { left: 12px; right: 72px; width: auto; transform: none; padding: 8px 2px 6px; }
   .bandbar__track { height: 40px; }
 }
 
@@ -73,7 +72,7 @@
    never show card text in the strip above the bar */
 .bandbar-veil {
   position: fixed; top: 0; left: 0; right: 0; height: 150px; z-index: 39;
-  pointer-events: none; opacity: 0; transition: opacity 0.35s ease;
+  pointer-events: none; opacity: 0; transition: opacity 0.2s ease;
 }
 .bandbar-veil.is-visible { opacity: 1; }
 .bandbar-veil--dark { background: linear-gradient(to bottom, #000 0, #000 92px, rgba(0, 0, 0, 0) 100%); }

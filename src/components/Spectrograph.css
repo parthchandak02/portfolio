@@ -16,21 +16,27 @@
 .spectro--dark { color: rgba(255, 255, 255, 0.92); --mute: rgba(255, 255, 255, 0.58); --well: rgba(0, 0, 0, 0.24); --edge: rgba(255, 255, 255, 0.14); --ink: 0; --tick-ink: 0; }
 .spectro--light { color: rgba(20, 20, 24, 0.92); --mute: rgba(20, 20, 24, 0.62); --well: rgba(255, 255, 255, 0.4); --edge: rgba(0, 0, 0, 0.16); --ink: 0.38; --tick-ink: 0.1; }
 
-/* Seamless chevron: no circle, no glass. It just rotates. */
-.spectro__toggle {
-  flex: none; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 12px;
-  display: grid; place-items: center; cursor: pointer;
-  background: transparent; color: var(--mute);
-  -webkit-tap-highlight-color: transparent;
+.spectro__chevron { transition: transform 0.3s ease; }
+.spectro-toggle[aria-expanded="true"] .spectro__chevron { transform: rotate(180deg); }
+.spectro__track:focus-visible, .spectro__proof:focus-visible { outline: 2px solid #ff6b35; outline-offset: 3px; }
+
+/* The fourth round button, in line with the light, lock and play buttons above it */
+.spectro-toggle {
+  position: fixed; top: 194px; right: 20px; z-index: 100;
+  width: 48px; height: 48px; padding: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;
+  transition: opacity 0.25s ease;
 }
-.spectro__toggle:hover { color: inherit; }
-.spectro__chevron { transition: transform 0.25s ease; }
-.spectro--expanded .spectro__chevron { transform: rotate(180deg); }
-.spectro__toggle:focus-visible, .spectro__track:focus-visible, .spectro__proof:focus-visible { outline: 2px solid #ff6b35; outline-offset: 3px; }
+.spectro-toggle:focus-visible { outline: 2px solid #ff6b35; outline-offset: 3px; }
+.spectro-toggle.is-away { opacity: 0; pointer-events: none; }
+.dark-mode .spectro-toggle { color: rgba(255, 255, 255, 0.9); }
+.light-mode .spectro-toggle { color: rgba(0, 0, 0, 0.8); }
+@media (max-width: 768px) {
+  .spectro-toggle { top: 170px; right: 16px; width: 44px; height: 44px; }
+}
 
 /* The strip and the lanes share one stage. The chevron is pinned to its top right corner in both states. */
-.spectro__stage { position: relative; padding-right: 48px; }
-.spectro__toggle { position: absolute; top: 0; right: 0; z-index: 3; }
+.spectro__stage { position: relative; }
 
 /* Each layout sits in a grid row that animates between 0fr and 1fr, so one folds away as the other opens */
 .spectro__fold { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease; }
