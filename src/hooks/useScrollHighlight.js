@@ -28,7 +28,12 @@ const useScrollHighlight = (activeFilter) => {
     const containerRect = scrollContainer.getBoundingClientRect();
     // Reading happens just under the band bar, which is also where jumps land a card.
     // The card on that line is the one you are on.
-    const readingLine = containerRect.top + 170;
+    let readingLine = containerRect.top + 170;
+    // The last cards can never scroll up to that line, so over the final stretch the line glides down
+    // to meet them, reaching the last card just as the page bottoms out
+    const remaining = scrollContainer.scrollHeight - scrollContainer.clientHeight - scrollContainer.scrollTop;
+    const target = timelineItems[timelineItems.length - 1].getBoundingClientRect().bottom - remaining - 12;
+    if (target > readingLine && remaining < target - readingLine) readingLine = target - remaining;
 
     // The bar takes over from the hero strip at the strip's own spot: while the strip is still on its way
     // up the bar stays away, and scrolling back up hands the spot back to the strip. With the lanes open,
@@ -49,11 +54,11 @@ const useScrollHighlight = (activeFilter) => {
     let centermostCategory = 'all';
     let centermostTitle = null;
     let smallestDistance = Infinity;
-    let onLine = null;
+    const crossing = [];
 
     timelineItems.forEach((item) => {
       const rect = item.getBoundingClientRect();
-      if (rect.top <= readingLine && rect.bottom >= readingLine) onLine = item;
+      if (rect.top <= readingLine && rect.bottom >= readingLine) crossing.push({ item, rect });
 
       // Otherwise (the line is in a gap) fall back to the closest card
       const distance = Math.abs(rect.top + rect.height * 0.5 - readingLine);
@@ -64,6 +69,18 @@ const useScrollHighlight = (activeFilter) => {
         centermostTitle = item.getAttribute('data-title');
       }
     });
+
+    // Tiles side by side cross the line together. Hand the row's height out among them, left to right,
+    // so scrolling through the row walks the highlight across it and every tile gets its turn.
+    let onLine = null;
+    if (crossing.length === 1) onLine = crossing[0].item;
+    else if (crossing.length > 1) {
+      crossing.sort((a, b) => a.rect.left - b.rect.left);
+      const top = Math.min(...crossing.map((c) => c.rect.top));
+      const bottom = Math.max(...crossing.map((c) => c.rect.bottom));
+      const progress = (readingLine - top) / Math.max(1, bottom - top);
+      onLine = crossing[Math.min(crossing.length - 1, Math.floor(progress * crossing.length))].item;
+    }
 
     if (onLine) {
       centermostCategory = onLine.getAttribute('data-category') || 'all';

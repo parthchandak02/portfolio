@@ -179,6 +179,26 @@ const BandBar = ({ category, title, lightMode = false }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
+  // The round buttons step aside while the bar is up, so the bar can span the whole card column below it
+  const [column, setColumn] = useState(null);
+  useEffect(() => {
+    const measure = () => {
+      const items = document.querySelector('.timeline__items');
+      if (!items) return;
+      const r = items.getBoundingClientRect();
+      setColumn((prev) => (prev && prev.left === r.left && prev.width === r.width ? prev : { left: r.left, width: r.width }));
+    };
+    measure();
+    const items = document.querySelector('.timeline__items');
+    const observer = typeof ResizeObserver !== 'undefined' && items ? new ResizeObserver(measure) : null;
+    if (observer) observer.observe(items);
+    window.addEventListener('resize', measure);
+    return () => {
+      if (observer) observer.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [visible]);
+
   // Fade content out as it approaches the bar, so cards never run under it
   useEffect(() => {
     if (!visible) return undefined;
@@ -255,6 +275,7 @@ const BandBar = ({ category, title, lightMode = false }) => {
       className={`bandbar ${visible ? 'is-visible' : ''}${morphing ? ' is-morphing' : ''} ${lightMode ? 'bandbar--light' : 'bandbar--dark'}`}
       aria-label="Where you are in the record"
       aria-hidden={!visible}
+      style={column ? { left: `${column.left}px`, width: `${column.width}px`, transform: 'none' } : undefined}
     >
       <div className="bandbar__inner" key={shown.key} style={{ '--hue': shown.hue }}>
         <div className="bandbar__top">
