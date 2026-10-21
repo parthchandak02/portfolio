@@ -114,11 +114,10 @@ export const timelineDataByCategory = {
         "title": "Senior Creative Technologist",
         "company": "Zoox",
         "companyLogo": "/logos/zoox-logo.png",
-        "projectImage": "/images/zoox-main.png",
         "date": "October 2026 - Present",
         "category": "experience",
         "location": "Foster City, CA",
-        "description": "Promoted to Senior Creative Technologist. Continue to build the prototyping systems that let designers and researchers try ideas in the robotaxi cabin, from lights and sound to displays and controls, and test them in realistic conditions.",
+        "description": "Build the prototyping systems that let designers and researchers try ideas in the robotaxi cabin, from lights and sound to displays and controls, and test them in realistic conditions.",
         "typewriterTitle": "Creative Technologist",
         "typewriterPrefix": "I am a",
         "skills": [
