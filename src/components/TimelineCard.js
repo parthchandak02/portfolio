@@ -19,13 +19,16 @@ const TimelineCard = ({
   isTypewriterHighlighted = false,
   lightMode = false,
   className = '',
-  ...props 
+  defaultExpanded = false, // Opened from a tile: starts open
+  onCollapse, // Opened from a tile: collapsing turns it back into the tile
+  ...props
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [clickedIcons, setClickedIcons] = useState(new Set()); // Track clicked nav icons
   const [videoPlaying, setVideoPlaying] = useState(false); // Embed only loads after the visitor asks for it
-  
+
   const handleHeaderClick = () => {
+    if (isExpanded && onCollapse) { onCollapse(); return; }
     setIsExpanded((prev) => !prev);
   };
 

@@ -87,8 +87,25 @@
   .lab-tile:hover .lab-tile__reveal { opacity: 1; transform: none; }
 }
 
+/* Record cards shown as tiles: a button, so reset its defaults; titles can run longer than a project name */
+.timeline__tiles .lab__grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.lab-tile--card { width: 100%; padding: 0; font: inherit; text-align: left; aspect-ratio: 4 / 3; }
+.lab-tile--card .lab-tile__name {
+  font-size: 0.95rem; line-height: 1.25;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.lab-tile--card .lab-tile__desc { -webkit-line-clamp: 2; }
+.lab-tile.is-highlighted { border-color: rgba(255, 107, 53, 0.7); box-shadow: 0 0 0 1px rgba(255, 107, 53, 0.35), 0 0 24px rgba(255, 107, 53, 0.18); }
+.lab-tile__badge {
+  position: absolute; top: 10px; right: 10px; z-index: 4;
+  display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45); color: #fff;
+}
+
 @media (max-width: 560px) {
-  .lab__grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .lab__grid, .timeline__tiles .lab__grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .lab-tile--card { aspect-ratio: 1; }
+  .lab-tile--card .lab-tile__fog, .lab-tile--card .lab-tile__reveal { padding-left: 12px; padding-right: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
