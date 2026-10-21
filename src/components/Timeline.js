@@ -62,9 +62,11 @@ const Timeline = ({
         return;
       }
       const prev = out[out.length - 1];
+      // Runs follow the bands, so a keynote sitting among press pieces joins their grid
+      const band = bandIndex(item);
       if (isTile(item)) {
-        if (prev && prev.kind === 'tiles' && prev.category === item.category) prev.items.push({ item, index });
-        else out.push({ kind: 'tiles', category: item.category, items: [{ item, index }] });
+        if (prev && prev.kind === 'tiles' && prev.band === band) prev.items.push({ item, index });
+        else out.push({ kind: 'tiles', band, items: [{ item, index }] });
       } else {
         out.push({ kind: 'card', item, index });
       }

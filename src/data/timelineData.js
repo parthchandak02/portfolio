@@ -320,6 +320,7 @@ export const timelineDataByCategory = {
     {
         "title": "A Practical Framework for Rapid Prototyping and Fidelity in Product Development",
         "date": "June 2025",
+        "projectImage": "/images/keynote-rapid-prototyping-fidelity.jpg",
         "category": "speaking",
         "location": "ICETAIA Conference",
         "description": "Keynote presentation on innovative rapid prototyping methodologies and fidelity frameworks for modern product development, sharing insights from autonomous vehicle development.",
@@ -692,8 +693,9 @@ export const timelineDataByCategory = {
     {
         "title": "Cal Hacks 13.0, Judge",
         "date": "October 23-25, 2026",
+        "projectImage": "/images/judging/cal-hacks-13.jpg",
         "category": "judging",
-        "location": "Berkeley, CA",
+        "location": "San Francisco, CA",
         "description": "Judge at Cal Hacks 13.0.",
         "skills": [
             "Advisor",
@@ -703,6 +705,7 @@ export const timelineDataByCategory = {
     {
         "title": "LA Hacks 2026, Judge",
         "date": "April 26, 2026",
+        "projectImage": "/images/judging/la-hacks-2026.jpg",
         "category": "judging",
         "location": "Los Angeles, CA",
         "description": "Invite-only judge for a hackathon of 1,000+ students.",
@@ -714,6 +717,7 @@ export const timelineDataByCategory = {
     {
         "title": "HackMerced XI, Judge",
         "date": "March 8, 2026",
+        "projectImage": "/images/judging/hackmerced-xi-judges.jpg",
         "category": "judging",
         "location": "UC Merced",
         "description": "Judged MLH and UC Merced hackathon projects.",
@@ -811,6 +815,7 @@ export const timelineDataByCategory = {
     {
         "title": "Calendar and Alarm Productivity System",
         "date": "September 2024 - October 2026",
+        "projectImage": "/images/calarm-live-activity.jpg",
         "category": "projects",
         "description": "Advanced productivity system combining intelligent calendar management with context-aware alarm systems for optimized time management and task completion.",
         "url": "https://github.com/parthchandak02/calarm",
@@ -888,6 +893,7 @@ export const timelineDataByCategory = {
     {
         "title": "Crimson Code Software Hackathon - 1st Place (Tier 1)",
         "date": "March 2018",
+        "projectImage": "/images/crimson-code-2018-caffeine-cycle.png",
         "url": "https://tiny.cc/crimsoncode2018",
         "category": "awards",
         "company": "WSU",
@@ -927,6 +933,7 @@ export const timelineDataByCategory = {
     {
         "title": "User-Centered Design Approaches for Manufacturing Systems",
         "date": "2025",
+        "projectImage": "/images/media/ucd-manufacturing-zoox.jpg",
         "category": "media",
         "location": "Analytics Insight",
         "description": "Featured article discussing innovative approaches to user-centered design in modern manufacturing systems and Industry 4.0 applications.",
@@ -940,6 +947,7 @@ export const timelineDataByCategory = {
     {
         "title": "The Creative Technologist: Bridging Engineering, UX, and Robotics",
         "date": "2025",
+        "projectImage": "/images/media/creative-technologist-deccan.jpg",
         "category": "media",
         "location": "Deccan Chronicle",
         "description": "Profile piece highlighting the intersection of engineering, user experience design, and robotics in autonomous vehicle development.",
@@ -953,6 +961,8 @@ export const timelineDataByCategory = {
     {
         "title": "Bridging the Trust Gap Between Humans and Autonomous Systems",
         "date": "2025",
+        "projectImage": "/images/media/bridging-trust-gap.jpg",
+        "url": "https://www.freepressjournal.in/latest-news/bridging-the-trust-gap-between-humans-autonomous-systems-through-intuitive-interfaces",
         "category": "media",
         "location": "Free Press Journal",
         "description": "Analysis of trust-building strategies in human-autonomous system interactions, drawing from automotive industry experience.",
@@ -966,6 +976,7 @@ export const timelineDataByCategory = {
     {
         "title": "Leveraging Mixed Reality and Haptic Feedback for Immersive User Experiences",
         "date": "2024",
+        "projectImage": "/images/media/mixed-reality-haptics.jpg",
         "category": "media",
         "location": "The Hans India",
         "description": "Technical discussion of mixed reality applications and haptic feedback systems in creating immersive user experiences.",
@@ -979,6 +990,7 @@ export const timelineDataByCategory = {
     {
         "title": "Rapid Prototyping Methodologies for Complex Systems",
         "date": "2023",
+        "projectImage": "/images/media/rapid-prototyping-complex-systems.jpg",
         "category": "media",
         "location": "Indiahood",
         "description": "In-depth coverage of rapid prototyping techniques for complex engineering systems, from concept to testing phases.",
@@ -992,6 +1004,7 @@ export const timelineDataByCategory = {
     {
         "title": "Advancing Human-Robot Interaction Through Intuitive Interfaces",
         "date": "2022",
+        "projectImage": "/images/media/advancing-hri-indiacsr.jpg",
         "category": "media",
         "location": "India CSR",
         "description": "Discussion of innovative interface design approaches for improving human-robot interaction in various applications.",
@@ -1005,6 +1018,7 @@ export const timelineDataByCategory = {
     {
         "title": "Freedom to Soar",
         "date": "2018",
+        "projectImage": "/images/media/freedom-to-soar-wsu.jpg",
         "category": "media",
         "company": "WSU",
         "companyLogo": "/logos/wsu-logo.png",
