@@ -76,12 +76,12 @@ export const useWidth = () => {
 };
 
 /**
- * One row of lines. The whole track is the touch target: pointer position picks the nearest line
- * (hover on desktop, drag or tap on a phone), and the arrow keys step through lines.
+ * The touch and keyboard target for one row. The whole row picks the nearest line (hover on desktop,
+ * drag or tap on a phone), and the arrow keys step through lines. The lines themselves are drawn once,
+ * for every row, by the Spectrograph, so they can travel between the strip and the lanes.
  */
-const Track = ({ band, entries, active, onActive }) => {
-  const [trackRef, width] = useWidth();
-  const placed = useMemo(() => place(entries, width), [entries, width]);
+const Track = ({ band, placed, active, onActive, top, height }) => {
+  const trackRef = useRef(null);
 
   const pick = useCallback(
     (clientX) => {
@@ -93,7 +93,7 @@ const Track = ({ band, entries, active, onActive }) => {
       });
       onActive(best);
     },
-    [placed, onActive, trackRef]
+    [placed, onActive]
   );
 
   const step = (delta) => {
@@ -114,24 +114,14 @@ const Track = ({ band, entries, active, onActive }) => {
     <div
       ref={trackRef}
       className="spectro__track"
+      style={{ top: `${top}px`, height: `${height}px` }}
       role="group"
       tabIndex={0}
       aria-label={`${band ? band.name : 'All bands'}: use left and right arrow keys to move between items`}
       onPointerMove={(e) => pick(e.clientX)}
       onPointerDown={(e) => pick(e.clientX)}
       onKeyDown={onKeyDown}
-    >
-      {placed.map((p) => {
-        const on = active && active.item === p.item;
-        return (
-          <i
-            key={`${p.band.key}-${p.item.title}`}
-            className={`spectro__line${p.item.future ? ' spectro__line--future' : ''}${on ? ' spectro__line--on' : ''}`}
-            style={{ left: `${p.x}px`, '--hue': p.band.hue }}
-          />
-        );
-      })}
-    </div>
+    />
   );
 };
 
@@ -152,6 +142,21 @@ const Spectrograph = ({ lightMode = false, handedOver = false }) => {
     () => spectrumBands.map((band) => ({ band, entries: band.items.map((item) => ({ item, band })) })),
     []
   );
+
+  // Every line has two homes: its spot on the strip and its spot in its band's lane. The first lane sits
+  // where the strip is, so opening drops lines down onto their lanes and closing lifts them back up.
+  const [stageRef, width] = useWidth();
+  const rowH = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches ? 52 : 46;
+  const stripPlaced = useMemo(() => place(all, width), [all, width]);
+  const lanes = useMemo(() => rows.map(({ band, entries }) => ({ band, placed: place(entries, width) })), [rows, width]);
+  const lines = useMemo(() => {
+    const laneOf = new Map();
+    lanes.forEach(({ placed }, lane) => placed.forEach((p) => laneOf.set(p.item, { lane, x: p.x })));
+    return stripPlaced.map((p, i) => {
+      const home = laneOf.get(p.item);
+      return { ...p, sx: p.x, bx: home.x, lane: home.lane, jitter: (i * 37) % 90 };
+    });
+  }, [stripPlaced, lanes]);
 
   // The toggle is one more round button in the column with the other three, so it lives in the fixed UI
   // layer. It steps aside while the band bar has the spot; that is decided once, in useScrollHighlight,
@@ -178,24 +183,44 @@ const Spectrograph = ({ lightMode = false, handedOver = false }) => {
       className={`spectro ${expanded ? 'spectro--expanded' : 'spectro--collapsed'} ${active ? 'spectro--picking' : ''} ${lightMode ? 'spectro--light' : 'spectro--dark'}`}
       aria-label="Record spectrograph"
     >
-      {/* Both layouts stay mounted and trade height, so the strip unfolds into lanes instead of swapping.
-          The chevron never moves. */}
       {slot && createPortal(toggle, slot)}
-      <div className="spectro__stage">
-        <div className="spectro__fold spectro__fold--strip" inert={expanded}>
-          <div className="spectro__foldinner">
-            <Track entries={all} active={active} onActive={setActive} />
-          </div>
+      <div
+        ref={stageRef}
+        className="spectro__stage"
+        style={{ '--row-h': `${rowH}px`, height: `${expanded ? rowH * lanes.length : rowH}px` }}
+      >
+        {/* Hairlines: the strip's own, and one per lane that draws in as its lines arrive */}
+        <span className="spectro__rule spectro__rule--strip" style={{ top: `${rowH / 2}px` }} />
+        {lanes.map(({ band }, lane) => (
+          <span key={band.key} className="spectro__rule spectro__rule--lane" style={{ top: `${lane * rowH + rowH / 2}px`, '--lane': lane }} />
+        ))}
+
+        {/* Every line once. The outer span carries it along the row, the inner one between rows. */}
+        <div className="spectro__lines" aria-hidden="true">
+          {lines.map((l) => {
+            const on = active && active.item === l.item;
+            return (
+              <span
+                key={`${l.band.key}-${l.item.title}`}
+                className="spectro__x"
+                style={{ transform: `translateX(${expanded ? l.bx : l.sx}px)`, '--lane': l.lane, '--j': l.jitter }}
+              >
+                <span className="spectro__y" style={{ transform: `translateY(${(expanded ? l.lane * rowH : 0) + rowH / 2}px)` }}>
+                  <i
+                    className={`spectro__line${l.item.future ? ' spectro__line--future' : ''}${on ? ' spectro__line--on' : ''}`}
+                    style={{ '--hue': l.band.hue }}
+                  />
+                </span>
+              </span>
+            );
+          })}
         </div>
-        <div className="spectro__fold spectro__fold--bands" inert={!expanded}>
-          <div className="spectro__foldinner">
-            {rows.map(({ band, entries }, i) => (
-              <div className="spectro__row" key={band.key} style={{ '--hue': band.hue, '--i': i }}>
-                <Track band={band} entries={entries} active={active} onActive={setActive} />
-              </div>
-            ))}
-          </div>
-        </div>
+
+        {expanded
+          ? lanes.map(({ band, placed }, lane) => (
+            <Track key={band.key} band={band} placed={placed} active={active} onActive={setActive} top={lane * rowH} height={rowH} />
+          ))
+          : <Track placed={stripPlaced} active={active} onActive={setActive} top={0} height={rowH} />}
       </div>
 
       <div className={`spectro__readout${active ? '' : ' is-idle'}`} style={{ '--hue': active ? active.band.hue : 'currentColor' }} aria-live="polite">

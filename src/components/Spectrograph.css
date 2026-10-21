@@ -1,4 +1,4 @@
-/* Spectrograph: one quiet strip that unfolds into seven lanes. No panels, so the scene stays visible. */
+/* Spectrograph: one quiet strip that unfolds into eight lanes. No panels, so the scene stays visible. */
 .spectro {
   position: relative;
   z-index: 16;
@@ -35,53 +35,72 @@
   .spectro-toggle { top: 170px; right: 16px; width: 44px; height: 44px; }
 }
 
-/* The strip and the lanes share one stage. The chevron is pinned to its top right corner in both states. */
-.spectro__stage { position: relative; }
+/* The strip and the lanes share one stage. Each line is drawn once and travels between its two homes. */
+.spectro__stage { position: relative; transition: height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
 
-/* Each layout sits in a grid row that animates between 0fr and 1fr, so one folds away as the other opens */
-.spectro__fold { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease; }
-.spectro__foldinner { min-height: 0; overflow: hidden; padding: 4px 0; margin: -4px 0; }
-.spectro--expanded .spectro__fold--strip, .spectro--collapsed .spectro__fold--bands { grid-template-rows: 0fr; opacity: 0; pointer-events: none; }
-.spectro__fold--strip .spectro__track { height: 44px; }
-
-/* Tracks have no box at all: just a hairline with ticks on it. The whole track is the touch target. */
+/* Tracks are invisible touch targets, one per row */
 .spectro__track {
-  position: relative;
-  height: 44px;
+  position: absolute; left: 0; right: 0; z-index: 3;
   border-radius: 6px;
   cursor: crosshair;
   touch-action: pan-y; /* vertical scroll still works; horizontal drag scrubs */
   -webkit-tap-highlight-color: transparent;
 }
-.spectro__track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--edge); }
-.spectro__track .spectro__line { height: calc(100% - 14px); }
+
+.spectro__rule { position: absolute; left: 0; right: 0; height: 1px; background: var(--edge); pointer-events: none; transform-origin: left center; }
+.spectro__lines { position: absolute; inset: 0; pointer-events: none; }
+.spectro__x, .spectro__y { position: absolute; top: 0; left: 0; }
 
 /* Flat, crisp ticks: solid color, rounded ends, no halo. Only the selected tick gets a soft ring. */
 .spectro__line {
-  position: absolute; top: 50%; width: 2px;
+  position: absolute; top: 0; left: 0; width: 2px; height: calc(var(--row-h) - 16px);
   transform: translate(-50%, -50%);
-  border-radius: 2px; pointer-events: none;
+  border-radius: 2px;
   background: color-mix(in srgb, var(--hue) calc((1 - var(--tick-ink)) * 100%), #000);
   opacity: 0.9;
 }
-.spectro__line--on, .spectro__track .spectro__line--on {
-  width: 3px; height: calc(100% - 4px); opacity: 1; z-index: 2;
+.spectro__line--on {
+  width: 3px; height: calc(var(--row-h) - 6px); opacity: 1; z-index: 2;
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--hue) 22%, transparent);
 }
 .spectro__line--future { background: transparent; opacity: 1; width: 3px; border: 1.5px solid var(--hue); }
 /* While one line is selected, the rest step back so it reads clearly */
 .spectro--picking .spectro__line:not(.spectro__line--on):not(.spectro__line--future) { opacity: 0.36; }
 
-.spectro__row { padding: 2px 0; }
+/* Collapsed: one hairline. Expanded: a hairline per lane. */
+.spectro--expanded .spectro__rule--strip { opacity: 0; }
+.spectro--collapsed .spectro__rule--lane { opacity: 0; transform: scaleX(0); }
 
-/* Lanes drop out of the strip one after another */
 @media (prefers-reduced-motion: no-preference) {
-  .spectro__row { transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-  .spectro--collapsed .spectro__row { opacity: 0; transform: translateY(-14px); }
-  .spectro--expanded .spectro__row { transition-delay: calc(var(--i) * 45ms); }
   .spectro__line { transition: width 0.12s, height 0.12s, box-shadow 0.12s, opacity 0.18s; }
+  .spectro__rule { transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+  /* Opening: lines drop out of the strip onto their lanes, a lane at a time, then slide into place */
+  .spectro--expanded .spectro__y {
+    transition: transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition-delay: calc(var(--lane) * 55ms + var(--j) * 1ms);
+  }
+  .spectro--expanded .spectro__x {
+    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition-delay: calc(300ms + var(--lane) * 55ms + var(--j) * 1ms);
+  }
+  .spectro--expanded .spectro__rule--lane { transition-delay: calc(120ms + var(--lane) * 55ms); }
+
+  /* Closing: lines line up over their strip spots, then each lane snaps up into the strip in turn,
+     with a small overshoot so it lands like a block locking into place */
+  .spectro--collapsed .spectro__x {
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    transition-delay: calc(var(--j) * 1ms);
+  }
+  .spectro--collapsed .spectro__y {
+    transition: transform 0.34s cubic-bezier(0.3, 1.18, 0.55, 1);
+    transition-delay: calc(360ms + var(--lane) * 60ms);
+  }
+  .spectro--collapsed .spectro__rule--lane { transition-delay: calc(360ms + var(--lane) * 60ms); }
+  .spectro--collapsed .spectro__rule--strip { transition-delay: 0.36s; }
+  .spectro--collapsed .spectro__stage { transition-delay: 0.6s; }
 }
-@media (prefers-reduced-motion: reduce) { .spectro__fold { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .spectro__stage { transition: none; } }
 
 .spectro__readout {
   box-sizing: border-box; height: 104px; padding: 0.7rem 0.9rem; border-radius: 12px; border: 1px solid var(--edge); background: var(--well);
@@ -99,9 +118,3 @@
 .spectro__proof:hover { text-decoration: underline; }
 
 .spectro__sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-
-/* Any touch screen, including tablets wider than the phone breakpoint */
-@media (pointer: coarse) {
-  .spectro__track { height: 48px; }
-  .spectro__fold--strip .spectro__track { height: 52px; }
-}
