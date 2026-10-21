@@ -101,6 +101,8 @@ export const spectrumBands = [
       { t: 2026.69, when: 'Sep 10, 2026', title: 'Discover Education, re-review', meta: 'Peer reviewer, Springer Nature' },
       { t: 2026.7, when: 'Sep 10, 2026', title: 'Discover Sustainability', meta: 'Peer reviewer, Springer Nature' },
       { t: 2026.72, when: 'Sep 18, 2026', title: 'Discover Oncology', meta: 'Peer reviewer, Springer Nature' },
+      { t: 2026.76, when: 'Oct 6, 2026', title: 'Discover Applied Sciences', meta: 'Peer reviewer, Springer Nature' },
+      { t: 2026.8, when: 'Oct 19, 2026', title: 'International Journal of Social Robotics', meta: 'Peer reviewer, Springer Nature' },
       { t: 2026.18, when: 'Mar 8, 2026', title: 'HackMerced XI', meta: 'Judge, MLH and UC Merced' },
       { t: 2026.32, when: 'Apr 26, 2026', title: 'LA Hacks 2026', meta: 'Invite-only judge, 1,000+ students' },
       { t: 2026.81, when: 'Oct 23-25, 2026', title: 'Cal Hacks 13.0', meta: 'Judge, San Francisco', future: true }
@@ -171,7 +173,7 @@ const findCard = (title) => {
   return bestScore >= 0.75 ? best.title : null;
 };
 
-// Lines that describe a group (one patent family, seven peer reviews) point at that group's single card
+// Lines that describe a group (one patent family, nine peer reviews) point at that group's single card
 const CARD_FOR_BAND = { patent: 'Audio Prioritization (US20260003563A1)' };
 const CARD_OVERRIDES = {
   'ICETAIA 2025, invited keynote': 'A Practical Framework for Rapid Prototyping and Fidelity in Product Development'
