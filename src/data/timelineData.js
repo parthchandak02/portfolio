@@ -326,20 +326,6 @@ export const timelineDataByCategory = {
   ],
   volunteering: [
     {
-        "title": "BuildOn Nepal School Project - $55K Fundraising Lead",
-        "date": "January 2025",
-        "company": "BuildOn",
-        "companyLogo": "/logos/buildon-logo.png",
-        "category": "volunteering",
-        "location": "Nepal",
-        "description": "Raised $55,000 to build a school in Nepal, directly impacting 210+ students (including 108 girls) in a community of 2250 farmers. Led fundraising strategy and participated in construction trek.",
-        "skills": [
-            "Fundraising",
-            "Travel",
-            "School Building"
-        ]
-    },
-    {
         "title": "Manager, Team Innovation Program",
         "date": "May 2025 - Present",
         "category": "volunteering",
@@ -722,8 +708,24 @@ export const timelineDataByCategory = {
   lab: labProjects,
   projects: [
     {
+        "title": "BuildOn Nepal School Project - $55K Fundraising Lead",
+        "date": "January 2025",
+        "company": "BuildOn",
+        "companyLogo": "/logos/buildon-logo.png",
+        "category": "projects",
+        "location": "Nepal",
+        "url": "https://buildon-nepal-trek.vercel.app",
+        "projectImage": "/images/buildon-nepal-trek.png",
+        "description": "Raised $55,000 to build a school in Nepal, directly impacting 210+ students (including 108 girls) in a community of 2250 farmers. Led fundraising strategy and participated in construction trek.",
+        "skills": [
+            "Fundraising",
+            "Travel",
+            "School Building"
+        ]
+    },
+    {
         "title": "LLM Assisted Research Platform",
-        "date": "2024",
+        "date": "January 2026 - September 2026",
         "category": "projects",
         "description": "AI-powered literature review assistant that streamlines academic research workflows. Leverages large language models to automate paper analysis, extract key insights, and synthesize research findings across multiple documents.",
         "url": "https://github.com/parthchandak02/literature-review-assistant",
@@ -738,7 +740,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Google Apps Script AI Integration Framework",
-        "date": "2024",
+        "date": "February 2025",
         "category": "projects",
         "companyLogo": "/logos/gapps-script.png",
         "description": "Framework for integrating AI capabilities into Google Workspace applications using Apps Script and Gemini API. Enables automated document processing, intelligent data analysis, and workflow optimization.",
@@ -754,7 +756,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Financial Trading API for Interactive Brokers (IBKR)",
-        "date": "2024",
+        "date": "March 2025 - July 2026",
         "category": "projects",
         "companyLogo": "/logos/ibkr-logo.png",
         "description": "Comprehensive REST API for Interactive Brokers platform enabling automated trading, portfolio management, and real-time market data integration.",
@@ -768,7 +770,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Calendar and Alarm Productivity System",
-        "date": "2024",
+        "date": "September 2024 - October 2024",
         "category": "projects",
         "description": "Advanced productivity system combining intelligent calendar management with context-aware alarm systems for optimized time management and task completion.",
         "url": "https://github.com/parthchandak02/cal-tag-app",
@@ -845,7 +847,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Crimson Code Software Hackathon - 1st Place (Tier 1)",
-        "date": "2018",
+        "date": "March 2018",
         "url": "https://tiny.cc/crimsoncode2018",
         "category": "awards",
         "company": "WSU",
