@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import TimelineCard from './TimelineCard';
 import LabShowcase from './LabShowcase';
-import CardTile, { tileImageFor } from './CardTile';
+import CardTile, { isTile } from './CardTile';
 import { useTypewriterHighlight } from '../contexts/TypewriterHighlightContext';
 import { categoryOrder } from '../data/timelineData';
 import { bandForSection, spectrumBands, startOf, endOf } from '../data/spectrum';
@@ -50,7 +50,8 @@ const Timeline = ({
   const labItems = sortedData.filter((item) => item.category === 'lab');
   const firstLabIndex = sortedData.findIndex((item) => item.category === 'lab');
 
-  // Cards with a picture or a video show as glass tiles, a run of them sharing one grid. Text-only cards stay wide.
+  // Cards with a picture or a video, and research papers, show as glass tiles, a run of them sharing one grid.
+  // Other text-only cards stay wide.
   const [openTile, setOpenTile] = useState(null);
   const segments = useMemo(() => {
     const out = [];
@@ -60,7 +61,7 @@ const Timeline = ({
         return;
       }
       const prev = out[out.length - 1];
-      if (tileImageFor(item)) {
+      if (isTile(item)) {
         if (prev && prev.kind === 'tiles' && prev.category === item.category) prev.items.push({ item, index });
         else out.push({ kind: 'tiles', category: item.category, items: [{ item, index }] });
       } else {

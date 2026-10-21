@@ -111,3 +111,18 @@
 @media (prefers-reduced-motion: reduce) {
   .lab-tile__img, .lab-tile__fog, .lab-tile__reveal { transition: none; }
 }
+
+/* Text tiles (research): the venue up top in the band's colour, the title given room to run */
+.lab-tile--text .lab-tile__fog { justify-content: space-between; background: none; text-shadow: none; }
+.lab-tile--text .lab-tile__venue {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--hue, #ff9a3d);
+}
+.lab-tile--text .lab-tile__name { -webkit-line-clamp: 4; margin-top: auto; }
+.lab--light .lab-tile--text .lab-tile__venue { color: color-mix(in srgb, var(--hue, #ff9a3d) 62%, #000); }
+.lab--light .lab-tile--text .lab-tile__fog { text-shadow: none; }
+@media (max-width: 560px) {
+  .lab-tile--text { aspect-ratio: auto; min-height: 168px; }
+  .lab-tile--text .lab-tile__fog { position: relative; inset: auto; min-height: 168px; }
+  .lab-tile--text .lab-tile__name { -webkit-line-clamp: 6; }
+}
