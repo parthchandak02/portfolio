@@ -209,6 +209,8 @@ const Spectrograph = ({ lightMode = false, handedOver = false }) => {
                   <i
                     className={`spectro__line${l.item.future ? ' spectro__line--future' : ''}${on ? ' spectro__line--on' : ''}`}
                     style={{ '--hue': l.band.hue }}
+                    data-band={l.band.key}
+                    data-title={l.item.title}
                   />
                 </span>
               </span>

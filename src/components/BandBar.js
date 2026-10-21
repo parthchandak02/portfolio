@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { bandForSection } from '../data/spectrum';
 import { timelineDataByCategory } from '../data/timelineData';
 import { useWidth } from './Spectrograph';
@@ -22,6 +22,8 @@ const elementFor = (card) => {
   const key = LAB_TITLES.has(card) ? 'Lab' : card;
   return document.querySelector(`.timeline__item[data-title="${CSS.escape(key)}"]`);
 };
+
+const isCurrentCard = (item, title) => item.card === title || (title === 'Lab' && LAB_TITLES.has(item.card));
 
 const scrollToCard = (card) => {
   const target = elementFor(card);
@@ -47,6 +49,53 @@ const layout = (items, width) => {
   return sorted.map((item, i) => ({ item, x: pos[i] }));
 };
 
+// The hand-off between the hero strip and the bar is one motion: the band's lines fly from the strip
+// into the bar (and back), while the other bands' lines shrink away (or grow back) where they stand.
+// Positions are re-read every frame, so lines land on the strip even while it scrolls.
+const MORPH_MS = 560;
+const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+const centre = (el) => {
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2, h: r.height };
+};
+const lineColour = (el) => {
+  const cs = getComputedStyle(el);
+  return cs.backgroundColor === 'rgba(0, 0, 0, 0)' ? cs.borderTopColor : cs.backgroundColor;
+};
+
+const runMorph = (layer, sprites, done) => {
+  layer.replaceChildren(...sprites.map((sp) => sp.el));
+  const start = performance.now();
+  let frame = 0;
+  const tick = () => {
+    const now = performance.now();
+    let busy = false;
+    sprites.forEach((sp) => {
+      const raw = (now - start - sp.delay) / sp.duration;
+      if (raw < 1) busy = true;
+      const e = ease(Math.min(1, Math.max(0, raw)));
+      const a = sp.from();
+      const b = sp.to();
+      const x = a.x + (b.x - a.x) * e;
+      const y = a.y + (b.y - a.y) * e - Math.sin(Math.PI * e) * sp.lift;
+      sp.el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+      sp.el.style.height = `${Math.max(0, a.h + (b.h - a.h) * e)}px`;
+      sp.el.style.opacity = String(sp.o0 + (sp.o1 - sp.o0) * e);
+    });
+    if (busy) frame = requestAnimationFrame(tick);
+    else { layer.replaceChildren(); done(); }
+  };
+  frame = requestAnimationFrame(tick);
+  return () => { cancelAnimationFrame(frame); layer.replaceChildren(); };
+};
+
+const sprite = (el, opts) => {
+  const node = document.createElement('i');
+  node.className = 'bandbar-morph__line';
+  node.style.background = lineColour(el);
+  return { el: node, delay: 0, duration: MORPH_MS, lift: 0, o0: 0.9, o1: 0.9, ...opts };
+};
+
 /**
  * A fogged-glass bar pinned to the top while you read the record. It shows only the band you are in,
  * as a row of ticks with the card you are reading lit. Tapping a tick jumps to its card.
@@ -64,6 +113,71 @@ const BandBar = ({ category, title, lightMode = false }) => {
   const visible = Boolean(band);
 
   const placed = useMemo(() => (shown ? layout(shown.items, width) : []), [shown, width]);
+
+  const morphRef = useRef(null);
+  const [morphing, setMorphing] = useState(false);
+  const wasVisible = useRef(visible);
+
+  useLayoutEffect(() => {
+    const before = wasVisible.current;
+    wasVisible.current = visible;
+    if (before === visible || !shown) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const layer = morphRef.current;
+    const track = trackRef.current;
+    const strip = document.querySelector('.spectro');
+    const stripLines = strip ? Array.from(strip.querySelectorAll('.spectro__line[data-band]')) : [];
+    if (!layer || !track || !stripLines.length) return undefined;
+    // A jump from far down the page (a link, a restored scroll) has nothing on screen to morph from
+    const stage = strip.querySelector('.spectro__stage').getBoundingClientRect();
+    if (stage.bottom < -window.innerHeight || stage.top > window.innerHeight) return undefined;
+
+    const trackRect = track.getBoundingClientRect();
+    const barSpots = new Map(layout(shown.items, trackRect.width).map((p) => [p.item.title, {
+      x: trackRect.left + p.x,
+      y: trackRect.top + trackRect.height / 2,
+      h: isCurrentCard(p.item, title) ? 22 : 14,
+      o: isCurrentCard(p.item, title) ? 1 : 0.4
+    }]));
+    const ours = stripLines.filter((el) => el.dataset.band === shown.key && barSpots.has(el.dataset.title))
+      .sort((a, b) => centre(a).x - centre(b).x);
+
+    const sprites = [];
+    if (visible) {
+      // Into the bar: the band's lines lift off the strip and spread across the bar
+      ours.forEach((el, i) => {
+        const from = centre(el);
+        const to = barSpots.get(el.dataset.title);
+        sprites.push(sprite(el, { from: () => from, to: () => to, o1: to.o, delay: i * 9, lift: 14 }));
+      });
+      stripLines.forEach((el) => {
+        if (ours.includes(el)) return;
+        const from = centre(el);
+        sprites.push(sprite(el, { from: () => from, to: () => ({ ...from, h: 0 }), o1: 0, duration: 300, delay: (from.x % 7) * 12 }));
+      });
+    } else {
+      // Back to the strip: the bar's ticks fly home, and the other bands grow back in around them
+      const ticks = new Map(Array.from(track.querySelectorAll('.bandbar__line[data-title]')).map((el) => [el.dataset.title, centre(el)]));
+      ours.forEach((el, i) => {
+        const from = ticks.get(el.dataset.title) || barSpots.get(el.dataset.title);
+        sprites.push(sprite(el, { from: () => from, to: () => centre(el), o0: 0.5, delay: i * 9, lift: -10 }));
+      });
+      stripLines.forEach((el) => {
+        if (ours.includes(el)) return;
+        sprites.push(sprite(el, { from: () => ({ ...centre(el), h: 0 }), to: () => centre(el), o0: 0, delay: 200 + (centre(el).x % 7) * 14, duration: 360 }));
+      });
+    }
+
+    setMorphing(true);
+    strip.classList.add('is-morphing');
+    const stop = runMorph(layer, sprites, () => {
+      setMorphing(false);
+      strip.classList.remove('is-morphing');
+    });
+    return () => { stop(); setMorphing(false); strip.classList.remove('is-morphing'); };
+    // Only a change of visibility starts a morph; the rest is read when it starts
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
   // Fade content out as it approaches the bar, so cards never run under it
   useEffect(() => {
@@ -107,9 +221,9 @@ const BandBar = ({ category, title, lightMode = false }) => {
     };
   }, [visible]);
 
-  if (!shown) return null;
+  if (!shown) return <div ref={morphRef} className="bandbar-morph" aria-hidden="true" />;
 
-  const isCurrent = (item) => item.card === title || (title === 'Lab' && LAB_TITLES.has(item.card));
+  const isCurrent = (item) => isCurrentCard(item, title);
   const nearest = (clientX) => {
     const rect = trackRef.current.getBoundingClientRect();
     const x = clientX - rect.left;
@@ -134,10 +248,11 @@ const BandBar = ({ category, title, lightMode = false }) => {
 
   return (
     <>
+    <div ref={morphRef} className="bandbar-morph" aria-hidden="true" />
     <div className={`bandbar-veil ${visible ? 'is-visible' : ''} ${lightMode ? 'bandbar-veil--light' : 'bandbar-veil--dark'}`} aria-hidden="true" />
     <nav
       ref={navRef}
-      className={`bandbar ${visible ? 'is-visible' : ''} ${lightMode ? 'bandbar--light' : 'bandbar--dark'}`}
+      className={`bandbar ${visible ? 'is-visible' : ''}${morphing ? ' is-morphing' : ''} ${lightMode ? 'bandbar--light' : 'bandbar--dark'}`}
       aria-label="Where you are in the record"
       aria-hidden={!visible}
     >
@@ -170,6 +285,7 @@ const BandBar = ({ category, title, lightMode = false }) => {
           {placed.map((p) => (
             <i
               key={p.item.title}
+              data-title={p.item.title}
               className={`bandbar__line${isCurrent(p.item) ? ' is-current' : ''}${peek && peek.item === p.item ? ' is-peek' : ''}${p.item.future ? ' is-future' : ''}`}
               style={{ left: `${p.x}px` }}
             />

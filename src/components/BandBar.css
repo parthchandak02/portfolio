@@ -77,3 +77,10 @@
 .bandbar-veil.is-visible { opacity: 1; }
 .bandbar-veil--dark { background: linear-gradient(to bottom, #000 0, #000 92px, rgba(0, 0, 0, 0) 100%); }
 .bandbar-veil--light { background: linear-gradient(to bottom, #fff 0, #fff 92px, rgba(255, 255, 255, 0) 100%); }
+
+/* The hand-off between the hero strip and the bar: stand-in lines fly between the two while the real
+   ones wait out of sight */
+.bandbar-morph { position: fixed; inset: 0; z-index: 45; pointer-events: none; }
+.bandbar-morph__line { position: absolute; top: 0; left: 0; width: 2px; border-radius: 2px; will-change: transform, height, opacity; }
+.bandbar.is-morphing .bandbar__line { opacity: 0 !important; transition: none; }
+.spectro.is-morphing .spectro__line { opacity: 0 !important; transition: none; }

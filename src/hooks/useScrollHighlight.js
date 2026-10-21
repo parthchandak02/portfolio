@@ -4,8 +4,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
  * Custom hook to track the visible category for sidebar highlighting
  * (decoupled from card expansion logic for better performance)
  */
-// The hero strip hands over to the band bar once its top reaches this many px below the top of the screen
-export const STICK_AT = 20;
+// The hero strip hands over to the band bar once its top reaches this many px below the top of the screen.
+// At 43 the strip's hairline sits exactly on the bar's, so the hand-off morph moves lines along one line.
+export const STICK_AT = 43;
 
 const useScrollHighlight = (activeFilter) => {
   const [visible, setVisible] = useState({ category: 'all', title: null });
@@ -30,9 +31,14 @@ const useScrollHighlight = (activeFilter) => {
     const readingLine = containerRect.top + 170;
 
     // The bar takes over from the hero strip at the strip's own spot: while the strip is still on its way
-    // up the bar stays away, and scrolling back up hands the spot back to the strip
-    const strip = document.querySelector('.spectro');
-    const stuck = strip ? strip.getBoundingClientRect().top <= containerRect.top + STICK_AT : scrollContainer.scrollTop > 40;
+    // up the bar stays away, and scrolling back up hands the spot back to the strip. With the lanes open,
+    // the hand-off waits for the last lane, so the bar and the lanes are never on screen together.
+    const stage = document.querySelector('.spectro__stage');
+    let stuck = scrollContainer.scrollTop > 40;
+    if (stage) {
+      const rowH = parseFloat(getComputedStyle(stage).getPropertyValue('--row-h')) || 46;
+      stuck = stage.getBoundingClientRect().bottom - rowH <= containerRect.top + STICK_AT;
+    }
     if (!stuck) {
       setVisible((prev) => (prev.category === 'all' ? prev : { category: 'all', title: null }));
       lastKeyRef.current = 'all|';
