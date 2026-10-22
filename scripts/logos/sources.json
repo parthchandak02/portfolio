@@ -1,0 +1,35 @@
+{
+  "_about": "Where each generated logo in public/logos came from and how it was made. To rebuild one, download its source and run: node scripts/logos/make-logo.mjs <source> public/logos/<out> <args>",
+  "logos": [
+    {
+      "out": "springer-nature-logo.png",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Springer_Nature_Logo.svg",
+      "args": ["--stack"],
+      "note": "One-line wordmark stacked into two lines, as in Springer Nature's own stacked version"
+    },
+    {
+      "out": "ieee-logo.png",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/21/IEEE_logo.svg",
+      "args": ["--crop", "0,0,1,0.5"],
+      "note": "Top half only: drops the 'Advancing Technology for Humanity' tagline"
+    },
+    {
+      "out": "sigma-xi-logo.png",
+      "source": "https://www.sigmaxi.org/images/default-source/Chapters/officer-resource-center/promotional-materials/blue_and_gold_sx_logo_rgb_hi_res.jpg",
+      "args": ["--erase", "0.18,0.76,0.82,0.24", "--box", "470,380"],
+      "note": "Erases the rule and tagline beside the key; a little wider than the default so the thin serif lettering reads at 50 px"
+    },
+    {
+      "out": "tau-beta-pi-logo.png",
+      "source": "https://www.tbp.org/images/white_circle_logo.png",
+      "args": ["--ink", "alpha"],
+      "note": "Already white on transparent"
+    },
+    {
+      "out": "quillbot-logo.png",
+      "source": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/a1/df/93/a1df937b-062f-76a7-98a7-595bc3eafd91/qb_app_icon-0-0-1x_U007ephone-0-1-0-85-220.png/1024x1024bb.png",
+      "args": ["--ink", "dark", "--box", "280,280"],
+      "note": "App Store icon: the dark robot only, sized down because a solid mark reads heavier than outlines and wordmarks"
+    }
+  ]
+}

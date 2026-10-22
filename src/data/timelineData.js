@@ -679,6 +679,8 @@ export const timelineDataByCategory = {
   judging: [
     {
         "title": "Peer Reviewer, Springer Nature",
+        "company": "Springer Nature",
+        "companyLogo": "/logos/springer-nature-logo.png",
         "date": "February 2026 - October 2026",
         "category": "judging",
         "location": "BMC, Discover, Humanities and Social Sciences Communications and International Journal of Social Robotics",
@@ -730,6 +732,8 @@ export const timelineDataByCategory = {
   memberships: [
     {
         "title": "IEEE Senior Member",
+        "company": "IEEE",
+        "companyLogo": "/logos/ieee-logo.png",
         "date": "February 2026",
         "category": "memberships",
         "description": "Elevated membership grade of the IEEE, awarded for professional achievement.",
@@ -739,6 +743,8 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Sigma Xi, The Scientific Research Honor Society",
+        "company": "Sigma Xi",
+        "companyLogo": "/logos/sigma-xi-logo.png",
         "date": "March 2026",
         "category": "memberships",
         "description": "Member of the scientific research honor society.",
@@ -748,6 +754,8 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Tau Beta Pi, Engineering Honor Society",
+        "company": "Tau Beta Pi",
+        "companyLogo": "/logos/tau-beta-pi-logo.png",
         "date": "May 2018",
         "category": "memberships",
         "description": "Member of the engineering honor society.",
@@ -757,6 +765,8 @@ export const timelineDataByCategory = {
     },
     {
         "title": "QuillBot Product Advisory Panel",
+        "company": "QuillBot",
+        "companyLogo": "/logos/quillbot-logo.png",
         "date": "April 2025",
         "category": "memberships",
         "description": "Member of the product advisory panel for the QuillBot writing tool.",
