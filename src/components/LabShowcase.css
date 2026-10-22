@@ -117,10 +117,22 @@
 .lab-tile--text .lab-tile__venue {
   font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--hue, #ff9a3d);
+  padding-right: 34px; /* clear of the topic mark */
 }
 .lab-tile--text .lab-tile__name { -webkit-line-clamp: 4; margin-top: auto; }
 .lab--light .lab-tile--text .lab-tile__venue { color: color-mix(in srgb, var(--hue, #ff9a3d) 62%, #000); }
 .lab--light .lab-tile--text .lab-tile__fog { text-shadow: none; }
+/* The topic mark, faint in the corner until the tile is the one being read or opened */
+.lab-tile__logo {
+  position: absolute; top: 10px; right: 10px; z-index: 2;
+  width: 30px; height: 30px;
+  opacity: 0.32;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.lab-tile.is-highlighted .lab-tile__logo, .lab-tile.is-open .lab-tile__logo, .lab-tile:focus-visible .lab-tile__logo { opacity: 0.85; }
+@media (hover: hover) { .lab-tile:hover .lab-tile__logo { opacity: 0.85; } }
+.lab--light .lab-tile__logo { filter: invert(1) brightness(0.8); }
 @media (max-width: 560px) {
   .lab-tile--text { aspect-ratio: auto; min-height: 168px; }
   .lab-tile--text .lab-tile__fog { position: relative; inset: auto; min-height: 168px; }

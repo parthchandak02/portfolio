@@ -32,6 +32,7 @@ const CardTile = ({ item, highlighted = false, onOpen }) => {
     >
       {image && <img className="lab-tile__img" src={image} alt="" loading="lazy" />}
       {item.video && <span className="lab-tile__badge" aria-hidden="true"><Play size={12} fill="currentColor" /></span>}
+      {!image && item.companyLogo && <img className="lab-tile__logo" src={item.companyLogo} alt="" aria-hidden="true" />}
 
       <span className="lab-tile__fog" aria-hidden="true">
         {!image && venue && <span className="lab-tile__venue">{venue}</span>}

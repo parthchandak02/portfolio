@@ -72,7 +72,7 @@ const TimelineCard = ({
           {companyLogo && (
             <img 
               src={companyLogo} 
-              alt={`${company || 'Company'} logo`}
+              alt={company ? `${company} logo` : ''}
               className="timeline-card__company-logo timeline-card__company-logo--header"
               onError={(e) => {
                 e.target.style.display = 'none'; // Hide logo if it fails to load

@@ -25,6 +25,23 @@ node scripts/logos/make-logo.mjs <source.svg|png|jpg> public/logos/<name>-logo.p
 Prefer an official vector (Wikimedia Commons, the organisation's brand page) over a screenshot.
 Record the source and options in `sources.json` so the logo can be rebuilt.
 
+## Topic logos
+
+Work with no organisation behind it (independent research papers) gets a topic logo instead. These are
+drawn by hand in `topics/*.svg` to one spec, so they read as a set:
+
+- 512 x 512 viewBox, white strokes on transparent, `stroke-width="16"`, round caps and joins
+- the drawing stays inside the central 300 x 300 area (106 to 406)
+
+```sh
+node scripts/logos/render-topics.mjs            # all of them
+node scripts/logos/render-topics.mjs robotics   # just one
+```
+
+Each renders to `public/logos/topic-<name>.png`. The set: `healthcare`, `haptics`, `robotics`,
+`prototyping`, `iot-agriculture`, `materials`, `ebike`. Research tiles show the mark faintly in their
+corner and brighten it when the tile is read, hovered or opened.
+
 ## Check it before it ships
 
 ```sh
