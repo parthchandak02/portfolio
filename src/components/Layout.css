@@ -132,7 +132,7 @@
 }
 
 /* Each round button names what it does: on hover or keyboard focus, and briefly after the opening */
-.light-toggle, .lock-toggle, .play-mode-toggle, .spectro-toggle { overflow: visible; }
+.light-toggle, .lock-toggle, .play-mode-toggle { overflow: visible; }
 .ui-hint {
   position: absolute; right: calc(100% + 10px); top: 50%;
   transform: translate(8px, -50%); opacity: 0; pointer-events: none;
@@ -145,18 +145,16 @@
 .light-mode .ui-hint { background: rgba(255, 255, 255, 0.82); border: 1px solid rgba(0, 0, 0, 0.1); color: rgba(20, 20, 24, 0.9); }
 @media (hover: hover) {
   .light-toggle:hover > .ui-hint, .lock-toggle:hover > .ui-hint,
-  .play-mode-toggle:hover > .ui-hint, .spectro-toggle:hover > .ui-hint { opacity: 1; transform: translate(0, -50%); }
+  .play-mode-toggle:hover > .ui-hint { opacity: 1; transform: translate(0, -50%); }
 }
 .light-toggle:focus-visible > .ui-hint, .lock-toggle:focus-visible > .ui-hint,
-.play-mode-toggle:focus-visible > .ui-hint, .spectro-toggle:focus-visible > .ui-hint { opacity: 1; transform: translate(0, -50%); }
+.play-mode-toggle:focus-visible > .ui-hint { opacity: 1; transform: translate(0, -50%); }
 /* After the spark lands the labels cascade up from the button it hit */
 .layout__ui--hints .ui-hint { opacity: 1; transform: translate(0, -50%); }
-.layout__ui--hints .play-mode-toggle .ui-hint { transition-delay: 0.09s; }
-.layout__ui--hints .lock-toggle .ui-hint { transition-delay: 0.18s; }
-.layout__ui--hints .light-toggle .ui-hint { transition-delay: 0.27s; }
-.spectro-toggle.is-hint .ui-hint { color: #ff6b35; border-color: rgba(255, 107, 53, 0.5); }
+.layout__ui--hints .lock-toggle .ui-hint { transition-delay: 0.09s; }
+.layout__ui--hints .light-toggle .ui-hint { transition-delay: 0.18s; }
 @media (max-width: 768px) { .ui-hint { font-size: 0.75rem; padding: 5px 10px; right: calc(100% + 8px); } }
-/* On a phone the hero sits right beside the buttons, so only the label the spark points at comes up */
+/* On a phone the hero sits right beside the buttons, so no labels come up after the opening */
 @media (max-width: 768px) {
   .layout__ui--hints .light-toggle .ui-hint,
   .layout__ui--hints .lock-toggle .ui-hint,

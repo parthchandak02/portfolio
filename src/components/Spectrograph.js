@@ -132,10 +132,10 @@ const Track = ({ band, placed, active, onActive, top, height }) => {
  */
 // The opening: the record arrives split into its eight lanes, holds a moment, then folds into one strip.
 // A spark then carries the fold to the button that undoes it, so the control explains itself.
-const INTRO_HOLD = 2600; // ms the lanes stay open; covers their draw-in and a beat to take them in
+const INTRO_HOLD = 1100; // ms the lanes stay open; the draw-in finishes inside it. Start-up work adds ~0.5 s in practice
 const FOLD_MS = 1150; // ms for the fold to finish, matching the collapse transitions in Spectrograph.css
 const SPARK_MS = 900;
-const HINT_MS = 3600; // ms the button labels stay up after the spark lands
+const HINT_MS = 2600; // ms the button labels stay up after the spark lands
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -189,7 +189,7 @@ const Spectrograph = ({ lightMode = false, handedOver = false }) => {
   const [slot, setSlot] = useState(null);
   useEffect(() => setSlot(document.querySelector('.layout__ui')), []);
 
-  // The spark leaves the strip's right end and lands on the toggle; then every button shows its label
+  // The spark leaves the strip's right end and lands on the toggle, which rings; the other buttons show their labels
   const showHints = useCallback(() => {
     const ui = document.querySelector('.layout__ui');
     setHint(true);
@@ -269,7 +269,6 @@ const Spectrograph = ({ lightMode = false, handedOver = false }) => {
       onClick={onToggle}
     >
       <ChevronDown size={18} strokeWidth={1.75} className="spectro__chevron" />
-      <span className="ui-hint" aria-hidden="true">{expanded ? 'Fold into one strip' : 'Split into eight bands'}</span>
     </button>
   );
 
