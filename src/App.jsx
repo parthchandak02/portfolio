@@ -106,16 +106,21 @@ export default function App() {
       togglePlayMode();
       return;
     }
-    const timer = setTimeout(() => {
+    // Measure once the web fonts are in: text set in a fallback font has other heights and the jump lands off
+    let cancelled = false;
+    const timer = setTimeout(() => document.fonts.ready.then(() => {
       const target = document.getElementById(hash);
       const scroller = document.querySelector('.main-content-scroll');
-      if (target && scroller) {
+      if (!cancelled && target && scroller) {
         // 143 lands the section's first row just clear of the band bar and its veil
         const top = scroller.scrollTop + target.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 143;
         scroller.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
       }
-    }, 150);
-    return () => clearTimeout(timer);
+    }), 150);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
     // togglePlayMode is recreated each render; hash and mode are the real triggers
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash, isPlayMode]);

@@ -44,6 +44,14 @@
   opacity: 0.9;
 }
 
+/* Hold the greeting's line before it starts typing, so the page below doesn't drop a line half a
+   second in (section links would land a line low) */
+.ui-typewriter-static::before {
+  content: '\200b';
+  margin-right: -2px;
+  line-height: 1.5; /* the typed text is a span, which takes the global span line-height */
+}
+
 /* Cycling Professional Titles Typewriter - larger, cycles continuously */
 .ui-typewriter-cycling {
   font-family: var(--font-family-primary);
