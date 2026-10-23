@@ -44,14 +44,17 @@
 .bandbar__track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--edge); }
 .bandbar__track:focus-visible, .bandbar__name:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; }
 
+/* Ticks are as tall as the strip's lines (row height less 16px), so the hand-off never resizes them.
+   The card you are reading stands out by brightness and weight, not height. */
 .bandbar__line {
-  position: absolute; top: 50%; width: 2px; height: 14px; transform: translate(-50%, -50%);
-  border-radius: 2px; pointer-events: none; opacity: 0.4;
+  position: absolute; top: 50%; width: 2px; height: 30px; transform: translate(-50%, -50%);
+  border-radius: 2px; pointer-events: none; opacity: 0.45;
   background: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000);
 }
-.bandbar__line.is-current { opacity: 1; height: 22px; }
+@media (pointer: coarse) { .bandbar__line { height: 36px; } }
+.bandbar__line.is-current { opacity: 1; width: 3px; }
 .bandbar__line.is-peek {
-  opacity: 1; height: 26px; width: 3px;
+  opacity: 1; width: 3px;
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--hue) 22%, transparent);
 }
 .bandbar__line.is-future { background: transparent; border: 1.5px solid var(--hue); opacity: 0.9; }

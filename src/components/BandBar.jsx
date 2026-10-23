@@ -49,8 +49,8 @@ const layout = (items, width) => {
   return sorted.map((item, i) => ({ item, x: pos[i] }));
 };
 
-// The hand-off between the hero strip and the bar is one motion: the band's lines fly from the strip
-// into the bar (and back), while the other bands' lines shrink away (or grow back) where they stand.
+// The hand-off between the hero strip and the bar is one motion: the band's lines lift out of the strip
+// into the bar (and back) at full height, while the other bands' lines fade out (or back in) where they stand.
 // Positions are re-read every frame, so lines land on the strip even while it scrolls.
 const MORPH_MS = 560;
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
@@ -133,11 +133,14 @@ const BandBar = ({ category, title, lightMode = false }) => {
     if (stage.bottom < -window.innerHeight || stage.top > window.innerHeight) return undefined;
 
     const trackRect = track.getBoundingClientRect();
+    // The bar's ticks are as tall as the strip's lines, so lines only move and fade on the way, never resize
+    const resting = stripLines.find((el) => !el.classList.contains('spectro__line--on')) || stripLines[0];
+    const lineH = centre(resting).h;
     const barSpots = new Map(layout(shown.items, trackRect.width).map((p) => [p.item.title, {
       x: trackRect.left + p.x,
       y: trackRect.top + trackRect.height / 2,
-      h: isCurrentCard(p.item, title) ? 22 : 14,
-      o: isCurrentCard(p.item, title) ? 1 : 0.4
+      h: lineH,
+      o: isCurrentCard(p.item, title) ? 1 : 0.45
     }]));
     const ours = stripLines.filter((el) => el.dataset.band === shown.key && barSpots.has(el.dataset.title))
       .sort((a, b) => centre(a).x - centre(b).x);
@@ -153,7 +156,7 @@ const BandBar = ({ category, title, lightMode = false }) => {
       stripLines.forEach((el) => {
         if (ours.includes(el)) return;
         const from = centre(el);
-        sprites.push(sprite(el, { from: () => from, to: () => ({ ...from, h: 0 }), o1: 0, duration: 300, delay: (from.x % 7) * 12 }));
+        sprites.push(sprite(el, { from: () => from, to: () => from, o1: 0, duration: 300, delay: (from.x % 7) * 12 }));
       });
     } else {
       // Back to the strip: the bar's ticks fly home, and the other bands grow back in around them
@@ -164,7 +167,7 @@ const BandBar = ({ category, title, lightMode = false }) => {
       });
       stripLines.forEach((el) => {
         if (ours.includes(el)) return;
-        sprites.push(sprite(el, { from: () => ({ ...centre(el), h: 0 }), to: () => centre(el), o0: 0, delay: 200 + (centre(el).x % 7) * 14, duration: 360 }));
+        sprites.push(sprite(el, { from: () => centre(el), to: () => centre(el), o0: 0, delay: 200 + (centre(el).x % 7) * 14, duration: 360 }));
       });
     }
 
