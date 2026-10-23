@@ -16,7 +16,9 @@ const RainbowMaterial = shaderMaterial(
     endRadius: 0,
     emissiveIntensity: 2.5,
     ratio: 1,
-    lightMode: false
+    lightMode: false,
+    focus: 550,
+    focusAmount: 0
   },
   /*glsl*/ ` varying vec2 vUv;
     void main() {
@@ -33,6 +35,8 @@ const RainbowMaterial = shaderMaterial(
     uniform float time;
     uniform float ratio;
     uniform bool lightMode;
+    uniform float focus;
+    uniform float focusAmount;
   
     vec2 mp;
     // ratio: 1/3 = neon, 1/4 = refracted, 1/5+ = approximate white
@@ -102,6 +106,10 @@ const RainbowMaterial = shaderMaterial(
       
       // Adapt colors based on background mode
       vec3 finalColor = area * co * l * brightness * emissiveIntensity;
+
+      // Light the band of the item being read and let the rest of the spectrum fall back
+      float near = exp(-pow((w - focus) / 26.0, 2.0));
+      finalColor *= mix(1.0, 0.15 + 1.75 * near, focusAmount);
       
       if (lightMode) {
         // For light backgrounds: invert dark areas and enhance contrast

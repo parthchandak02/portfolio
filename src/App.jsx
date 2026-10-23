@@ -125,6 +125,9 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash, isPlayMode]);
 
+  // The band picked on the spectrograph, lit in the prism's rainbow
+  const [focusBand, setFocusBand] = useState(null);
+
   // Which section and card is in view, for the sticky band bar
   const { visibleCategory, visibleTitle } = useScrollHighlight('all');
   // Once the band bar takes over from the strip, the round buttons step aside; they belong to the top screen
@@ -155,6 +158,7 @@ export default function App() {
             lightMode={lightMode}
             viewportPosition={viewportPosition}
             isLocked={isLocked}
+            focusWave={focusBand?.wave ?? null}
           />
         </Suspense>
         
@@ -172,7 +176,7 @@ export default function App() {
             <UITypewriter lightMode={lightMode} />
 
             {/* Record spectrograph - visible in both modes */}
-            <Spectrograph lightMode={lightMode} handedOver={handedOver} />
+            <Spectrograph lightMode={lightMode} handedOver={handedOver} onBand={setFocusBand} />
             
             {/* Resume content - Hidden in play mode */}
             {!isPlayMode && (

@@ -44,11 +44,14 @@ const fromCards = (categories) =>
 
 const careerItems = fromCards(['experience', 'education']);
 
+// wave: where the band's colour sits in the prism's rainbow, in the shader's nanometres (measured on screen,
+// since the colour grade shifts them), so picking an item lights that part
 export const spectrumBands = [
   {
     key: 'career',
     name: 'Career',
     hue: '#e4dccf',
+    // No wave: Career is the white beam itself, so it lights the whole rainbow
     sections: ['experience', 'education'],
     items: careerItems
   },
@@ -57,6 +60,7 @@ export const spectrumBands = [
     sections: ['patent'],
     name: 'Patent',
     hue: '#ff5a52',
+    wave: 685,
     items: [
       { t: 2024.49, when: 'Jun 2024', title: 'Audio prioritization, application filed', meta: 'Named inventor', url: 'https://patents.google.com/patent/US20260003563A1/en' },
       { t: 2026.0, when: 'Jan 2026', title: 'US20260003563A1, published application', meta: 'Named inventor', url: 'https://patents.google.com/patent/US20260003563A1/en' },
@@ -68,6 +72,7 @@ export const spectrumBands = [
     sections: ['research'],
     name: 'Research',
     hue: '#ff9a3d',
+    wave: 655,
     items: [
       { t: 2019.5, when: '2019', title: 'Growth and characterization of cadmium telluride', meta: 'IJFMR' },
       { t: 2020.5, when: '2020', title: 'Advancements in electric bicycle technology', meta: 'Zenodo' },
@@ -93,6 +98,7 @@ export const spectrumBands = [
     sections: ['judging'],
     name: 'Judging',
     hue: '#f2d34a',
+    wave: 595,
     items: [
       { t: 2026.14, when: 'Feb 22, 2026', title: 'BMC Health Services Research', meta: 'Peer reviewer, Springer Nature' },
       { t: 2026.61, when: 'Aug 11, 2026', title: 'Discover Artificial Intelligence', meta: 'Peer reviewer, Springer Nature' },
@@ -113,6 +119,7 @@ export const spectrumBands = [
     sections: ['impact'],
     name: 'Impact',
     hue: '#5fd38d',
+    wave: 545,
     items: fromCards(['impact'])
   },
   {
@@ -120,6 +127,7 @@ export const spectrumBands = [
     sections: ['awards', 'speaking', 'media'],
     name: 'Recognition',
     hue: '#4dd0e1',
+    wave: 500,
     items: [
       { t: 2015.6, when: '2015', title: 'Robert W. Finch Memorial Scholarship', meta: 'Washington State University' },
       { t: 2015.7, when: '2015-2018', title: 'International Merit Award', meta: 'Washington State University' },
@@ -135,6 +143,7 @@ export const spectrumBands = [
     sections: ['memberships'],
     name: 'Memberships',
     hue: '#6a8cff',
+    wave: 460,
     items: [
       { t: 2018.33, when: 'May 2018', title: 'Tau Beta Pi', meta: 'Engineering honor society' },
       { t: 2025.25, when: 'Apr 2025', title: 'QuillBot Product Advisory Panel', meta: 'Advisory panel member' },
@@ -147,6 +156,7 @@ export const spectrumBands = [
     sections: ['lab', 'projects'],
     name: 'Projects',
     hue: '#b07cff',
+    wave: 430,
     items: [
       ...fromCards(['lab']),
       ...fromCards(['projects'])

@@ -5,7 +5,7 @@ import { Bloom, EffectComposer, LUT } from '@react-three/postprocessing';
 import { LUTCubeLoader } from 'postprocessing';
 import Scene from './Scene';
 
-const Canvas3D = ({ lightMode, viewportPosition, isLocked }) => {
+const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave }) => {
   const texture = useLoader(LUTCubeLoader, '/lut/F-6800-STD.cube');
 
   return (
@@ -30,6 +30,7 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked }) => {
         lightMode={lightMode} 
         viewportPosition={viewportPosition} 
         isLocked={isLocked}
+        focusWave={focusWave}
       />
       <EffectComposer disableNormalPass>
         <Bloom mipmapBlur levels={9} intensity={1.5} luminanceThreshold={1} luminanceSmoothing={1} />

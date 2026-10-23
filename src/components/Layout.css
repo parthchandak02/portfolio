@@ -136,13 +136,13 @@
 .ui-hint {
   position: absolute; right: calc(100% + 10px); top: 50%;
   transform: translate(8px, -50%); opacity: 0; pointer-events: none;
-  white-space: nowrap; padding: 6px 12px; border-radius: 999px;
-  font-family: var(--font-family-primary); font-size: 0.8rem; font-weight: 600; line-height: 1.2; letter-spacing: 0.01em;
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  white-space: nowrap;
+  font-family: var(--font-family-primary); font-size: 0.8rem; font-weight: 500; line-height: 1.2; letter-spacing: 0.01em;
   transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.dark-mode .ui-hint { background: rgba(16, 16, 20, 0.72); border: 1px solid rgba(255, 255, 255, 0.14); color: rgba(255, 255, 255, 0.92); }
-.light-mode .ui-hint { background: rgba(255, 255, 255, 0.82); border: 1px solid rgba(0, 0, 0, 0.1); color: rgba(20, 20, 24, 0.9); }
+/* Plain text, no pill; a soft shadow keeps it readable over the beam */
+.dark-mode .ui-hint { color: rgba(255, 255, 255, 0.78); text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9); }
+.light-mode .ui-hint { color: rgba(20, 20, 24, 0.72); text-shadow: 0 1px 8px rgba(255, 255, 255, 0.95); }
 @media (hover: hover) {
   .light-toggle:hover > .ui-hint, .lock-toggle:hover > .ui-hint,
   .play-mode-toggle:hover > .ui-hint { opacity: 1; transform: translate(0, -50%); }
@@ -153,12 +153,10 @@
 .layout__ui--hints .ui-hint { opacity: 1; transform: translate(0, -50%); }
 .layout__ui--hints .lock-toggle .ui-hint { transition-delay: 0.09s; }
 .layout__ui--hints .light-toggle .ui-hint { transition-delay: 0.18s; }
-@media (max-width: 768px) { .ui-hint { font-size: 0.75rem; padding: 5px 10px; right: calc(100% + 8px); } }
+@media (max-width: 768px) { .ui-hint { font-size: 0.75rem; right: calc(100% + 8px); } }
 /* On a phone the hero sits right beside the buttons, so no labels come up after the opening */
 @media (max-width: 768px) {
   .layout__ui--hints .light-toggle .ui-hint,
   .layout__ui--hints .lock-toggle .ui-hint,
   .layout__ui--hints .play-mode-toggle .ui-hint { opacity: 0; }
-  .dark-mode .ui-hint { background: rgba(12, 12, 16, 0.9); }
-  .light-mode .ui-hint { background: rgba(255, 255, 255, 0.94); }
 }

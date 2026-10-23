@@ -8,7 +8,7 @@ import { Flare } from './Flare';
 import { Box } from './Box';
 import { calculateRefractionAngle, lerp, lerpV3 } from '../util';
 
-const Scene = ({ lightMode, viewportPosition, isLocked }) => {
+const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
   const [isPrismHit, hitPrism] = useState(false);
   const flare = useRef(null);
   const ambient = useRef(null);
@@ -76,6 +76,11 @@ const Scene = ({ lightMode, viewportPosition, isLocked }) => {
       boxreflect.current.setRay([mouseX, mouseY, 0], [0, 0, 0]);
     }
     
+    // Glide the highlight to the picked band's wavelength; with nothing picked, ease back to the full spectrum
+    const m = rainbow.current.material;
+    if (focusWave) lerp(m, 'focus', focusWave, m.focusAmount < 0.05 ? 1 : 0.12);
+    lerp(m, 'focusAmount', focusWave ? 1 : 0, 0.08);
+
     // Animate rainbow intensity
     lerp(rainbow.current.material, 'emissiveIntensity', isPrismHit ? 2.5 : 0, 0.1);
     spot.current.intensity = rainbow.current.material.emissiveIntensity;

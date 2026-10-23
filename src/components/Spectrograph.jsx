@@ -150,7 +150,7 @@ const arc = (a, b, steps = 12) => {
   });
 };
 
-const Spectrograph = ({ lightMode = false, handedOver = false }) => {
+const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   // Section links and reduced motion skip the show and start folded
   const [intro, setIntro] = useState(() => typeof window !== 'undefined' && !window.location.hash && !prefersReducedMotion());
   const [expanded, setExpanded] = useState(intro);
@@ -158,6 +158,12 @@ const Spectrograph = ({ lightMode = false, handedOver = false }) => {
   const [active, setActive] = useState(null);
   const toggleRef = useRef(null);
   const timersRef = useRef([]);
+
+  // The prism lights the picked item's band in its rainbow
+  const band = active ? active.band : null;
+  useEffect(() => {
+    if (onBand) onBand(band);
+  }, [band, onBand]);
 
   const all = useMemo(
     () => spectrumBands.flatMap((band) => band.items.map((item) => ({ item, band }))),
