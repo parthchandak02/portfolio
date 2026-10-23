@@ -1,6 +1,6 @@
-import { useEffect, useState, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useState, useMemo } from 'react';
+import './styles.css';
 import Layout from './components/Layout';
-import Canvas3D from './components/Canvas3D';
 // GlassNavigation removed - replaced with white space placeholder
 import LightToggle from './components/LightToggle';
 import LockToggle from './components/LockToggle';
@@ -16,6 +16,9 @@ import { timelineData } from './data/timelineData';
 import { TypewriterHighlightProvider } from './contexts/TypewriterHighlightContext';
 import ScrollTypewriterController from './components/ScrollTypewriterController';
 import Spectrograph from './components/Spectrograph';
+
+// three.js is most of the download, so the scene loads on its own and the text doesn't wait for it
+const Canvas3D = lazy(() => import('./components/Canvas3D'));
 
 const VISITED_KEY = 'pc-has-visited';
 
@@ -107,7 +110,8 @@ export default function App() {
       const target = document.getElementById(hash);
       const scroller = document.querySelector('.main-content-scroll');
       if (target && scroller) {
-        const top = scroller.scrollTop + target.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 100;
+        // 143 lands the section's first row just clear of the band bar and its veil
+        const top = scroller.scrollTop + target.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 143;
         scroller.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
       }
     }, 150);
@@ -141,11 +145,13 @@ export default function App() {
         ) : null}
       >
         {/* 3D Canvas Background */}
-        <Canvas3D 
-          lightMode={lightMode} 
-          viewportPosition={viewportPosition} 
-          isLocked={isLocked}
-        />
+        <Suspense fallback={null}>
+          <Canvas3D
+            lightMode={lightMode}
+            viewportPosition={viewportPosition}
+            isLocked={isLocked}
+          />
+        </Suspense>
         
         {/* UI Overlay Layer */}
         <div className={`layout__ui${handedOver ? ' layout__ui--reading' : ''}`}>

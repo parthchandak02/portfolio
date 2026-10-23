@@ -1,0 +1,4 @@
+# git-secrets: the ".env" pattern also matches these, which hold no secrets
+\.gitignore:[0-9]+:\.env
+\.eslintrc\.cjs:[0-9]+:  env: \{
+\.gitallowed:[0-9]+:

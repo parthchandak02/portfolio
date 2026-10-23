@@ -6,9 +6,9 @@ import { useFrame } from '@react-three/fiber'
 export const Flare = forwardRef(({ streak = [8, 20, 1], visible, ...props }, fRef) => {
   const ref = useRef(null)
   const [streakTexture, dotTexture, glowTexture] = useTexture([
-    process.env.PUBLIC_URL + '/textures/lensflare/lensflare2.png',
-    process.env.PUBLIC_URL + '/textures/lensflare/lensflare3.png',
-    process.env.PUBLIC_URL + '/textures/lensflare/lensflare0_bw.png'
+    '/textures/lensflare/lensflare2.png',
+    '/textures/lensflare/lensflare3.png',
+    '/textures/lensflare/lensflare0_bw.png'
   ])
   const config = {
     transparent: true,

@@ -1,7 +1,7 @@
 {
   "name": "portfolio",
   "version": "1.0.0",
-  "description": "An interactive 3D prism visualization built with React and Three.js, featuring glassmorphism UI elements and dynamic light refraction effects",
+  "description": "Parth Chandak's portfolio: an Astro site with an interactive React Three Fiber prism, glass UI and a spectrograph of the record",
   "keywords": [
     "react",
     "threejs",
@@ -11,35 +11,35 @@
     "glassmorphism",
     "webgl",
     "interactive",
-    "light-refraction"
+    "light-refraction",
+    "astro"
   ],
   "author": "Parth Chandak",
   "license": "MIT",
-  "main": "src/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/parthchandak02/Portfolio.git"
   },
   "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=7.0.0"
+    "node": ">=22.12.0",
+    "npm": ">=9.6.5"
   },
   "homepage": "https://parthchandak.info",
   "private": true,
   "dependencies": {
+    "@astrojs/react": "5.0.7",
     "@react-three/drei": "10.0.7",
     "@react-three/fiber": "9.1.2",
     "@react-three/postprocessing": "3.0.4",
     "@types/three": "0.176.0",
+    "astro": "6.4.8",
     "lucide-react": "^0.525.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-scripts": "5.0.1",
     "react-typed": "^2.0.12",
     "three": "0.176.0"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-react": "^7.37.5",
@@ -48,7 +48,6 @@
     "prettier": "^3.2.5",
     "rimraf": "^5.0.8",
     "sharp": "^0.33.5",
-    "source-map-explorer": "^2.5.3",
     "three-stdlib": "^2.36.0"
   },
   "scripts": {
@@ -57,11 +56,10 @@
     "start": "npm run start:app",
     "predev": "npm run cleanup:port",
     "dev": "npm run start:app",
-    "start:app": "cross-env GENERATE_SOURCEMAP=false BROWSER=none react-scripts start",
-    "build": "cross-env GENERATE_SOURCEMAP=false react-scripts build",
-    "build:analyze": "npm run build && npx source-map-explorer 'build/static/js/*.js'",
-    "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
+    "start:app": "astro dev --port 3000",
+    "build": "astro build",
+    "lint": "eslint src --ext .js,.jsx",
+    "lint:fix": "eslint src --ext .js,.jsx --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,css}\"",
     "format:check": "prettier --check \"src/**/*.{js,jsx,css}\"",
     "audit": "npm audit",
@@ -69,12 +67,8 @@
     "health": "npm outdated && npm audit",
     "outdated": "npm outdated",
     "clean": "rimraf build",
-    "eject": "react-scripts eject"
+    "preview": "astro preview --port 3000",
+    "deploy": "npm run build && wrangler pages deploy build --project-name portfolio --branch main --commit-dirty=true"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "type": "module"
 }

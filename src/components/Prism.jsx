@@ -3,7 +3,7 @@ import { MeshTransmissionMaterial } from '@react-three/drei'
 import { GLTFLoader } from 'three-stdlib'
 
 export function Prism({ onRayOver, onRayOut, onRayMove, ...props }) {
-  const { nodes } = useLoader(GLTFLoader, process.env.PUBLIC_URL + '/gltf/prism.glb')
+  const { nodes } = useLoader(GLTFLoader, '/gltf/prism.glb')
   return (
     <group {...props}>
       {/* A low-res, invisible representation of the prism that gets hit by the raycaster */}

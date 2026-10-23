@@ -231,3 +231,5 @@ dev-debug.log
 
 .cursor
 .taskmaster
+# Astro
+.astro/

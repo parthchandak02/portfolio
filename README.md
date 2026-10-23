@@ -8,6 +8,7 @@
 
 <h6>
 
+![Astro](https://img.shields.io/badge/Astro-6-111111?style=flat-square&logo=astro&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-111111?style=flat-square&logo=react&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-React%20Three%20Fiber-ff9a3d?style=flat-square&logo=threedotjs&logoColor=white)
 ![Cloudflare Pages](https://img.shields.io/badge/hosted-Cloudflare%20Pages-111111?style=flat-square&logo=cloudflare&logoColor=white)
@@ -109,11 +110,12 @@ The eight bands, each with its own colour on the strip and the bar:
 - **Beam lock.** Hold the beam still so it stops chasing the pointer while you read.
 - **Proof links.** Ticks with a public source (a DOI, a patent page, a live project) link straight to it.
 - **One data file per thing.** Cards live in `src/data/timelineData.js`, the Lab in `src/data/lab.js`, bands in `src/data/spectrum.js`.
+- **Readable before it loads.** Astro writes the whole record into the HTML from the same data files, so search engines and link previews see every card; the 3D scene loads after the text.
 - **Static and locked down.** No backend. Cloudflare Pages serves it with HSTS, a strict Content Security Policy and a sitemap.
 
 ## Run it
 
-Requires Node 16 or newer.
+Requires Node 22.12 or newer (`.node-version` pins the one Cloudflare uses).
 
 ```bash
 git clone https://github.com/parthchandak02/portfolio.git
@@ -121,9 +123,11 @@ cd portfolio
 npm ci
 npm run dev      # http://localhost:3000 (frees port 3000 first)
 npm run build    # static site in build/
+npm run deploy   # build, then upload build/ to Cloudflare Pages with wrangler
 ```
 
-Every push to `main` deploys to Cloudflare Pages (build command `npm run build`, output `build`).
+Every push to `main` also deploys to Cloudflare Pages (build command `npm run build`, output `build`).
+`npm run deploy` needs `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in the environment.
 Add `[skip ci]` to a commit message to skip the build for docs-only changes.
 
 <details>
@@ -131,17 +135,18 @@ Add `[skip ci]` to a commit message to skip the build for docs-only changes.
 
 ```
 src/
-  App.js                    Play mode / record switch, deep links, theme
+  pages/index.astro         The page: head tags, and the record as plain HTML until the app loads
+  App.jsx                   Play mode / record switch, deep links, theme
   components/
-    Canvas3D.js, Scene.js   R3F canvas, post-processing, scene setup
-    Beam.js, Prism.js,
-    Rainbow.js, Flare.js    The light beam, the GLTF prism, refraction and flare
-    Spectrograph.js         The tick strip and its eight lanes
-    BandBar.js              Sticky band bar in the record
-    Timeline.js, TimelineCard.js, CardTile.js, LabShowcase.js
+    Canvas3D.jsx, Scene.jsx R3F canvas, post-processing, scene setup
+    Beam.jsx, Prism.jsx,
+    Rainbow.jsx, Flare.jsx  The light beam, the GLTF prism, refraction and flare
+    Spectrograph.jsx        The tick strip and its eight lanes
+    BandBar.jsx             Sticky band bar in the record
+    Timeline.jsx, TimelineCard.jsx, CardTile.jsx, LabShowcase.jsx
                             Cards, glass tiles and the Lab card
-    UITypewriter.js         The greeting and cycling roles
-    RightSidebar.js         Social and contact links
+    UITypewriter.jsx        The greeting and cycling roles
+    RightSidebar.jsx        Social and contact links
   data/
     timelineData.js         Every card, by category
     spectrum.js             Band names, colours and dated items
@@ -183,8 +188,8 @@ Projects band.
 organisation's file with `node scripts/logos/make-logo.mjs <source> public/logos/<name>-logo.png`;
 see [scripts/logos/README.md](scripts/logos/README.md) for the options and the topic marks.
 
-**Other things to change for your own copy:** `homepage` in `package.json`, `public/CNAME`, the links
-in `src/components/RightSidebar.js`, colours in `src/styles.css` and the component CSS files, and
+**Other things to change for your own copy:** `site` in `astro.config.mjs`, the head tags in
+`src/pages/index.astro`, `public/CNAME`, the links in `src/components/RightSidebar.jsx`, colours in `src/styles.css` and the component CSS files, and
 the model at `public/gltf/prism.glb`.
 
 </details>
@@ -195,14 +200,15 @@ the model at `public/gltf/prism.glb`.
 | Command | Does |
 |---|---|
 | `npm run dev` | Dev server on port 3000, after freeing the port |
-| `npm run build` | Production build without source maps |
-| `npm run build:analyze` | Build, then inspect bundle size with source-map-explorer |
+| `npm run build` | Production build into `build/` |
+| `npm run preview` | Serve the production build on port 3000 |
+| `npm run deploy` | Build and upload to Cloudflare Pages with wrangler |
 | `npm run lint` / `lint:fix` | ESLint over `src/` |
 | `npm run format` / `format:check` | Prettier over `src/` |
 | `npm run health` | `npm outdated` and `npm audit` |
 | `npm run clean` | Remove `build/` |
 
-Check a production build locally with `npx serve -s build -l 8080`.
+Check a production build locally with `npm run preview`.
 
 </details>
 
@@ -221,7 +227,7 @@ The build is a plain static folder, so Vercel or Netlify work too (build `npm ru
 |---|---|
 | Build runs out of memory | `NODE_OPTIONS=--max-old-space-size=4096 npm run build` |
 | 3D scene is blank | Check the console for WebGL errors and that `public/gltf/prism.glb` exists |
-| Assets 404 after deploy | `homepage` in `package.json` must match the deployed URL |
+| Cloudflare build fails on the Node version | `.node-version` must name Node 22.12 or newer |
 | Cloudflare build fails | Keep only `package-lock.json` as a lockfile; build command `npm run build` |
 
 </details>
@@ -229,5 +235,5 @@ The build is a plain static folder, so Vercel or Netlify work too (build `npm ru
 <br>
 
 <div align="center">
-<sub>Built with React, Three.js, React Three Fiber and Lucide icons. Hosted on Cloudflare Pages.</sub>
+<sub>Built with Astro, React, Three.js, React Three Fiber and Lucide icons. Hosted on Cloudflare Pages.</sub>
 </div>

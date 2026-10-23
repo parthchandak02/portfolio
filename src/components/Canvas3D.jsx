@@ -6,7 +6,7 @@ import { LUTCubeLoader } from 'postprocessing';
 import Scene from './Scene';
 
 const Canvas3D = ({ lightMode, viewportPosition, isLocked }) => {
-  const texture = useLoader(LUTCubeLoader, process.env.PUBLIC_URL + '/lut/F-6800-STD.cube');
+  const texture = useLoader(LUTCubeLoader, '/lut/F-6800-STD.cube');
 
   return (
     <Canvas 
