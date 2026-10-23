@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { bandForSection } from '../data/spectrum';
+import { bandForSection, spectrumBands } from '../data/spectrum';
 import { timelineDataByCategory } from '../data/timelineData';
 import { useWidth } from './Spectrograph';
 import './BandBar.css';
@@ -107,10 +107,29 @@ const BandBar = ({ category, title, lightMode = false }) => {
   const [lastBand, setLastBand] = useState(null);
   const navRef = useRef(null);
 
+  // Moving from one band to the next, the old band drifts out while the new one's ticks rise in, so keep
+  // the old one (and the label it showed) for the length of that hand-over
+  const [leaving, setLeaving] = useState(null);
+  const lastLabelRef = useRef('');
+  const shownRef = useRef(false);
+
   // Keep the last band's content on screen while the bar fades out
-  if (band && band !== lastBand) setLastBand(band);
+  if (band && band !== lastBand) {
+    if (lastBand && shownRef.current) {
+      const dir = spectrumBands.indexOf(band) > spectrumBands.indexOf(lastBand) ? 1 : -1;
+      setLeaving({ band: lastBand, label: lastLabelRef.current, dir });
+    }
+    setLastBand(band);
+  }
   const shown = band || lastBand;
   const visible = Boolean(band);
+  shownRef.current = visible;
+
+  useEffect(() => {
+    if (!leaving) return undefined;
+    const timer = setTimeout(() => setLeaving(null), 760); // the longest tick-in in BandBar.css, plus a frame
+    return () => clearTimeout(timer);
+  }, [leaving]);
 
   const placed = useMemo(() => (shown ? layout(shown.items, width) : []), [shown, width]);
 
@@ -268,6 +287,8 @@ const BandBar = ({ category, title, lightMode = false }) => {
   };
 
   const label = peek ? peek.item.title : title || '';
+  lastLabelRef.current = label;
+  const leavingPlaced = leaving ? layout(leaving.band.items, width) : [];
 
   return (
     <>
@@ -280,7 +301,21 @@ const BandBar = ({ category, title, lightMode = false }) => {
       aria-hidden={!visible}
       style={column ? { left: `${column.left}px`, width: `${column.width}px`, transform: 'none' } : undefined}
     >
-      <div className="bandbar__inner" key={shown.key} style={{ '--hue': shown.hue }}>
+      <div className="bandbar__stack" style={{ '--dir': leaving ? leaving.dir : 1 }}>
+      {leaving && (
+        <div className="bandbar__inner is-leaving" key={`out-${leaving.band.key}`} style={{ '--hue': leaving.band.hue }} aria-hidden="true">
+          <div className="bandbar__top">
+            <span className="bandbar__name">{leaving.band.name}</span>
+            <span className="bandbar__label">{leaving.label}</span>
+          </div>
+          <div className="bandbar__track">
+            {leavingPlaced.map((p) => (
+              <i key={p.item.title} className={`bandbar__line${p.item.future ? ' is-future' : ''}`} style={{ left: `${p.x}px` }} />
+            ))}
+          </div>
+        </div>
+      )}
+      <div className={`bandbar__inner${leaving ? ' is-entering' : ''}`} key={shown.key} style={{ '--hue': shown.hue, '--step': `${Math.min(9, 220 / Math.max(1, placed.length))}ms` }}>
         <div className="bandbar__top">
           <button
             type="button"
@@ -306,15 +341,16 @@ const BandBar = ({ category, title, lightMode = false }) => {
           onClick={(e) => scrollToCard(nearest(e.clientX).item.card)}
           onKeyDown={onKeyDown}
         >
-          {placed.map((p) => (
+          {placed.map((p, i) => (
             <i
               key={p.item.title}
               data-title={p.item.title}
               className={`bandbar__line${isCurrent(p.item) ? ' is-current' : ''}${peek && peek.item === p.item ? ' is-peek' : ''}${p.item.future ? ' is-future' : ''}`}
-              style={{ left: `${p.x}px` }}
+              style={{ left: `${p.x}px`, '--i': i }}
             />
           ))}
         </div>
+      </div>
       </div>
     </nav>
     </>
