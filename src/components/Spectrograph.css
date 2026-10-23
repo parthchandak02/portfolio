@@ -118,12 +118,18 @@
 }
 .spectro-spark--trail { background: radial-gradient(circle, #ffd2b8 0 25%, rgba(255, 107, 53, 0.7) 50%, rgba(255, 107, 53, 0) 72%); box-shadow: 0 0 12px 3px rgba(255, 107, 53, 0.35); }
 
-/* Where it lands, the button rings twice */
-@keyframes spectro-toggle-ring {
-  from { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.6), var(--glass-shadow-base); }
-  to { box-shadow: 0 0 0 18px rgba(255, 107, 53, 0), var(--glass-shadow-base); }
+/* The ring the spark draws round the button: a conic gradient cut to a thin band, with a tail that fades
+   toward where the spark came in. The script sets --start, --sweep and the turn each frame. */
+.spectro-toggle { overflow: visible; }
+.spectro-ring { position: absolute; inset: -4px; border-radius: 50%; pointer-events: none; filter: drop-shadow(0 0 3px rgba(255, 107, 53, 0.65)); }
+.spectro-ring__arc {
+  position: absolute; inset: 0; border-radius: 50%; opacity: 0;
+  background: conic-gradient(from var(--start, 270deg), rgba(255, 107, 53, 0) 0deg, rgba(255, 107, 53, 0.45) calc(var(--sweep, 0deg) * 0.55), rgba(255, 200, 170, 1) var(--sweep, 0deg), transparent var(--sweep, 0deg));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px), #000 calc(100% - 0.5px), transparent 100%);
+          mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px), #000 calc(100% - 0.5px), transparent 100%);
 }
-.spectro-toggle.is-hint { color: #ff6b35 !important; border-color: rgba(255, 107, 53, 0.55); animation: spectro-toggle-ring 1.1s ease-out 2; }
+.spectro-toggle .spectro__chevron { transition: transform 0.3s ease, color 0.6s ease; }
+.spectro-toggle.is-hint { color: #ff6b35 !important; }
 
 .spectro__readout {
   box-sizing: border-box; height: 104px; padding: 0.7rem 0.9rem; border-radius: 12px; border: 1px solid var(--edge); background: var(--well);
