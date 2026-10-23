@@ -8,6 +8,37 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 // At 43 the strip's hairline sits exactly on the bar's, so the hand-off morph moves lines along one line.
 export const STICK_AT = 43;
 
+// The card you are on is the one in the middle of what you can see: between the band bar (with its veil)
+// and the bottom of the screen, or the link dock when it sits along the bottom.
+const BAR_CLEARANCE = 110;
+export const readingLineOf = (scroller) => {
+  const r = scroller.getBoundingClientRect();
+  const top = r.top + BAR_CLEARANCE;
+  let bottom = r.bottom;
+  const dock = document.querySelector('.right-sidebar');
+  if (dock) {
+    const d = dock.getBoundingClientRect();
+    if (d.height && d.top > (top + bottom) / 2) bottom = Math.min(bottom, d.top - 8);
+  }
+  return (top + bottom) / 2;
+};
+
+// Scroll so a card sits on the reading line and is the one lit. Tiles side by side share the line in turn,
+// left to right (see measure below), so a tile is brought to its own share of the row.
+export const scrollCardToLine = (target, scroller) => {
+  const rect = target.getBoundingClientRect();
+  const row = Array.from(document.querySelectorAll('.timeline__item[data-category]'))
+    .map((el) => ({ el, r: el.getBoundingClientRect() }))
+    .filter((x) => x.r.height && Math.abs(x.r.top - rect.top) < 2)
+    .sort((a, b) => a.r.left - b.r.left);
+  const n = Math.max(1, row.length);
+  const k = Math.max(0, row.findIndex((x) => x.el === target));
+  const top = Math.min(rect.top, ...row.map((x) => x.r.top));
+  const bottom = Math.max(rect.bottom, ...row.map((x) => x.r.bottom));
+  const anchor = top + ((bottom - top) * (k + 0.5)) / n;
+  scroller.scrollTo({ top: Math.max(0, scroller.scrollTop + anchor - readingLineOf(scroller)), behavior: 'smooth' });
+};
+
 const useScrollHighlight = (activeFilter) => {
   const [visible, setVisible] = useState({ category: 'all', title: null });
   const frameRef = useRef(0);
@@ -26,9 +57,8 @@ const useScrollHighlight = (activeFilter) => {
     }
 
     const containerRect = scrollContainer.getBoundingClientRect();
-    // Reading happens just under the band bar, which is also where jumps land a card.
-    // The card on that line is the one you are on.
-    let readingLine = containerRect.top + 170;
+    // The card on the reading line, mid-screen, is the one you are on. Jumps land cards on it too.
+    let readingLine = readingLineOf(scrollContainer);
     // The last cards can never scroll up to that line, so over the final stretch the line glides down
     // to meet them, reaching the last card just as the page bottoms out
     const remaining = scrollContainer.scrollHeight - scrollContainer.clientHeight - scrollContainer.scrollTop;

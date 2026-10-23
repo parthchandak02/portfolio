@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { bandForSection, spectrumBands } from '../data/spectrum';
 import { timelineDataByCategory } from '../data/timelineData';
 import { useWidth } from './Spectrograph';
+import { scrollCardToLine } from '../hooks/useScrollHighlight';
 import './BandBar.css';
 
 const EDGE = 6;
@@ -28,9 +29,7 @@ const isCurrentCard = (item, title) => item.card === title || (title === 'Lab' &
 const scrollToCard = (card) => {
   const target = elementFor(card);
   const scroller = document.querySelector('.main-content-scroll');
-  if (!target || !scroller) return;
-  const top = scroller.scrollTop + target.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 96;
-  scroller.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  if (target && scroller) scrollCardToLine(target, scroller);
 };
 
 // Lay one band's items out by date between its first and last item, then keep them apart

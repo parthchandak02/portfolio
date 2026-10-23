@@ -11,7 +11,7 @@ import RightSidebar from './components/RightSidebar';
 import UITypewriter from './components/UITypewriter';
 import useLightMode from './hooks/useLightMode';
 import useGlobalMouse from './hooks/useGlobalMouse';
-import useScrollHighlight from './hooks/useScrollHighlight';
+import useScrollHighlight, { scrollCardToLine } from './hooks/useScrollHighlight';
 import { timelineData } from './data/timelineData';
 import { TypewriterHighlightProvider } from './contexts/TypewriterHighlightContext';
 import ScrollTypewriterController from './components/ScrollTypewriterController';
@@ -111,11 +111,8 @@ export default function App() {
     const timer = setTimeout(() => document.fonts.ready.then(() => {
       const target = document.getElementById(hash);
       const scroller = document.querySelector('.main-content-scroll');
-      if (!cancelled && target && scroller) {
-        // 143 lands the section's first row just clear of the band bar and its veil
-        const top = scroller.scrollTop + target.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 143;
-        scroller.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
-      }
+      // The section's first card lands mid-screen, on the reading line, so it is the one lit
+      if (!cancelled && target && scroller) scrollCardToLine(target, scroller);
     }), 150);
     return () => {
       cancelled = true;
