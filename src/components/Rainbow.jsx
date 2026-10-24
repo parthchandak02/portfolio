@@ -18,7 +18,11 @@ const RainbowMaterial = shaderMaterial(
     ratio: 1,
     lightMode: false,
     focus: 550,
-    focusAmount: 0
+    focusAmount: 0,
+    pulseR: -1,
+    pulseAmt: 0,
+    pulseWave: 0,
+    flash: 0
   },
   /*glsl*/ ` varying vec2 vUv;
     void main() {
@@ -37,6 +41,10 @@ const RainbowMaterial = shaderMaterial(
     uniform bool lightMode;
     uniform float focus;
     uniform float focusAmount;
+    uniform float pulseR;
+    uniform float pulseAmt;
+    uniform float pulseWave;
+    uniform float flash;
   
     vec2 mp;
     // ratio: 1/3 = neon, 1/4 = refracted, 1/5+ = approximate white
@@ -105,11 +113,16 @@ const RainbowMaterial = shaderMaterial(
       vec3 co = c / iridescence(uv.x * 0.5 * 3.14159, 1.0 - uv.y + time / 10.0) / 20.0;      
       
       // Adapt colors based on background mode
-      vec3 finalColor = area * co * l * brightness * emissiveIntensity;
+      vec3 finalColor = area * co * l * brightness * emissiveIntensity * (1.0 + flash);
 
       // Light the band of the item being read and let the rest of the spectrum fall back
       float near = exp(-pow((w - focus) / 26.0, 2.0));
       finalColor *= mix(1.0, 0.15 + 1.75 * near, focusAmount);
+
+      // A band of light that runs out from the prism along one colour, or the whole spectrum when pulseWave is 0
+      float ring = exp(-pow((uv.y - pulseR) / 0.05, 2.0));
+      float pulseBand = pulseWave > 0.0 ? exp(-pow((w - pulseWave) / 24.0, 2.0)) : 1.0;
+      finalColor *= 1.0 + pulseAmt * ring * pulseBand * 2.0;
       
       if (lightMode) {
         // For light backgrounds: invert dark areas and enhance contrast

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { animate, stagger } from 'motion';
 import { Calendar, FileText, Github, Linkedin, Mail, MessageCircle, X } from 'lucide-react';
+import { glowPrism } from '../hooks/prismGlow';
 import './ContactButton.css';
 
 const LINKS = [
@@ -74,6 +75,7 @@ const ContactButton = ({ lightMode = false }) => {
   const set = useCallback((to) => {
     setOpen(to);
     morph(to);
+    if (to) glowPrism();
   }, [morph]);
 
   // Escape or a tap anywhere else closes it; a resize while open re-fits the card

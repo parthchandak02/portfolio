@@ -7,6 +7,10 @@ import { Prism } from './Prism';
 import { Flare } from './Flare';
 import { Box } from './Box';
 import { calculateRefractionAngle, lerp, lerpV3 } from '../util';
+import { onPrismGlow } from '../hooks/prismGlow';
+
+const PULSE_MS = 1500; // the pulse's run from the prism to the rainbow's far end
+const CATCH_MS = 900; // the flare's swell and settle
 
 const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
   const [isPrismHit, hitPrism] = useState(false);
@@ -37,6 +41,17 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
     rainbow.current.material.speed = 1;
     rainbow.current.material.emissiveIntensity = 20;
   }, []);
+
+  // A moment of light: the prism catches the beam and a pulse runs out along the rainbow. It starts when the
+  // lit band changes (picking an item, or scrolling into a section) and when the page asks for one.
+  const glow = useRef(null);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    return onPrismGlow((wave) => { glow.current = { t: performance.now(), wave }; });
+  }, []);
+  useEffect(() => {
+    if (focusWave && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) glow.current = { t: performance.now(), wave: focusWave };
+  }, [focusWave]);
 
   const vecRef = useRef(new THREE.Vector3());
   
@@ -80,6 +95,18 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
     const m = rainbow.current.material;
     if (focusWave) lerp(m, 'focus', focusWave, m.focusAmount < 0.05 ? 1 : 0.12);
     lerp(m, 'focusAmount', focusWave ? 1 : 0, 0.08);
+
+    // The pulse fades in quickly and out as it travels; the catch swells the flare a little and settles
+    const g = glow.current;
+    const p = g ? (performance.now() - g.t) / PULSE_MS : 1;
+    const k = g ? Math.max(0, 1 - (performance.now() - g.t) / CATCH_MS) : 0;
+    const swell = k * k * (3 - 2 * k);
+    m.pulseR = 0.05 + p * 1.05;
+    m.pulseAmt = p < 1 ? Math.sin(Math.min(1, p * 6) * Math.PI / 2) * (1 - p) : 0;
+    m.pulseWave = g ? g.wave : 0;
+    m.flash = swell * 0.3;
+    if (flare.current) flare.current.scale.setScalar(1.25 * (1 + swell * 0.4));
+    if (p >= 1) glow.current = null;
 
     // Animate rainbow intensity
     lerp(rainbow.current.material, 'emissiveIntensity', isPrismHit ? 2.5 : 0, 0.1);

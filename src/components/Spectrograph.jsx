@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { animate } from 'motion';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 import { spectrumBands } from '../data/spectrum';
+import { glowPrism } from '../hooks/prismGlow';
 import './Spectrograph.css';
 
 // Time is not linear on the track: the sparse early years are compressed so the busy recent
@@ -264,7 +265,8 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
           onComplete: () => { chevron.style.scale = ''; }
         }));
       }
-      if (!landed) { landed = true; showHints(); }
+      // The first pill to land lights the prism too
+      if (!landed) { landed = true; showHints(); glowPrism(); }
     };
 
     pills.forEach((p) => {
