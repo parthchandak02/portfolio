@@ -146,7 +146,7 @@ src/
     Timeline.jsx, TimelineCard.jsx, CardTile.jsx, LabShowcase.jsx
                             Cards, glass tiles and the Lab card
     UITypewriter.jsx        The greeting and cycling roles
-    RightSidebar.jsx        Social and contact links
+    ContactButton.jsx       The contact button and the card it frosts open
   data/
     timelineData.js         Every card, by category
     spectrum.js             Band names, colours and dated items
@@ -189,7 +189,7 @@ organisation's file with `node scripts/logos/make-logo.mjs <source> public/logos
 see [scripts/logos/README.md](scripts/logos/README.md) for the options and the topic marks.
 
 **Other things to change for your own copy:** `site` in `astro.config.mjs`, the head tags in
-`src/pages/index.astro`, `public/CNAME`, the links in `src/components/RightSidebar.jsx`, colours in `src/styles.css` and the component CSS files, and
+`src/pages/index.astro`, `public/CNAME`, the links in `src/components/ContactButton.jsx`, colours in `src/styles.css` and the component CSS files, and
 the model at `public/gltf/prism.glb`.
 
 </details>

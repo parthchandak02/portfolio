@@ -47,31 +47,6 @@
   display: none;
 }
 
-.layout__right-sidebar {
-  position: fixed;
-  right: var(--space-150); /* Back to original equal spacing from right edge */
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 30;
-  pointer-events: auto;
-  width: auto; /* Let the content determine width */
-  max-height: 80vh;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.layout__right-sidebar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Intermediate viewport adjustment - add extra margin for better balance */
-@media (min-width: 1025px) and (max-width: 1300px) {
-  .right-sidebar {
-    /* Add extra margin to the dynamic width for intermediate viewports */
-    margin-left: calc(var(--left-sidebar-width, 117px) + 10px);
-  }
-}
 
 /* Mobile responsive behavior */
 @media (max-width: 1024px) {
@@ -86,30 +61,12 @@
     max-height: none;
     overflow-y: visible;
   }
-  
-  /* Right sidebar moves to bottom */
-  .layout__right-sidebar {
-    position: fixed;
-    right: 50%;
-    bottom: var(--space-150);
-    top: auto;
-    transform: translateX(50%);
-    width: auto;
-    max-width: calc(100vw - var(--space-300));
-    max-height: none;
-    overflow-y: visible;
-  }
 }
 
 @media (max-width: 768px) {
   .layout__left-sidebar {
     top: var(--space-100);
     max-width: calc(100vw - 120px); /* Reserve space for right buttons on smaller screens: 44px button + 16px margin + 60px safety = 120px total */
-  }
-  
-  .layout__right-sidebar {
-    bottom: var(--space-100);
-    max-width: calc(100vw - var(--space-150));
   }
 }
 

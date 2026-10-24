@@ -9,18 +9,11 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 export const STICK_AT = 43;
 
 // The card you are on is the one in the middle of what you can see: between the band bar (with its veil)
-// and the bottom of the screen, or the link dock when it sits along the bottom.
+// and the bottom of the screen.
 const BAR_CLEARANCE = 110;
 export const readingLineOf = (scroller) => {
   const r = scroller.getBoundingClientRect();
-  const top = r.top + BAR_CLEARANCE;
-  let bottom = r.bottom;
-  const dock = document.querySelector('.right-sidebar');
-  if (dock) {
-    const d = dock.getBoundingClientRect();
-    if (d.height && d.top > (top + bottom) / 2) bottom = Math.min(bottom, d.top - 8);
-  }
-  return (top + bottom) / 2;
+  return (r.top + BAR_CLEARANCE + r.bottom) / 2;
 };
 
 // Scroll so a card sits on the reading line and is the one lit. Tiles side by side share the line in turn,

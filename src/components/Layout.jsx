@@ -1,7 +1,7 @@
 // React import removed - not needed
 import './Layout.css';
 
-const Layout = ({ children, darkMode = false, leftSidebar, rightSidebar }) => {
+const Layout = ({ children, darkMode = false, leftSidebar }) => {
   // Removed sidebar balancing - functionality was unused
   return (
     <div className={`layout ${darkMode ? 'layout--dark' : 'layout--light'}`}>
@@ -9,13 +9,6 @@ const Layout = ({ children, darkMode = false, leftSidebar, rightSidebar }) => {
       {leftSidebar && (
         <div className="layout__left-sidebar">
           {leftSidebar}
-        </div>
-      )}
-      
-      {/* Right sidebar container */}
-      {rightSidebar && (
-        <div className="layout__right-sidebar">
-          {rightSidebar}
         </div>
       )}
       

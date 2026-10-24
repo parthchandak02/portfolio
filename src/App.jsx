@@ -7,7 +7,7 @@ import LockToggle from './components/LockToggle';
 import PlayModeToggle from './components/PlayModeToggle';
 import Timeline from './components/Timeline';
 import BandBar from './components/BandBar';
-import RightSidebar from './components/RightSidebar';
+import ContactButton from './components/ContactButton';
 import UITypewriter from './components/UITypewriter';
 import useLightMode from './hooks/useLightMode';
 import useGlobalMouse from './hooks/useGlobalMouse';
@@ -143,11 +143,6 @@ export default function App() {
       <Layout 
         lightMode={lightMode}
         darkMode={!lightMode}
-        rightSidebar={!isPlayMode ? (
-          <RightSidebar
-            lightMode={lightMode}
-          />
-        ) : null}
       >
         {/* 3D Canvas Background */}
         <Suspense fallback={null}>
@@ -159,6 +154,9 @@ export default function App() {
           />
         </Suspense>
         
+        {/* One contact button, always on screen */}
+        <ContactButton lightMode={lightMode} />
+
         {/* UI Overlay Layer */}
         <div className={`layout__ui${handedOver ? ' layout__ui--reading' : ''}`}>
           {/* Fixed UI Components */}
