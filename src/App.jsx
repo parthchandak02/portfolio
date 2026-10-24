@@ -13,6 +13,7 @@ import useLightMode from './hooks/useLightMode';
 import useGlobalMouse from './hooks/useGlobalMouse';
 import useScrollHighlight, { scrollCardToLine } from './hooks/useScrollHighlight';
 import { timelineData } from './data/timelineData';
+import { bandForSection } from './data/spectrum';
 import { TypewriterHighlightProvider } from './contexts/TypewriterHighlightContext';
 import ScrollTypewriterController from './components/ScrollTypewriterController';
 import Spectrograph from './components/Spectrograph';
@@ -129,6 +130,8 @@ export default function App() {
   const { visibleCategory, visibleTitle } = useScrollHighlight('all');
   // Once the band bar takes over from the strip, the round buttons step aside; they belong to the top screen
   const handedOver = !isPlayMode && visibleCategory !== 'all';
+  // The rainbow lights the band you are reading in the record, or the one picked on the strip above it
+  const litBand = handedOver ? bandForSection(visibleCategory) : focusBand;
 
   // Sync html and body background with light mode to prevent edge bleeding
   useEffect(() => {
@@ -150,7 +153,7 @@ export default function App() {
             lightMode={lightMode}
             viewportPosition={viewportPosition}
             isLocked={isLocked}
-            focusWave={focusBand?.wave ?? null}
+            focusWave={litBand?.wave ?? null}
           />
         </Suspense>
         
