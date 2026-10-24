@@ -7,8 +7,8 @@
   pointer-events: none;
   font-family: var(--font-family-primary);
 }
-.contact--dark { --ink: rgba(255, 255, 255, 0.92); --mute: rgba(255, 255, 255, 0.58); --pane: rgba(255, 255, 255, 0.07); --edge: rgba(255, 255, 255, 0.18); --chip: rgba(255, 255, 255, 0.08); --hover: rgba(255, 255, 255, 0.07); }
-.contact--light { --ink: rgba(20, 20, 24, 0.92); --mute: rgba(20, 20, 24, 0.6); --pane: rgba(255, 255, 255, 0.6); --edge: rgba(0, 0, 0, 0.12); --chip: rgba(0, 0, 0, 0.05); --hover: rgba(0, 0, 0, 0.04); }
+.contact--dark { --ink: rgba(255, 255, 255, 0.92); --pane: rgba(255, 255, 255, 0.07); --edge: rgba(255, 255, 255, 0.18); --chip: rgba(255, 255, 255, 0.08); --hover: rgba(255, 255, 255, 0.07); }
+.contact--light { --ink: rgba(20, 20, 24, 0.92); --pane: rgba(255, 255, 255, 0.6); --edge: rgba(0, 0, 0, 0.12); --chip: rgba(0, 0, 0, 0.05); --hover: rgba(0, 0, 0, 0.04); }
 
 .contact__button {
   pointer-events: auto; position: relative;
@@ -24,25 +24,22 @@
 /* Frosted glass over the scene; the script grows it out of the button with a circular clip */
 .contact__card {
   pointer-events: auto; box-sizing: border-box;
-  width: min(300px, calc(100vw - 40px));
+  width: min(240px, calc(100vw - 40px));
   padding: 16px 14px 12px; border-radius: 20px;
   color: var(--ink); background: var(--pane); border: 1px solid var(--edge);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(22px) saturate(1.3); -webkit-backdrop-filter: blur(22px) saturate(1.3);
 }
-.contact__title { margin: 0 4px 2px; font-size: 1rem; font-weight: 700; }
-.contact__sub { margin: 0 4px 10px; font-size: 0.78rem; color: var(--mute); }
+.contact__title { margin: 0 4px 8px; font-size: 1rem; font-weight: 700; }
 .contact__links { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
 .contact__links a {
   display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: center; gap: 10px;
-  padding: 7px 6px; border-radius: 12px; color: inherit; text-decoration: none;
+  padding: 5px 6px; border-radius: 12px; color: inherit; text-decoration: none;
 }
 .contact__links a:hover { background: var(--hover); }
 .contact__links a:focus-visible { outline: 2px solid #ff6b35; outline-offset: 1px; }
 .contact__icon { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--chip); }
-.contact__text { min-width: 0; }
-.contact__text b { display: block; font-size: 0.88rem; font-weight: 600; }
-.contact__text small { display: block; font-size: 0.74rem; color: var(--mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.contact__text { min-width: 0; font-size: 0.9rem; font-weight: 600; }
 
 .contact-frost { position: fixed; top: 0; left: 0; z-index: 61; pointer-events: none; } /* sized in px by the script */
 

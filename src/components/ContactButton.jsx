@@ -3,11 +3,11 @@ import { Calendar, FileText, Github, Linkedin, Mail, MessageCircle, X } from 'lu
 import './ContactButton.css';
 
 const LINKS = [
-  { icon: Mail, label: 'Email', detail: 'parthchandak02@gmail.com', url: 'mailto:parthchandak02@gmail.com' },
-  { icon: Linkedin, label: 'LinkedIn', detail: 'in/parthchandak02', url: 'https://linkedin.com/in/parthchandak02' },
-  { icon: Github, label: 'GitHub', detail: 'parthchandak02', url: 'https://github.com/parthchandak02' },
-  { icon: FileText, label: 'Resume', detail: 'One page, PDF', url: 'https://tiny.cc/parthchandakresume' },
-  { icon: Calendar, label: 'Book a meeting', detail: 'Pick a time that suits you', url: 'https://tiny.cc/parthchandakbook' }
+  { icon: Mail, label: 'Email', url: 'mailto:parthchandak02@gmail.com' },
+  { icon: Linkedin, label: 'LinkedIn', url: 'https://linkedin.com/in/parthchandak02' },
+  { icon: Github, label: 'GitHub', url: 'https://github.com/parthchandak02' },
+  { icon: FileText, label: 'Resume', url: 'https://tiny.cc/parthchandakresume' },
+  { icon: Calendar, label: 'Book a meeting', url: 'https://tiny.cc/parthchandakbook' }
 ];
 
 const FROST_MS = 1000; // a full open or close; reversing midway takes only the part already played
@@ -173,13 +173,12 @@ const ContactButton = ({ lightMode = false }) => {
       {shown && (
         <div ref={cardRef} id="contact-card" className="contact__card" role="dialog" aria-label="Contact" style={{ clipPath: 'circle(0px at 100% 100%)' }}>
           <p className="contact__title">Get in touch</p>
-          <p className="contact__sub">Parth Chandak, Senior Creative Technologist</p>
           <ul className="contact__links">
-            {LINKS.map(({ icon: Icon, label, detail, url }) => (
+            {LINKS.map(({ icon: Icon, label, url }) => (
               <li key={label}>
                 <a href={url} {...(url.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
                   <span className="contact__icon"><Icon size={16} strokeWidth={1.75} /></span>
-                  <span className="contact__text"><b>{label}</b><small>{detail}</small></span>
+                  <span className="contact__text">{label}</span>
                 </a>
               </li>
             ))}
