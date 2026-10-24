@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { animate, stagger } from 'motion';
 import { Calendar, FileText, Github, Linkedin, Mail, MessageCircle, X } from 'lucide-react';
 import './ContactButton.css';
 
@@ -10,170 +11,97 @@ const LINKS = [
   { icon: Calendar, label: 'Book a meeting', url: 'https://tiny.cc/parthchandakbook' }
 ];
 
-const FROST_MS = 1000; // a full open or close; reversing midway takes only the part already played
-const SHARDS = 70;
+const CARD_W = 240; // px, or the window less its gutters on narrow phones
+const GUTTER = 16;
+const RADIUS = 20; // the open card's corners; closed, the corners are half the button so it is a circle
+const OPEN = { type: 'spring', bounce: 0.2, visualDuration: 0.5 };
+const CLOSE = { type: 'spring', bounce: 0.08, visualDuration: 0.36 };
 
-const clamp01 = (x) => Math.min(1, Math.max(0, x));
-const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
-const noise = (i, k) => { const v = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return v - Math.floor(v); };
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
- * One glass button in the bottom-right corner, always on screen. It opens the contact card the way frost
- * spreads on a window: the glass grows out of the button in a widening circle, with fine white shards
- * scattering off its edge. Closing draws it back in.
+ * One glass button in the bottom-right corner, always on screen. Opening it does not bring in a second
+ * panel: the button's own glass grows into the card on a spring, like a phone's Dynamic Island, and the
+ * links settle in one after another. Closing springs the same glass back into the circle.
  */
 const ContactButton = ({ lightMode = false }) => {
   const [open, setOpen] = useState(false);
-  const [shown, setShown] = useState(false); // the card stays in the page until it has fully closed
-  const buttonRef = useRef(null);
+  const shellRef = useRef(null);
   const cardRef = useRef(null);
-  const progressRef = useRef(0); // 0 closed, 1 open
-  const rafRef = useRef(0);
-  const canvasRef = useRef(null);
+  const buttonRef = useRef(null);
+  const runningRef = useRef([]);
 
-  const frost = useCallback((to) => {
+  const morph = useCallback((to) => {
+    const shell = shellRef.current;
     const card = cardRef.current;
     const button = buttonRef.current;
-    if (!card || !button) return;
-    cancelAnimationFrame(rafRef.current);
-    const done = () => {
-      if (canvasRef.current) canvasRef.current.remove();
-      canvasRef.current = null;
-      // Closed stays clipped to nothing until the card unmounts; clearing it here flashed the whole card
-      card.style.clipPath = to ? 'none' : 'circle(0px at 100% 100%)';
-      if (!to) setShown(false);
-    };
-    if (prefersReducedMotion()) { progressRef.current = to; done(); return; }
+    if (!shell || !card || !button) return;
+    runningRef.current.forEach((c) => c.stop());
+    runningRef.current = [];
 
-    const c = card.getBoundingClientRect();
-    const b = button.getBoundingClientRect();
-    const F = { x: b.left + b.width / 2, y: b.top + b.height / 2 };
-    const origin = `${F.x - c.left}px ${F.y - c.top}px`;
-    const reach = Math.hypot(Math.max(F.x - c.left, c.right - F.x), Math.max(F.y - c.top, c.bottom - F.y)) + 10;
-    const toward = Math.atan2(c.top + c.height / 2 - F.y, c.left + c.width / 2 - F.x);
-    const shards = Array.from({ length: SHARDS }, (_, i) => ({ spread: noise(i, 1) - 0.5, phase: noise(i, 2), size: 2 + noise(i, 3) * 2.5, skew: noise(i, 4) }));
+    const size = button.offsetWidth; // 48, or 44 on phones
+    const w = Math.min(CARD_W, window.innerWidth - GUTTER * 2);
+    card.style.width = `${w - 2}px`; // inside the glass's 1px border
+    const target = to
+      ? { width: w, height: card.offsetHeight + 2, borderRadius: RADIUS }
+      : { width: size, height: size, borderRadius: size / 2 };
+    const items = card.querySelectorAll('.contact__title, .contact__links li');
 
-    // Shards are drawn on a canvas over the window, sized in px (100vh is taller than the window on phones)
-    const canvas = canvasRef.current || document.createElement('canvas');
-    canvas.className = 'contact-frost';
-    canvas.setAttribute('aria-hidden', 'true');
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    canvas.width = vw * dpr;
-    canvas.height = vh * dpr;
-    canvas.style.width = `${vw}px`;
-    canvas.style.height = `${vh}px`;
-    if (!canvasRef.current) document.body.appendChild(canvas);
-    canvasRef.current = canvas;
-    const ctx = canvas.getContext('2d');
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const ink = lightMode ? '150, 150, 162' : '255, 255, 255'; // white shards vanish on the light page, so a soft grey there
-
-    const shard = (x, y, angle, s, skew, alpha) => {
-      if (alpha <= 0.003) return;
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(angle);
-      ctx.globalAlpha = alpha;
-      const g = ctx.createLinearGradient(-s, -s, s, s);
-      g.addColorStop(0, `rgba(${ink}, 0.95)`);
-      g.addColorStop(1, `rgba(${ink}, 0.15)`);
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.moveTo(0, -s * (1 + skew * 0.4));
-      ctx.lineTo(s * 0.85, s * 0.6);
-      ctx.lineTo(-s * (0.5 + skew * 0.4), s * 0.75);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-    };
-
-    let last = performance.now();
-    const frame = (now) => {
-      const step = (now - last) / FROST_MS;
-      last = now;
-      const q = clamp01(progressRef.current + (to ? step : -step));
-      progressRef.current = q;
-      const R = easeInOut(clamp01(q / 0.9)) * reach;
-      card.style.clipPath = `circle(${R}px at ${origin})`;
-
-      ctx.clearRect(0, 0, vw, vh);
-      ctx.globalCompositeOperation = lightMode ? 'source-over' : 'lighter';
-      const fade = Math.sin(Math.PI * q);
-      shards.forEach((s, i) => {
-        const angle = toward + s.spread * 2.2;
-        const life = (q * 3 + s.phase) % 1;
-        const r = R + life * 26;
-        const x = F.x + Math.cos(angle) * r;
-        const y = F.y + Math.sin(angle) * r;
-        if (x < c.left - 6 || x > c.right + 6 || y < c.top - 6 || y > c.bottom + 6) return;
-        shard(x, y, angle + life * 4 + i, s.size, s.skew, (1 - life) * fade * 0.9);
-      });
-      // A faint bright line on the spreading edge
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(c.left, c.top, c.width, c.height);
-      ctx.clip();
-      ctx.globalAlpha = 0.35 * fade;
-      ctx.strokeStyle = lightMode ? 'rgba(0, 0, 0, 0.5)' : '#fff';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.arc(F.x, F.y, R, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-
-      if ((to && q < 1) || (!to && q > 0)) rafRef.current = requestAnimationFrame(frame);
-      else done();
-    };
-    rafRef.current = requestAnimationFrame(frame);
-  }, [lightMode]);
-
-  // Mount the card first (clipped to nothing), then frost it in once it can be measured
-  useEffect(() => {
-    if (open && shown) frost(true);
-  }, [open, shown, frost]);
-
-  const toggle = () => {
-    if (open) {
-      setOpen(false);
-      frost(false);
-    } else {
-      setShown(true);
-      setOpen(true);
+    if (prefersReducedMotion()) {
+      Object.assign(shell.style, { width: `${target.width}px`, height: `${target.height}px`, borderRadius: `${target.borderRadius}px` });
+      items.forEach((el) => { el.style.opacity = to ? 1 : 0; });
+      if (!to) Object.assign(shell.style, { width: '', height: '', borderRadius: '' });
+      return;
     }
-  };
 
-  // Escape or a tap anywhere else closes it
+    if (to) {
+      runningRef.current.push(
+        animate(shell, target, OPEN),
+        animate(items, { opacity: [0, 1], y: [10, 0] }, { delay: stagger(0.045, { startDelay: 0.12 }), type: 'spring', bounce: 0.15, visualDuration: 0.4 })
+      );
+    } else {
+      // The glass closes over the links as they fade, the open played backwards
+      const shrink = animate(shell, target, CLOSE);
+      runningRef.current.push(animate(items, { opacity: 0, y: 6 }, { duration: 0.18 }), shrink);
+      // Back to the stylesheet's size once closed, so the button follows the layout again
+      shrink.then(() => {
+        if (shellRef.current?.classList.contains('is-open')) return;
+        Object.assign(shell.style, { width: '', height: '', borderRadius: '' });
+      });
+    }
+  }, []);
+
+  const set = useCallback((to) => {
+    setOpen(to);
+    morph(to);
+  }, [morph]);
+
+  // Escape or a tap anywhere else closes it; a resize while open re-fits the card
   useEffect(() => {
     if (!open) return undefined;
     const onKey = (e) => {
-      if (e.key === 'Escape') { setOpen(false); frost(false); buttonRef.current?.focus(); }
+      if (e.key === 'Escape') { set(false); buttonRef.current?.focus(); }
     };
     const onDown = (e) => {
-      if (cardRef.current?.contains(e.target) || buttonRef.current?.contains(e.target)) return;
-      setOpen(false);
-      frost(false);
+      if (!shellRef.current?.contains(e.target)) set(false);
     };
+    const onResize = () => morph(true);
     document.addEventListener('keydown', onKey);
     document.addEventListener('pointerdown', onDown);
+    window.addEventListener('resize', onResize);
     return () => {
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('resize', onResize);
     };
-  }, [open, frost]);
+  }, [open, set, morph]);
 
-  useEffect(() => () => {
-    cancelAnimationFrame(rafRef.current);
-    if (canvasRef.current) canvasRef.current.remove();
-  }, []);
+  useEffect(() => () => runningRef.current.forEach((c) => c.stop()), []);
 
   return (
     <div className={`contact ${lightMode ? 'contact--light' : 'contact--dark'}`}>
-      {shown && (
-        <div ref={cardRef} id="contact-card" className="contact__card" role="dialog" aria-label="Contact" style={{ clipPath: 'circle(0px at 100% 100%)' }}>
-          <p className="contact__title">Get in touch</p>
+      <div ref={shellRef} className={`contact__shell${open ? ' is-open' : ''}`}>
+        <div ref={cardRef} id="contact-card" className="contact__card" role="dialog" aria-label="Contact" aria-hidden={!open} inert={!open}>
           <ul className="contact__links">
             {LINKS.map(({ icon: Icon, label, url }) => (
               <li key={label}>
@@ -184,20 +112,22 @@ const ContactButton = ({ lightMode = false }) => {
               </li>
             ))}
           </ul>
+          {/* The title shares the bottom row with the button, which stays in its corner as the close control */}
+          <p className="contact__title">Get in touch</p>
         </div>
-      )}
-      <button
-        ref={buttonRef}
-        type="button"
-        className={`contact__button glass${open ? ' is-open' : ''}`}
-        aria-label={open ? 'Close contact links' : 'Contact'}
-        aria-expanded={open}
-        aria-controls="contact-card"
-        onClick={toggle}
-      >
-        <MessageCircle className="contact__glyph contact__glyph--chat" size={20} strokeWidth={1.75} />
-        <X className="contact__glyph contact__glyph--close" size={20} strokeWidth={1.75} />
-      </button>
+        <button
+          ref={buttonRef}
+          type="button"
+          className="contact__button"
+          aria-label={open ? 'Close contact links' : 'Contact'}
+          aria-expanded={open}
+          aria-controls="contact-card"
+          onClick={() => set(!open)}
+        >
+          <MessageCircle className="contact__glyph contact__glyph--chat" size={20} strokeWidth={1.75} />
+          <X className="contact__glyph contact__glyph--close" size={20} strokeWidth={1.75} />
+        </button>
+      </div>
     </div>
   );
 };
