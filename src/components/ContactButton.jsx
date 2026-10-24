@@ -40,7 +40,8 @@ const ContactButton = ({ lightMode = false }) => {
     const done = () => {
       if (canvasRef.current) canvasRef.current.remove();
       canvasRef.current = null;
-      card.style.clipPath = to ? 'none' : '';
+      // Closed stays clipped to nothing until the card unmounts; clearing it here flashed the whole card
+      card.style.clipPath = to ? 'none' : 'circle(0px at 100% 100%)';
       if (!to) setShown(false);
     };
     if (prefersReducedMotion()) { progressRef.current = to; done(); return; }
