@@ -110,7 +110,7 @@
 .spectro--intro .spectro__readout { visibility: hidden; }
 
 /* The swarm that carries the fold to its button: pills drawn on a canvas over the page for its flight */
-.spectro-swarm { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 120; pointer-events: none; }
+.spectro-swarm { position: fixed; top: 0; left: 0; z-index: 120; pointer-events: none; } /* sized in px by the script */
 /* The chevron takes each arriving pill's colour, and eases back after */
 .spectro-toggle { transition: opacity 0.25s ease, color 0.35s ease; }
 

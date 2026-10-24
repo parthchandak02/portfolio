@@ -247,9 +247,15 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     const canvas = document.createElement('canvas');
     canvas.className = 'spectro-swarm';
     canvas.setAttribute('aria-hidden', 'true');
+    // Sized to the visible window in px, not 100vh: on phones 100vh is taller than the visible area,
+    // which would stretch the drawing and land the swarm below the button
     const dpr = Math.min(2, window.devicePixelRatio || 1);
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    canvas.width = vw * dpr;
+    canvas.height = vh * dpr;
+    canvas.style.width = `${vw}px`;
+    canvas.style.height = `${vh}px`;
     document.body.appendChild(canvas);
     swarmRef.current = canvas;
     const ctx = canvas.getContext('2d');
@@ -273,7 +279,7 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     const t0 = performance.now();
     const frame = (now) => {
       const ms = now - t0;
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      ctx.clearRect(0, 0, vw, vh);
       ctx.globalCompositeOperation = blend;
       let arriving = null;
       pills.forEach((p) => {
