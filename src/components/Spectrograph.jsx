@@ -131,20 +131,28 @@ const Track = ({ band, placed, active, onActive, top, height }) => {
  * src/data/spectrum.js, so adding an item there is all it takes.
  */
 // The opening: the record arrives split into its eight lanes, holds a moment, then folds into one strip.
-// A spark then carries the fold to the button that undoes it, so the control explains itself.
+// A swarm of the strip's own colours then carries the fold to the button that undoes it, so the control
+// explains itself.
 const INTRO_HOLD = 1100; // ms the lanes stay open; the draw-in finishes inside it. Start-up work adds ~0.5 s in practice
 const FOLD_MS = 1150; // ms for the fold to finish, matching the collapse transitions in Spectrograph.css
-const SPARK_MS = 1900; // ms from leaving the strip to closing the lap round the button
-const COAST_MS = 1300; // ms the drawn ring keeps turning as it fades, on the same curve
-const HINT_MS = 2600; // ms the button labels stay up after the spark lands
+const SWARM_WAVE = 520; // ms for the lift-off to travel from the strip's left end to its right
+const SWARM_FLY = 1050; // ms each pill takes to reach the button
+const HINT_MS = 2600; // ms the button labels stay up after the first pills land
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// One timing curve for the spark's whole trip: quick off the strip, slowing all the way round the button
-const easeOut = (t) => 1 - Math.pow(1 - t, 2.6);
+const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
 const smooth = (x) => { const c = clamp01(x); return c * c * (3 - 2 * c); };
+const noise = (i, k) => { const v = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return v - Math.floor(v); };
+const bezier = (a, b, c, d, t) => {
+  const u = 1 - t;
+  return {
+    x: u * u * u * a.x + 3 * u * u * t * b.x + 3 * u * t * t * c.x + t * t * t * d.x,
+    y: u * u * u * a.y + 3 * u * u * t * b.y + 3 * u * t * t * c.y + t * t * t * d.y
+  };
+};
 
 const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   // Section links and reduced motion skip the show and start folded
@@ -202,96 +210,104 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     }, HINT_MS));
   }, []);
 
-  // The spark leaves the strip's right end, curves into the button's rim from the left already heading up,
-  // and carries straight on round it, drawing a ring that coasts on and fades. One motion, one speed curve.
+  // The strip's lines lift off as small pills of their own colour, in a wave from left to right like the
+  // bars rising, and flock into the button. The chevron takes the colour of each pill as it lands.
   const rafRef = useRef(0);
+  const swarmRef = useRef(null);
   const sendSpark = useCallback(() => {
     const stage = stageRef.current;
     const button = toggleRef.current;
     if (!stage || !button || button.classList.contains('is-away')) return;
     const s = stage.getBoundingClientRect();
-    const ring = button.querySelector('.spectro-ring');
-    const arcEl = button.querySelector('.spectro-ring__arc');
-    if (s.bottom < 0 || s.top > window.innerHeight || !ring) { showHints(); return; }
-    const o = ring.getBoundingClientRect();
-    const cx = o.left + o.width / 2;
-    const cy = o.top + o.height / 2;
-    const r = o.width / 2 - 1.25; // the middle of the ring's band
-    const A = { x: s.right - 6, y: s.top + rowH / 2 };
-    const P = { x: cx - r, y: cy }; // enter on the left of the rim
-    const Q = { x: P.x, y: P.y + Math.max(40, (A.y - P.y) * 0.9) }; // control point below it, so the curve meets the rim heading up
+    if (s.bottom < 0 || s.top > window.innerHeight) { showHints(); return; }
+    const b = button.getBoundingClientRect();
+    const T = { x: b.left + b.width / 2, y: b.top + b.height / 2 };
 
-    // The flight measured by distance, so the speed carries over unchanged where it meets the rim
-    const pts = [];
-    let flight = 0;
-    for (let i = 0; i <= 80; i += 1) {
-      const t = i / 80;
-      const u = 1 - t;
-      const p = { x: u * u * A.x + 2 * u * t * Q.x + t * t * P.x, y: u * u * A.y + 2 * u * t * Q.y + t * t * P.y };
-      if (i) flight += Math.hypot(p.x - pts[i - 1].x, p.y - pts[i - 1].y);
-      p.d = flight;
-      pts.push(p);
-    }
-    const lap = 2 * Math.PI * r;
-    const coast = (80 * Math.PI * r) / 180; // the ring coasts on 80 degrees after it closes
-    const total = flight + lap + coast;
-    const at = (d) => {
-      if (d <= flight) {
-        let i = 1;
-        while (i < pts.length - 1 && pts[i].d < d) i += 1;
-        const a = pts[i - 1];
-        const b = pts[i];
-        const f = (d - a.d) / Math.max(1e-6, b.d - a.d);
-        return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f };
-      }
-      const phi = Math.PI + (d - flight) / r; // clockwise on screen from the left
-      return { x: cx + r * Math.cos(phi), y: cy + r * Math.sin(phi) };
+    // Every other line, plus a few more, so the flight stays airy over the dense runs
+    const lines = Array.from(stage.querySelectorAll('.spectro__line'))
+      .map((el) => ({ r: el.getBoundingClientRect(), hue: getComputedStyle(el).getPropertyValue('--hue').trim() }))
+      .sort((p, q) => p.r.left - q.r.left);
+    if (!lines.length) { showHints(); return; }
+    const left = lines[0].r.left;
+    const span = lines[lines.length - 1].r.left - left || 1;
+    const pills = lines.filter((_, i) => i % 2 === 0 || noise(i, 0) > 0.6).map((l, i) => {
+      const S = { x: l.r.left + l.r.width / 2, y: l.r.top + l.r.height / 2 };
+      const r1 = noise(i, 1);
+      const r2 = noise(i, 2);
+      const r3 = noise(i, 3);
+      return {
+        hue: l.hue,
+        S,
+        c1: { x: S.x + (r2 - 0.5) * 40, y: S.y - 70 - r3 * 70 },
+        c2: { x: T.x - 60 - r2 * 110, y: T.y + (r1 - 0.5) * 120 },
+        start: ((S.x - left) / span) * SWARM_WAVE + r1 * 60
+      };
+    });
+
+    const canvas = document.createElement('canvas');
+    canvas.className = 'spectro-swarm';
+    canvas.setAttribute('aria-hidden', 'true');
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    document.body.appendChild(canvas);
+    swarmRef.current = canvas;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const blend = lightMode ? 'source-over' : 'lighter';
+
+    const pill = (x, y, angle, length, colour, alpha) => {
+      if (alpha <= 0.002) return;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = colour;
+      ctx.beginPath();
+      ctx.roundRect(-1.2, -length / 2, 2.4, length, 1.2);
+      ctx.fill();
+      ctx.restore();
     };
 
-    // A head and a short trail riding the same path; once on the rim the ring itself is the trail
-    const lags = [0, 9, 19, 31];
-    const sparks = lags.map((_, k) => {
-      const spark = document.createElement('i');
-      spark.className = k ? 'spectro-spark spectro-spark--trail' : 'spectro-spark';
-      spark.setAttribute('aria-hidden', 'true');
-      spark.style.opacity = '0';
-      document.body.appendChild(spark);
-      return spark;
-    });
-    ring.style.setProperty('--start', '270deg');
-
-    let lit = false;
+    let landed = false;
     const t0 = performance.now();
     const frame = (now) => {
-      const d = easeOut(clamp01((now - t0) / (SPARK_MS + COAST_MS))) * total;
-      const drawn = clamp01((d - flight) / lap);
-      const after = clamp01((d - flight - lap) / coast);
-      const drift = (Math.max(0, d - flight - lap) / r) * (180 / Math.PI);
-
-      sparks.forEach((el, k) => {
-        const dk = Math.max(0, d - lags[k]);
-        const p = at(dk);
-        const onRim = clamp01((dk - flight) / 40);
-        let fade = (1 - k * 0.26) * clamp01(dk / 30) * (1 - smooth(after));
-        if (k && drawn > 0) fade *= 1 - smooth(drawn * 3);
-        el.style.opacity = String(fade);
-        el.style.transform = `translate(${p.x}px, ${p.y}px) scale(${(1 - onRim * 0.45) * (1 - k * 0.18)})`;
+      const ms = now - t0;
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      ctx.globalCompositeOperation = blend;
+      let arriving = null;
+      pills.forEach((p) => {
+        const raw = (ms - p.start) / SWARM_FLY;
+        if (raw <= 0) return;
+        const t = clamp01(raw);
+        const e = easeInOut(t);
+        const at = bezier(p.S, p.c1, p.c2, T, e);
+        const ahead = bezier(p.S, p.c1, p.c2, T, Math.min(1, e + 0.01));
+        const angle = Math.atan2(ahead.y - at.y, ahead.x - at.x) + Math.PI / 2;
+        const alpha = smooth(t / 0.08) * (1 - smooth((t - 0.86) / 0.14));
+        const length = 12 * (1 - 0.6 * smooth((t - 0.7) / 0.3));
+        // A short fading trail along the same path
+        for (let g = 1; g <= 3; g += 1) {
+          const back = bezier(p.S, p.c1, p.c2, T, easeInOut(clamp01(t - g * 0.025)));
+          pill(back.x, back.y, angle, length, p.hue, (alpha * 0.22) / g);
+        }
+        pill(at.x, at.y, angle, length, p.hue, alpha);
+        if (t >= 0.86 && raw < 1.6) arriving = p.hue;
       });
-      ring.style.setProperty('--sweep', `${drawn * 360}deg`);
-      ring.style.transform = `rotate(${drift}deg)`;
-      if (arcEl) arcEl.style.opacity = drawn > 0 ? String(1 - smooth(after)) : '0';
-      if (!lit && drawn > 0) { lit = true; showHints(); }
-
-      if (now - t0 < SPARK_MS + COAST_MS) {
+      if (arriving) {
+        button.style.color = arriving;
+        if (!landed) { landed = true; showHints(); }
+      }
+      if (ms < SWARM_WAVE + 60 + SWARM_FLY * 1.6) {
         rafRef.current = requestAnimationFrame(frame);
       } else {
-        sparks.forEach((el) => el.remove());
-        if (arcEl) arcEl.style.opacity = '0';
-        ring.style.transform = '';
+        canvas.remove();
+        swarmRef.current = null;
+        button.style.color = '';
       }
     };
     rafRef.current = requestAnimationFrame(frame);
-  }, [stageRef, rowH, showHints]);
+  }, [stageRef, showHints, lightMode]);
 
   // Run the opening once. Touching the toggle during it hands control straight to the visitor.
   useEffect(() => {
@@ -305,9 +321,9 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   }, []);
   const stopSpark = () => {
     cancelAnimationFrame(rafRef.current);
-    document.querySelectorAll('.spectro-spark').forEach((el) => el.remove());
-    const arcEl = toggleRef.current && toggleRef.current.querySelector('.spectro-ring__arc');
-    if (arcEl) arcEl.style.opacity = '0';
+    if (swarmRef.current) swarmRef.current.remove();
+    swarmRef.current = null;
+    if (toggleRef.current) toggleRef.current.style.color = '';
   };
   useEffect(() => () => {
     timersRef.current.forEach(clearTimeout);
@@ -336,7 +352,6 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
       tabIndex={handedOver ? -1 : 0}
       onClick={onToggle}
     >
-      <span className="spectro-ring" aria-hidden="true"><span className="spectro-ring__arc" /></span>
       <ChevronDown size={18} strokeWidth={1.75} className="spectro__chevron" />
     </button>
   );

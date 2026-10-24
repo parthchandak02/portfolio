@@ -109,27 +109,10 @@
 .spectro--intro .spectro__line { animation: spectro-line-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(150ms + var(--lane) * 40ms + var(--j) * 1.5ms); }
 .spectro--intro .spectro__readout { visibility: hidden; }
 
-/* The spark that carries the fold to its button */
-.spectro-spark {
-  position: fixed; top: 0; left: 0; z-index: 120; width: 10px; height: 10px; margin: -5px 0 0 -5px;
-  border-radius: 50%; pointer-events: none;
-  background: radial-gradient(circle, #fff 0 30%, #ffb38a 55%, rgba(255, 107, 53, 0) 72%);
-  box-shadow: 0 0 16px 5px rgba(255, 107, 53, 0.55), 0 0 40px 10px rgba(255, 107, 53, 0.22);
-}
-.spectro-spark--trail { background: radial-gradient(circle, #ffd2b8 0 25%, rgba(255, 107, 53, 0.7) 50%, rgba(255, 107, 53, 0) 72%); box-shadow: 0 0 12px 3px rgba(255, 107, 53, 0.35); }
-
-/* The ring the spark draws round the button: a conic gradient cut to a thin band, with a tail that fades
-   toward where the spark came in. The script sets --start, --sweep and the turn each frame. */
-.spectro-toggle { overflow: visible; }
-.spectro-ring { position: absolute; inset: -4px; border-radius: 50%; pointer-events: none; filter: drop-shadow(0 0 3px rgba(255, 107, 53, 0.65)); }
-.spectro-ring__arc {
-  position: absolute; inset: 0; border-radius: 50%; opacity: 0;
-  background: conic-gradient(from var(--start, 270deg), rgba(255, 107, 53, 0) 0deg, rgba(255, 107, 53, 0.45) calc(var(--sweep, 0deg) * 0.55), rgba(255, 200, 170, 1) var(--sweep, 0deg), transparent var(--sweep, 0deg));
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px), #000 calc(100% - 0.5px), transparent 100%);
-          mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px), #000 calc(100% - 0.5px), transparent 100%);
-}
-.spectro-toggle .spectro__chevron { transition: transform 0.3s ease, color 0.6s ease; }
-.spectro-toggle.is-hint { color: #ff6b35 !important; }
+/* The swarm that carries the fold to its button: pills drawn on a canvas over the page for its flight */
+.spectro-swarm { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 120; pointer-events: none; }
+/* The chevron takes each arriving pill's colour, and eases back after */
+.spectro-toggle { transition: opacity 0.25s ease, color 0.35s ease; }
 
 .spectro__readout {
   box-sizing: border-box; height: 104px; padding: 0.7rem 0.9rem; border-radius: 12px; border: 1px solid var(--edge); background: var(--well);
