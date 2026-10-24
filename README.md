@@ -8,7 +8,7 @@
 
 <h6>
 
-![Astro](https://img.shields.io/badge/Astro-6-111111?style=flat-square&logo=astro&logoColor=white)
+![Astro](https://img.shields.io/badge/Astro-7-111111?style=flat-square&logo=astro&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-111111?style=flat-square&logo=react&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-React%20Three%20Fiber-ff9a3d?style=flat-square&logo=threedotjs&logoColor=white)
 ![Cloudflare Pages](https://img.shields.io/badge/hosted-Cloudflare%20Pages-111111?style=flat-square&logo=cloudflare&logoColor=white)
