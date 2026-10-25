@@ -55,6 +55,7 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
   }, [focusWave]);
 
   const vecRef = useRef(new THREE.Vector3());
+  const spreadRef = useRef(0.5); // the fan's width, set by where the beam meets the prism
   
   const rayMove = useCallback(({ api, position, direction, normal }) => {
     if (!normal) return;
@@ -68,6 +69,8 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
     const normalAngle = Math.atan2(normal.y, normal.x);
     // The angle between the ray and the normal
     const incidentAngle = angleScreenCenter - normalAngle;
+    // Glass spreads the colours more the more steeply the beam strikes it, so the fan widens toward grazing
+    spreadRef.current = 0.5 * (1 + 0.28 * Math.sin(incidentAngle) ** 2);
     // Calculate the refraction for the incident angle
     const refractionAngle = calculateRefractionAngle(incidentAngle) * 6;
     // Apply the refraction
@@ -96,6 +99,8 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
     const m = rainbow.current.material;
     if (focusWave) lerp(m, 'focus', focusWave, m.focusAmount < 0.05 ? 1 : 0.12);
     lerp(m, 'focusAmount', focusWave ? 1 : 0, 0.08);
+
+    lerp(m, 'endRadius', spreadRef.current, 0.06);
 
     // The pulse fades in quickly and out as it travels; the catch swells the flare a little and settles
     const g = glow.current;

@@ -1,4 +1,4 @@
-import { forwardRef, useRef } from 'react'
+import { forwardRef, useMemo, useRef } from 'react'
 import { extend, useFrame, useThree } from '@react-three/fiber'
 import { shaderMaterial } from '@react-three/drei'
 import * as THREE from 'three'
@@ -22,7 +22,8 @@ const RainbowMaterial = shaderMaterial(
     pulseR: -1,
     pulseAmt: 0,
     pulseWave: 0,
-    flash: 0
+    flash: 0,
+    dispersion: 0.4
   },
   /*glsl*/ ` varying vec2 vUv;
     void main() {
@@ -45,6 +46,7 @@ const RainbowMaterial = shaderMaterial(
     uniform float pulseAmt;
     uniform float pulseWave;
     uniform float flash;
+    uniform float dispersion;
   
     vec2 mp;
     // ratio: 1/3 = neon, 1/4 = refracted, 1/5+ = approximate white
@@ -62,8 +64,6 @@ const RainbowMaterial = shaderMaterial(
       float interf1 = interf0 * 4.0 / 3.0;      
       float phase1 = phase0;      
       float f = (1.0 - NxV) * (1.0 - NxV);
-      float interf = mix(interf0, interf1, f);
-      float phase = mix(phase0, phase1, f);
       float dp = (NxV - 1.0) * 0.5;            
       vec3 hue = mix(physhue2rgb(thickness * interf0 + dp, thickness * phase0), physhue2rgb(thickness * interf1 + 0.1 + dp, thickness * phase1), f);      
       vec3 film = hue * lum + vec3(0.9639,0.78252,0.18723) * luma;      
@@ -105,7 +105,15 @@ const RainbowMaterial = shaderMaterial(
       vec2 uv = (mat2(cosR, -sinR, sinR, cosR) * (vUv * vec2(ratio, 1.) - vec2(0., 1.) - vstart * vec2(1., -1.)) / len);
       float a = atan(uv.x, uv.y) * 10.0;
       float s = uv.y * (endRadius - startRadius) + startRadius;
-      float w = (uv.x / s + .5) * 300. + 400. + a;
+      // Across the fan, 0 is the violet edge and 1 the red. Glass bends short wavelengths more, so the colours
+      // are laid out by refractive index (Cauchy's equation for BK7 glass, n = A + B / λ² with λ in µm) rather
+      // than evenly: violet and blue open wide and red bunches up, as through a real prism.
+      float across = uv.x / s + 0.5;
+      const float CAUCHY_A = 1.5046;
+      const float CAUCHY_B = 0.0042;
+      float n = mix(CAUCHY_A + CAUCHY_B / 0.16, CAUCHY_A + CAUCHY_B / 0.49, across); // n at 400 nm to n at 700 nm
+      float wPrism = sqrt(CAUCHY_B / max(n - CAUCHY_A, 1e-4)) * 1000.0;
+      float w = mix(across * 300. + 400., wPrism, dispersion) + a;
       vec3 c = spectral_zucconi6(w, time); // [400, 700]
       float l = 1. - smoothstep(fade, 1., uv.y);
       float area = uv.y < 0. ? 0. : 1.;
@@ -125,26 +133,34 @@ const RainbowMaterial = shaderMaterial(
       finalColor *= 1.0 + pulseAmt * ring * pulseBand * 2.0;
       
       if (lightMode) {
-        // For light backgrounds: invert dark areas and enhance contrast
+        // On white, light cannot be added, so the colour is laid over the page and fades with its brightness.
+        // A smooth fade, where a cutoff used to leave the fan's edges jagged.
         float luminance = dot(finalColor, vec3(0.299, 0.587, 0.114));
-        // If it's too dark, make it more transparent instead of visible
-        if (luminance < 0.1) {
-          discard; // Remove dark edges entirely on light backgrounds
-        }
-        // Boost mid-tones and highlights for better visibility
-        finalColor = pow(finalColor, vec3(0.8)) * 1.2;
+        gl_FragColor = vec4(pow(finalColor, vec3(0.8)) * 1.2, smoothstep(0.02, 0.3, luminance));
+      } else {
+        gl_FragColor = vec4(finalColor, 1.0);
       }
-      
-      gl_FragColor = vec4(finalColor, 1.0);
-      if (gl_FragColor.r + gl_FragColor.g + gl_FragColor.b < 0.01) discard;
       #include <colorspace_fragment>
     }`
 )
 
 extend({ RainbowMaterial })
 
+// The fan covers a narrow wedge of the plane the shader is written for: from the plane's centre, where the light
+// leaves the prism, out to its edge, within a quarter of the distance either side. Drawing only that wedge (with
+// a margin) instead of the whole plane, which is larger than the screen, saves most of the shader's work.
+const WEDGE = 0.4; // width at the far end, either side, as a share of the length; the colours reach 0.33 at the widest spread
+const wedgeGeometry = () => {
+  const g = new THREE.BufferGeometry()
+  const pts = [0, 0, 0, 0.5, -0.5 * WEDGE, 0, 0.5, 0.5 * WEDGE, 0]
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3))
+  g.setAttribute('uv', new THREE.Float32BufferAttribute([0.5, 0.5, 1, 0.5 - 0.5 * WEDGE, 1, 0.5 + 0.5 * WEDGE], 2))
+  return g
+}
+
 export const Rainbow = forwardRef(({ lightMode, startRadius = 0, endRadius = 0.5, emissiveIntensity = 2.5, fade = 0.25, ...props }, fRef) => {
   const material = useRef(null)
+  const geometry = useMemo(wedgeGeometry, [])
   const { width, height } = useThree((state) => state.viewport)
   // calculate the maximum length the rainbow has to have to reach all screen corners
   const length = Math.hypot(width, height) + 1.5 // add 1.5 to due motion of the rainbow
@@ -162,8 +178,7 @@ export const Rainbow = forwardRef(({ lightMode, startRadius = 0, endRadius = 0.5
   const blendingMode = lightMode ? THREE.NormalBlending : THREE.AdditiveBlending;
   
   return (
-    <mesh ref={fRef} scale={[length, length, 1]} {...props}>
-      <planeGeometry />
+    <mesh ref={fRef} scale={[length, length, 1]} geometry={geometry} {...props}>
       <rainbowMaterial 
         ref={material} 
         key={RainbowMaterial.key} 
