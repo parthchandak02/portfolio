@@ -6,6 +6,7 @@ import { Rainbow } from './Rainbow';
 import { Prism } from './Prism';
 import { Flare } from './Flare';
 import { Box } from './Box';
+import { SwarmLight } from './SwarmLight';
 import { calculateRefractionAngle, lerp, lerpV3 } from '../util';
 import { onPrismGlow } from '../hooks/prismGlow';
 
@@ -134,6 +135,7 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
       
       {/* Rainbow and flares */}
       <Rainbow ref={rainbow} lightMode={lightMode} startRadius={0} endRadius={0.5} fade={0} />
+      <SwarmLight lightMode={lightMode} />
       <Flare ref={flare} visible={isPrismHit} renderOrder={10} scale={1.25} streak={[12.5, 20, 1]} />
     </>
   );

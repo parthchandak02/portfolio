@@ -4,6 +4,7 @@ import { animate } from 'motion';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 import { spectrumBands } from '../data/spectrum';
 import { glowPrism } from '../hooks/prismGlow';
+import { swarmLight } from '../hooks/swarmLight';
 import './Spectrograph.css';
 
 // Time is not linear on the track: the sparse early years are compressed so the busy recent
@@ -144,7 +145,6 @@ const HINT_MS = 2600; // ms the button labels stay up after the first pills land
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
 const noise = (i, k) => { const v = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return v - Math.floor(v); };
 
 const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
@@ -208,10 +208,9 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   // each curves in on its own path; it stretches with its speed, and the chevron takes its colour and
   // gives a small bounce as it is absorbed.
   const rafRef = useRef(0);
-  const swarmRef = useRef(null);
   const flightsRef = useRef([]);
   const pillsRef = useRef([]);
-  const sendSpark = useCallback(() => {
+  const launch = useCallback(() => {
     const stage = stageRef.current;
     const button = toggleRef.current;
     if (!stage || !button || button.classList.contains('is-away')) return;
@@ -231,26 +230,8 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     const pills = lines.filter((_, i) => i % 4 === 0).map((l, i) => {
       const x = l.r.left + l.r.width / 2;
       const y = l.r.top + l.r.height / 2;
-      return { hue: l.hue, x, y, px: x, py: y, angle: 0, r1: noise(i, 1), r2: noise(i, 2), wave: (x - left) / span, on: false, done: false };
+      return { hue: l.hue, x, y, px: x, py: y, angle: 0, speed: 0, born: 0, r1: noise(i, 1), r2: noise(i, 2), wave: (x - left) / span, on: false, done: false };
     });
-
-    const canvas = document.createElement('canvas');
-    canvas.className = 'spectro-swarm';
-    canvas.setAttribute('aria-hidden', 'true');
-    // Sized to the visible window in px, not 100vh: on phones 100vh is taller than the visible area,
-    // which would stretch the drawing and land the swarm below the button
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    canvas.width = vw * dpr;
-    canvas.height = vh * dpr;
-    canvas.style.width = `${vw}px`;
-    canvas.style.height = `${vh}px`;
-    document.body.appendChild(canvas);
-    swarmRef.current = canvas;
-    const ctx = canvas.getContext('2d');
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const blend = lightMode ? 'source-over' : 'lighter';
 
     let landed = false;
     const absorb = (p) => {
@@ -272,6 +253,7 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     pills.forEach((p) => {
       p.timer = setTimeout(() => {
         p.on = true;
+        p.born = performance.now();
         // Upward the spring is loose, so the throw carries each pill above the button and it drops in.
         // Sideways it is nearly critical, so no pill swings past the button and off the screen's edge.
         const stiffness = 55 + p.r1 * 35;
@@ -283,13 +265,14 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
       }, p.wave * SWARM_WAVE + p.r1 * 80);
     });
 
+    // The pills are drawn as light in the 3D scene (SwarmLight); this loop measures each one's speed and
+    // heading for that drawing, and catches it as it reaches the button
+    swarmLight.pills = pills;
     const t0 = performance.now();
     let last = t0;
     const frame = (now) => {
       const dt = Math.max(1, now - last);
       last = now;
-      ctx.clearRect(0, 0, vw, vh);
-      ctx.globalCompositeOperation = blend;
       let live = 0;
       pills.forEach((p) => {
         if (p.done) return;
@@ -300,18 +283,9 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
         p.px = p.x;
         p.py = p.y;
         if (Math.hypot(p.x - T.x, p.y - T.y) < catchR) { absorb(p); return; }
-        // Longer when fast, a short pill when slow, always pointing along its flight
-        const speed = (Math.hypot(dx, dy) / dt) * 16.7;
-        if (speed > 0.2) p.angle = Math.atan2(dy, dx) + Math.PI / 2;
-        const length = clamp(7 + speed * 1.4, 7, 26);
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.angle);
-        ctx.fillStyle = p.hue;
-        ctx.beginPath();
-        ctx.roundRect(-1.3, -length / 2, 2.6, length, 1.3);
-        ctx.fill();
-        ctx.restore();
+        // Speed in px per 60 Hz frame sets the pill's length; the heading is in the scene's y-up terms
+        p.speed = (Math.hypot(dx, dy) / dt) * 16.7;
+        if (p.speed > 0.2) p.angle = Math.atan2(-dy, dx) - Math.PI / 2;
       });
       if (live && now - t0 < SWARM_CAP) {
         rafRef.current = requestAnimationFrame(frame);
@@ -324,17 +298,26 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     pillsRef.current = pills;
   // stopSwarm only touches refs
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stageRef, showHints, lightMode]);
+  }, [stageRef, showHints]);
 
-  // Ends any flight: the pills, the canvas, and the chevron's borrowed colour
+  // The scene loads a moment after the page; hold the swarm until it is drawing, so the first visit never misses it
+  const sendSpark = useCallback(() => {
+    const start = performance.now();
+    const wait = () => {
+      if (swarmLight.ready || performance.now() - start > 3000) launch();
+      else timersRef.current.push(setTimeout(wait, 100));
+    };
+    wait();
+  }, [launch]);
+
+  // Ends any flight: the pills, their light in the scene, and the chevron's borrowed colour
   const stopSwarm = () => {
     cancelAnimationFrame(rafRef.current);
     pillsRef.current.forEach((p) => clearTimeout(p.timer));
     pillsRef.current = [];
     flightsRef.current.forEach((c) => c.stop());
     flightsRef.current = [];
-    if (swarmRef.current) swarmRef.current.remove();
-    swarmRef.current = null;
+    swarmLight.pills = [];
     const button = toggleRef.current;
     if (button) {
       // The colour eases back through the button's transition
