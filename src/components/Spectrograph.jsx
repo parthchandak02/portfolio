@@ -210,12 +210,14 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   const rafRef = useRef(0);
   const flightsRef = useRef([]);
   const pillsRef = useRef([]);
-  const launch = useCallback(() => {
+  const launch = useCallback((withHints) => {
+    // The button labels come up only on the opening; a fold the visitor makes just gets the swarm
+    const hints = withHints ? showHints : () => {};
     const stage = stageRef.current;
     const button = toggleRef.current;
     if (!stage || !button || button.classList.contains('is-away')) return;
     const s = stage.getBoundingClientRect();
-    if (s.bottom < 0 || s.top > window.innerHeight) { showHints(); return; }
+    if (s.bottom < 0 || s.top > window.innerHeight) { hints(); return; }
     const b = button.getBoundingClientRect();
     const T = { x: b.left + b.width / 2, y: b.top + b.height / 2 };
     const catchR = b.width / 2 - 6; // a pill is absorbed once it is inside the button's glass
@@ -224,7 +226,7 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     const lines = Array.from(stage.querySelectorAll('.spectro__line'))
       .map((el) => ({ r: el.getBoundingClientRect(), hue: getComputedStyle(el).getPropertyValue('--hue').trim() }))
       .sort((p, q) => p.r.left - q.r.left);
-    if (!lines.length) { showHints(); return; }
+    if (!lines.length) { hints(); return; }
     const left = lines[0].r.left;
     const span = lines[lines.length - 1].r.left - left || 1;
     const pills = lines.filter((_, i) => i % 4 === 0).map((l, i) => {
@@ -247,7 +249,7 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
         }));
       }
       // The first pill to land lights the prism too
-      if (!landed) { landed = true; showHints(); glowPrism(); }
+      if (!landed) { landed = true; hints(); glowPrism(); }
     };
 
     pills.forEach((p) => {
@@ -291,7 +293,7 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
         rafRef.current = requestAnimationFrame(frame);
       } else {
         stopSwarm();
-        if (!landed) showHints();
+        if (!landed) hints();
       }
     };
     rafRef.current = requestAnimationFrame(frame);
@@ -301,10 +303,10 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   }, [stageRef, showHints]);
 
   // The scene loads a moment after the page; hold the swarm until it is drawing, so the first visit never misses it
-  const sendSpark = useCallback(() => {
+  const sendSpark = useCallback((withHints = true) => {
     const start = performance.now();
     const wait = () => {
-      if (swarmLight.ready || performance.now() - start > 3000) launch();
+      if (swarmLight.ready || performance.now() - start > 3000) launch(withHints);
       else timersRef.current.push(setTimeout(wait, 100));
     };
     wait();
@@ -350,6 +352,8 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     setHint(false);
     const ui = document.querySelector('.layout__ui');
     if (ui) ui.classList.remove('layout__ui--hints');
+    // Folding the lanes back into the strip sends the swarm to the button again, once the fold has landed
+    if (expanded && !prefersReducedMotion()) timersRef.current.push(setTimeout(() => sendSpark(false), FOLD_MS));
     setExpanded((v) => !v);
     setActive(null);
   };
