@@ -11,6 +11,7 @@
 ![Astro](https://img.shields.io/badge/Astro-7-111111?style=flat-square&logo=astro&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-111111?style=flat-square&logo=react&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-React%20Three%20Fiber-ff9a3d?style=flat-square&logo=threedotjs&logoColor=white)
+![Motion](https://img.shields.io/badge/Motion-springs-111111?style=flat-square)
 ![Cloudflare Pages](https://img.shields.io/badge/hosted-Cloudflare%20Pages-111111?style=flat-square&logo=cloudflare&logoColor=white)
 ![Live](https://img.shields.io/badge/live-parthchandak.info-ff5a52?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-555555?style=flat-square)
@@ -24,7 +25,7 @@
 
 <br><br>
 
-<a href="https://parthchandak.info"><img src="docs/assets/readme/hero.jpg" width="100%" alt="A glass prism on a black background splitting a white beam into an orange, blue and violet rainbow, under the typed lines 'Hi, my name is Parth Chandak' and 'I am a Creative Technologist', with a strip of coloured timeline ticks across the middle and four round buttons in the top-right corner"></a>
+<a href="https://parthchandak.info"><img src="docs/assets/readme/hero.jpg" width="100%" alt="A glass prism on a black background splitting a white beam into an orange, blue and violet rainbow, under the typed lines 'Hi, my name is Parth Chandak' and 'I am a Creative Technologist', with a strip of coloured timeline ticks across the middle, four round buttons in the top-right corner and a round contact button in the bottom-right corner"></a>
 
 <sub>Play mode on the live site, October 2026.</sub>
 
@@ -48,8 +49,9 @@ still behind them.
 **1 · The prism**
 
 A GLTF prism in a React Three Fiber scene. The beam's angle follows the pointer; where it
-meets the prism, refracted rays fan out into a rainbow, with a lens flare, plus bloom and a colour LUT from
-`@react-three/postprocessing`.
+meets the prism, it fans out into a rainbow drawn by a spectral shader. The colours are laid out partly by
+the refractive index of BK7 glass (Cauchy's equation), so blue and violet open wider, and the fan widens as
+the beam strikes more steeply. Bloom, a colour LUT and dithering come from `@react-three/postprocessing`.
 
 </td>
 <td width="33%" valign="top">
@@ -57,7 +59,8 @@ meets the prism, refracted rays fan out into a rainbow, with a lens flare, plus 
 **2 · The spectrograph**
 
 Every dated item is one tick on a timeline from 2015 to 2027. The years are warped so the busy
-recent ones get room. The chevron unfolds the strip into eight lanes, one per band.
+recent ones get room. The chevron unfolds the strip into eight lanes, one per band; folding them back
+sends the strip's colours flying into the chevron as light.
 
 </td>
 <td width="33%" valign="top">
@@ -71,11 +74,25 @@ Cards with a picture or video show as glass tiles, the rest as wide cards, newes
 </tr>
 </table>
 
+<div align="center">
+
+<img src="docs/assets/readme/swarm.jpg" width="720" alt="Glowing pills in the strip's colours, orange, cyan, violet and white, streaking up from the timeline strip toward the round chevron button on the right, drawn as light in the 3D scene">
+
+<sub>The fold: each colour lifts off the strip as light in the 3D scene and springs into the chevron.</sub>
+
+</div>
+
+**The light and the page move together.** The swarm is drawn inside the 3D scene, not on top of the
+page: the strip measures each pill in screen pixels and flies it on [Motion](https://motion.dev)
+springs, and the scene places it with the canvas's own box and the camera's zoom, so it lands exactly on
+the button on any screen. When it lands, the prism catches the light and a pulse runs out along the
+rainbow. Picking an item, or scrolling into a band of the record, lights that band's colour in the rainbow.
+
 ## The record
 
 <div align="center">
 
-<img src="docs/assets/readme/record.jpg" width="720" alt="The Research band: a sticky orange band bar at the top with ticks for each paper, above a three-column grid of glass tiles, each showing a journal name, a small line-drawn topic icon, a paper title and a year, with the rainbow beam glowing through the tiles">
+<img src="docs/assets/readme/record.jpg" width="720" alt="The Research band: a sticky orange band bar at the top with ticks for each paper, above a three-column grid of glass tiles, each showing a journal name, a small line-drawn topic icon, a paper title and a year, with the rainbow glowing through the tiles and the contact button in the bottom-right corner">
 
 <sub>The Research band, reached with <code>parthchandak.info/#research</code>.</sub>
 
@@ -96,7 +113,7 @@ The eight bands, each with its own colour on the strip and the bar:
 
 <div align="center">
 
-<img src="docs/assets/readme/mobile.jpg" width="32%" alt="The same play-mode screen on a phone: the typed greeting and role, the coloured strip drawn as dense full-width ticks, the prism and rainbow below, and the four round buttons stacked on the right">
+<img src="docs/assets/readme/mobile.jpg" width="32%" alt="The same play-mode screen on a phone: the typed greeting and role, the coloured strip drawn as dense full-width ticks, the prism and rainbow below, the four round buttons stacked on the right and the contact button in the bottom-right corner">
 
 <sub>Play mode on a phone-sized screen.</sub>
 
@@ -108,6 +125,8 @@ The eight bands, each with its own colour on the strip and the bar:
 - **Deep links per band.** `#experience`, `#research`, `#projects` and the rest open the record scrolled to that section.
 - **Light and dark.** A toggle swaps the theme for the scene and the glass UI together.
 - **Beam lock.** Hold the beam still so it stops chasing the pointer while you read.
+- **One contact button.** A glass button in the corner whose own glass springs open into the contact card (email, LinkedIn, GitHub, résumé, booking), and springs back.
+- **Respects reduced motion.** With reduced motion set, the opening, the swarm and the glow are skipped.
 - **Proof links.** Ticks with a public source (a DOI, a patent page, a live project) link straight to it.
 - **One data file per thing.** Cards live in `src/data/timelineData.js`, the Lab in `src/data/lab.js`, bands in `src/data/spectrum.js`.
 - **Readable before it loads.** Astro writes the whole record into the HTML from the same data files, so search engines and link previews see every card; the 3D scene loads after the text.
@@ -138,20 +157,22 @@ src/
   pages/index.astro         The page: head tags, and the record as plain HTML until the app loads
   App.jsx                   Play mode / record switch, deep links, theme
   components/
-    Canvas3D.jsx, Scene.jsx R3F canvas, post-processing, scene setup
+    Canvas3D.jsx, Scene.jsx R3F canvas, post-processing, scene setup, the prism's catch and pulse
     Beam.jsx, Prism.jsx,
-    Rainbow.jsx, Flare.jsx  The light beam, the GLTF prism, refraction and flare
+    Rainbow.jsx, Flare.jsx  The light beam, the GLTF prism, the spectral rainbow and flare
+    SwarmLight.jsx          The strip's swarm, drawn as light in the scene
     Spectrograph.jsx        The tick strip and its eight lanes
     BandBar.jsx             Sticky band bar in the record
     Timeline.jsx, TimelineCard.jsx, CardTile.jsx, LabShowcase.jsx
                             Cards, glass tiles and the Lab card
     UITypewriter.jsx        The greeting and cycling roles
-    ContactButton.jsx       The contact button and the card it frosts open
+    ContactButton.jsx       The contact button and the card its glass springs open into
   data/
     timelineData.js         Every card, by category
     spectrum.js             Band names, colours and dated items
     lab.js                  Public side projects
-  hooks/                    Mouse, light mode, scroll tracking
+  hooks/                    Mouse, light mode, scroll tracking; prismGlow.js and swarmLight.js
+                            connect the page to the scene
 public/
   gltf/                     prism.glb
   logos/, images/           Card logos and pictures
@@ -235,5 +256,5 @@ The build is a plain static folder, so Vercel or Netlify work too (build `npm ru
 <br>
 
 <div align="center">
-<sub>Built with Astro, React, Three.js, React Three Fiber and Lucide icons. Hosted on Cloudflare Pages.</sub>
+<sub>Built with Astro, React, Three.js, React Three Fiber, Motion and Lucide icons. Hosted on Cloudflare Pages.</sub>
 </div>
