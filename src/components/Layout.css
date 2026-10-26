@@ -110,6 +110,8 @@
 .layout__ui--hints .ui-hint { opacity: 1; transform: translate(0, -50%); }
 .layout__ui--hints .lock-toggle .ui-hint { transition-delay: 0.09s; }
 .layout__ui--hints .light-toggle .ui-hint { transition-delay: 0.18s; }
+/* At the very top of the page the play button's label stays up, so the prism's screen is easy to find */
+.layout__ui--top .play-mode-toggle > .ui-hint { opacity: 1; transform: translate(0, -50%); }
 @media (max-width: 768px) { .ui-hint { font-size: 0.75rem; right: calc(100% + 8px); } }
 /* On a phone the hero sits right beside the buttons, so no labels come up after the opening */
 @media (max-width: 768px) {

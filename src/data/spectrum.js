@@ -208,6 +208,22 @@ FEATURED.forEach(({ title }) => {
   if (pick) pick.featured = true;
 });
 
-export const bandForSection = (section) => spectrumBands.find((band) => band.sections.includes(section)) || null;
+// Selected work is not a band of the spectrum, but the bar shows it like one while you read it: its picks
+// from across the bands, each in its own band's colour
+export const selectedBand = {
+  key: 'selected',
+  name: 'Selected work',
+  hue: '#ff6b35',
+  sections: ['selected'],
+  section: 'selected',
+  items: FEATURED.map(({ title }) => {
+    const band = spectrumBands.find((b) => b.items.some((item) => item.featured && item.card === title));
+    const item = band && band.items.find((i) => i.featured && i.card === title);
+    return item && { ...item, hue: band.hue };
+  }).filter(Boolean)
+};
+
+export const bandForSection = (section) =>
+  (section === 'selected' ? selectedBand : spectrumBands.find((band) => band.sections.includes(section)) || null);
 
 export const spectrumTotal = spectrumBands.reduce((n, b) => n + b.items.length, 0);

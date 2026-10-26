@@ -70,7 +70,7 @@
 /* Selected work: a fuller line with its mini prism standing just above it */
 .spectro__line--featured { width: 3px; opacity: 1; }
 .spectro__prism { position: absolute; left: 0; top: calc((var(--row-h) - 16px) / -2 - 1px); transform: translate(-50%, -100%); pointer-events: none; }
-.spectro__kicker-prism { --s: 11px; --h: 7px; margin-right: 7px; vertical-align: -1px; }
+.spectro__kicker-prism { --s: 11px; margin-right: 7px; vertical-align: -1px; }
 
 /* Each lane's band name, in the margin to its left. The picked band's name lights up. */
 .spectro__label {

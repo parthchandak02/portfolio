@@ -8,5 +8,4 @@ export const FEATURED = [
   { title: 'Centicede, a Sunlight-Following Robot', name: 'Centicede', kind: 'Robotics · 2017' }
 ];
 
-const featured = new Set(FEATURED.map((f) => f.title));
-export const isFeatured = (title) => featured.has(title);
+export const featuredName = (title) => FEATURED.find((f) => f.title === title)?.name;

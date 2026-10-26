@@ -6,7 +6,7 @@ const PlayModeToggle = ({ isPlayMode, onToggle }) => {
     <button
       className={`play-mode-toggle glass glass-interactive ${isPlayMode ? 'play-mode' : ''}`}
       onClick={onToggle}
-      aria-label={`Switch to ${isPlayMode ? 'reading mode' : 'prism play mode'}`}
+      aria-label={isPlayMode ? 'Back to the record' : 'Play with prism'}
     >
       <span className="play-mode-toggle__icon">
         {isPlayMode ? (
@@ -29,7 +29,7 @@ const PlayModeToggle = ({ isPlayMode, onToggle }) => {
           </span>
         )}
       </span>
-      <span className="ui-hint" aria-hidden="true">{isPlayMode ? 'Read the record' : 'Play with the prism'}</span>
+      <span className="ui-hint" aria-hidden="true">{isPlayMode ? 'Back to the record' : 'Play with prism'}</span>
     </button>
   );
 };

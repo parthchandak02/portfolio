@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { bandForSection, spectrumBands } from '../data/spectrum';
 import { timelineDataByCategory } from '../data/timelineData';
+import { featuredName } from '../data/featured';
 import { useWidth } from './Spectrograph';
 import { scrollCardToLine } from '../hooks/useScrollHighlight';
 import './BandBar.css';
@@ -18,16 +19,18 @@ const clearFade = (el) => {
   el.style.removeProperty('--fade-ramp');
 };
 
-// The Lab is one block on the page, so its projects all jump to that block
-const elementFor = (card) => {
+// The Lab is one block on the page, so its projects all jump to that block. Selected work's copies of cards
+// are only jumped to from Selected work's own bar.
+const elementFor = (card, selected) => {
+  if (selected) return document.querySelector(`.timeline__item[data-category="selected"][data-title="${CSS.escape(card)}"]`);
   const key = LAB_TITLES.has(card) ? 'Lab' : card;
   return document.querySelector(`.timeline__item[data-title="${CSS.escape(key)}"]:not([data-category="selected"])`);
 };
 
 const isCurrentCard = (item, title) => item.card === title || (title === 'Lab' && LAB_TITLES.has(item.card));
 
-const scrollToCard = (card) => {
-  const target = elementFor(card);
+const scrollToCard = (card, selected = false) => {
+  const target = elementFor(card, selected);
   const scroller = document.querySelector('.main-content-scroll');
   if (target && scroller) scrollCardToLine(target, scroller);
 };
@@ -160,7 +163,8 @@ const BandBar = ({ category, title, lightMode = false }) => {
       h: lineH,
       o: isCurrentCard(p.item, title) ? 1 : 0.45
     }]));
-    const ours = stripLines.filter((el) => el.dataset.band === shown.key && barSpots.has(el.dataset.title))
+    // Selected work's lines come from several bands
+    const ours = stripLines.filter((el) => (shown.key === 'selected' || el.dataset.band === shown.key) && barSpots.has(el.dataset.title))
       .sort((a, b) => centre(a).x - centre(b).x);
 
     const sprites = [];
@@ -281,11 +285,13 @@ const BandBar = ({ category, title, lightMode = false }) => {
     if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
     else if (e.key === 'Enter' || e.key === ' ') {
-      if (peek) { e.preventDefault(); scrollToCard(peek.item.card); }
+      if (peek) { e.preventDefault(); scrollToCard(peek.item.card, shown.key === 'selected'); }
     } else if (e.key === 'Escape') setPeek(null);
   };
 
-  const label = peek ? peek.item.title : title || '';
+  // Selected work names its picks as its tiles do
+  const named = (card, fallback) => (shown.key === 'selected' && featuredName(card)) || fallback;
+  const label = peek ? named(peek.item.card, peek.item.title) : named(title, title) || '';
   lastLabelRef.current = label;
   const leavingPlaced = leaving ? layout(leaving.band.items, width) : [];
 
@@ -337,7 +343,7 @@ const BandBar = ({ category, title, lightMode = false }) => {
           onPointerMove={(e) => setPeek(nearest(e.clientX))}
           onPointerDown={(e) => setPeek(nearest(e.clientX))}
           onPointerLeave={() => setPeek(null)}
-          onClick={(e) => scrollToCard(nearest(e.clientX).item.card)}
+          onClick={(e) => scrollToCard(nearest(e.clientX).item.card, shown.key === 'selected')}
           onKeyDown={onKeyDown}
         >
           {placed.map((p, i) => (
@@ -345,7 +351,7 @@ const BandBar = ({ category, title, lightMode = false }) => {
               key={p.item.title}
               data-title={p.item.title}
               className={`bandbar__line${isCurrent(p.item) ? ' is-current' : ''}${peek && peek.item === p.item ? ' is-peek' : ''}${p.item.future ? ' is-future' : ''}`}
-              style={{ left: `${p.x}px`, '--i': i }}
+              style={{ left: `${p.x}px`, '--i': i, ...(p.item.hue ? { '--hue': p.item.hue } : {}) }}
             />
           ))}
         </div>

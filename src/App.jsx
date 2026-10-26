@@ -110,6 +110,17 @@ export default function App() {
     };
   }, [isPlayMode]);
 
+  // At the very top of the page the play button keeps its label up, so the prism's own screen is easy to find
+  const [atTop, setAtTop] = useState(true);
+  useEffect(() => {
+    const scroller = document.querySelector('.main-content-scroll');
+    if (!scroller) return undefined;
+    const onScroll = () => setAtTop(scroller.scrollTop < 24);
+    onScroll();
+    scroller.addEventListener('scroll', onScroll, { passive: true });
+    return () => scroller.removeEventListener('scroll', onScroll);
+  }, [isPlayMode]);
+
   // Get unique categories for filter buttons (excluding 'all')
   const categories = useMemo(() => {
     return [...new Set(timelineData.map(item => item.category?.toLowerCase()).filter(Boolean))];
@@ -193,7 +204,7 @@ export default function App() {
         <ContactButton lightMode={lightMode} />
 
         {/* UI Overlay Layer */}
-        <div className={`layout__ui${handedOver ? ' layout__ui--reading' : ''}`}>
+        <div className={`layout__ui${handedOver ? ' layout__ui--reading' : ''}${atTop ? ' layout__ui--top' : ''}`}>
           {/* Fixed UI Components */}
           <LightToggle lightMode={lightMode} onToggle={toggleLightMode} />
           <LockToggle isLocked={isLocked} onToggle={toggleLock} />

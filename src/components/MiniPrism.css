@@ -1,54 +1,46 @@
-/* A triangular prism, built standing on one end and then laid with that end toward the viewer, apex up,
-   like the prism in the scene. --s is a side of its triangle, --h its depth. The faces sit at the
-   triangle's apothem, s / (2 * sqrt 3), from the axis; each end is centred on the axis by its centroid,
-   which lies s * 0.1443 below the middle of its box. */
+/* A three-sided pyramid (a regular tetrahedron). --s is an edge. Each side is an equilateral triangle
+   hinged on an edge of the base, s / (2 * sqrt 3) from the centre, and leaned in by 19.47deg (90deg less
+   the 70.53deg between a side and the base), which brings the three tips together over the centre at
+   s * 0.8165. The base lies flat with its centroid on the axis. */
 .mini-prism {
-  --s: 14px; --h: 9px;
-  display: inline-block; flex-shrink: 0; width: var(--s); height: calc(var(--s) * 0.866);
+  --s: 14px;
+  display: inline-block; flex-shrink: 0; width: var(--s); height: calc(var(--s) * 0.8165);
   perspective: calc(var(--s) * 6);
 }
 .mini-prism__body {
-  position: relative; display: block; width: var(--s); height: var(--h);
-  top: calc((var(--s) * 0.866 - var(--h)) / 2 + var(--s) * 0.08);
+  position: relative; display: block; width: 100%; height: 100%;
   transform-style: preserve-3d;
-  transform: rotateX(-14deg) rotateY(-32deg) rotateX(-90deg);
-  animation: mini-prism-rock 6s ease-in-out infinite alternate;
+  transform: rotateX(-14deg) rotateY(-25deg);
+  animation: mini-prism-turn 10s linear infinite;
 }
-/* It rocks side to side, enough to show its faces turning in the light */
-@keyframes mini-prism-rock {
-  from { transform: rotateX(-14deg) rotateY(-38deg) rotateX(-90deg); }
-  to { transform: rotateX(-14deg) rotateY(38deg) rotateX(-90deg); }
+@keyframes mini-prism-turn {
+  from { transform: rotateX(-14deg) rotateY(0deg); }
+  to { transform: rotateX(-14deg) rotateY(360deg); }
 }
 @media (prefers-reduced-motion: reduce) { .mini-prism__body { animation: none; } }
 
-.mini-prism__face, .mini-prism__cap { position: absolute; left: 0; box-sizing: border-box; backface-visibility: visible; }
-.mini-prism__face {
-  top: 0; width: var(--s); height: var(--h);
-  transform: rotateY(var(--a)) translateZ(calc(var(--s) * 0.2887));
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.55), color-mix(in srgb, var(--hue) 60%, transparent) 60%, rgba(255, 255, 255, 0.12));
-  border: 0.5px solid rgba(255, 255, 255, 0.8);
+.mini-prism__face, .mini-prism__base {
+  position: absolute; left: 0; bottom: 0; box-sizing: border-box;
+  width: var(--s); height: calc(var(--s) * 0.866);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  transform-origin: 50% 100%;
+  backface-visibility: visible;
 }
-/* One face carries a sliver of spectrum, the light it splits */
+.mini-prism__face {
+  transform: rotateY(var(--a)) translateZ(calc(var(--s) * 0.2887)) rotateX(19.47deg);
+  background: linear-gradient(170deg, rgba(255, 255, 255, 0.8), color-mix(in srgb, var(--hue) 60%, transparent) 55%, rgba(255, 255, 255, 0.2));
+}
+/* One side carries a sliver of spectrum, the light it splits */
 .mini-prism__face--glint {
   background:
-    linear-gradient(100deg, transparent 28%, rgba(255, 90, 82, 0.8) 38%, rgba(242, 211, 74, 0.8) 47%, rgba(95, 211, 141, 0.8) 55%, rgba(77, 208, 225, 0.8) 63%, rgba(176, 124, 255, 0.8) 72%, transparent 82%),
-    linear-gradient(165deg, rgba(255, 255, 255, 0.55), color-mix(in srgb, var(--hue) 45%, transparent));
+    linear-gradient(105deg, transparent 30%, rgba(255, 90, 82, 0.85) 40%, rgba(242, 211, 74, 0.85) 48%, rgba(95, 211, 141, 0.85) 56%, rgba(77, 208, 225, 0.85) 64%, rgba(176, 124, 255, 0.85) 72%, transparent 82%),
+    linear-gradient(170deg, rgba(255, 255, 255, 0.6), color-mix(in srgb, var(--hue) 45%, transparent));
 }
-.mini-prism__cap {
-  top: 50%; width: var(--s); height: calc(var(--s) * 0.866); margin-top: calc(var(--s) * -0.433);
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), color-mix(in srgb, var(--hue) 55%, rgba(255, 255, 255, 0.35)));
+.mini-prism__base {
+  transform: translateZ(calc(var(--s) * 0.2887)) rotateX(90deg);
+  background: color-mix(in srgb, var(--hue) 55%, rgba(255, 255, 255, 0.3));
+  opacity: 0.6;
 }
-/* The near end, facing the viewer: clear glass with a bright rim, so the triangle reads first */
-.mini-prism__cap--top {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 70%),
-    linear-gradient(115deg, transparent 40%, rgba(255, 90, 82, 0.55) 50%, rgba(242, 211, 74, 0.55) 57%, rgba(77, 208, 225, 0.55) 64%, rgba(176, 124, 255, 0.55) 71%, transparent 80%),
-    color-mix(in srgb, var(--hue) 45%, rgba(255, 255, 255, 0.25));
-}
-.mini-prism__cap--top { transform: translateY(calc(var(--h) / -2)) rotateX(90deg) translateY(calc(var(--s) * -0.1443)); }
-.mini-prism__cap--bottom { transform: translateY(calc(var(--h) / 2)) rotateX(90deg) translateY(calc(var(--s) * -0.1443)); opacity: 0.55; }
 
-/* On the light page white glass vanishes, so the edges and ends darken */
-.light-mode .mini-prism__face { border-color: rgba(20, 20, 24, 0.45); }
-.light-mode .mini-prism__cap { background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), color-mix(in srgb, var(--hue) 70%, rgba(20, 20, 24, 0.4))); }
+/* On the light page white glass vanishes, so the sides take more colour */
+.light-mode .mini-prism__face { background: linear-gradient(170deg, rgba(255, 255, 255, 0.9), color-mix(in srgb, var(--hue) 80%, rgba(20, 20, 24, 0.3)) 60%); }
