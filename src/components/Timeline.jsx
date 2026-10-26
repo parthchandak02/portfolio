@@ -3,7 +3,9 @@ import TimelineCard from './TimelineCard';
 import LabShowcase from './LabShowcase';
 import CardTile, { isTile } from './CardTile';
 import { useTypewriterHighlight } from '../contexts/TypewriterHighlightContext';
-import { categoryOrder } from '../data/timelineData';
+import { categoryOrder, timelineDataByCategory } from '../data/timelineData';
+import { FEATURED } from '../data/featured';
+import MiniPrism from './MiniPrism';
 import { bandForSection, spectrumBands, startOf, endOf } from '../data/spectrum';
 import './Timeline.css';
 
@@ -75,6 +77,15 @@ const Timeline = ({
     return out.flatMap((s) => (s.kind === 'tiles' && s.items.length === 1 ? [{ kind: 'card', ...s.items[0] }] : [s]));
   }, [sortedData, firstLabIndex]);
 
+  // Selected work opens the record: the cards marked with a mini prism on the strip, as tiles
+  const featured = useMemo(() => {
+    const cards = Object.values(timelineDataByCategory).flat();
+    return FEATURED.map((f) => {
+      const card = cards.find((c) => c.title === f.title);
+      return card && { item: card, tile: { ...card, title: f.name, date: f.kind } };
+    }).filter(Boolean);
+  }, []);
+
   const itemAttrs = (item, index) => ({
     style: { '--band-hue': bandForSection(item.category?.toLowerCase())?.hue || '#ff6b35' },
     'data-current': currentTitle === item.title ? 'true' : undefined,
@@ -113,6 +124,38 @@ const Timeline = ({
         {/* Timeline line */}
         <div className="timeline__line" />
         
+        {/* Selected work, ahead of the bands. Its tiles say data-category="selected", so jumps to a card
+            land on the card in its band, not on its copy here. */}
+        {featured.length > 0 && activeFilters.length === 0 && (
+          <section className="timeline__selected" id="selected" aria-labelledby="selected-title">
+            <h2 id="selected-title" className="timeline__selected-title">
+              <MiniPrism className="timeline__selected-prism" />
+              Selected work
+            </h2>
+            <div className={`timeline__tiles lab ${lightMode ? 'lab--light' : 'lab--dark'}`}>
+              <div className="lab__grid">
+                {featured.map(({ item, tile }) => {
+                  const key = `selected:${item.title}`;
+                  return (
+                    <div
+                      key={key}
+                      className={`timeline__item${openTile === key ? ' timeline__item--open' : ''}`}
+                      style={{ '--band-hue': bandForSection(item.category)?.hue || '#ff6b35' }}
+                      data-current={currentTitle === item.title && !openTile ? 'true' : undefined}
+                      data-category="selected"
+                      data-title={item.title}
+                    >
+                      {openTile === key
+                        ? renderCard(item, { defaultExpanded: true, onCollapse: () => setOpenTile(null) })
+                        : <CardTile item={tile} highlighted={highlights.timelineCards.includes(item.title)} onOpen={() => setOpenTile(key)} />}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Timeline items */}
         <div className="timeline__items">
           {sortedData.length > 0 ? (

@@ -21,7 +21,7 @@ const clearFade = (el) => {
 // The Lab is one block on the page, so its projects all jump to that block
 const elementFor = (card) => {
   const key = LAB_TITLES.has(card) ? 'Lab' : card;
-  return document.querySelector(`.timeline__item[data-title="${CSS.escape(key)}"]`);
+  return document.querySelector(`.timeline__item[data-title="${CSS.escape(key)}"]:not([data-category="selected"])`);
 };
 
 const isCurrentCard = (item, title) => item.card === title || (title === 'Lab' && LAB_TITLES.has(item.card));

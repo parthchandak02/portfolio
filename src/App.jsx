@@ -135,7 +135,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!hash || !categories.includes(hash)) return;
+    if (!hash || !(categories.includes(hash) || hash === 'selected')) return;
     if (isPlayMode) {
       togglePlayMode();
       return;

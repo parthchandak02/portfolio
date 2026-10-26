@@ -118,6 +118,22 @@
 
 /* A run of picture cards shown as tiles; an opened one takes the whole row */
 .timeline__tiles { margin-bottom: 32px; }
+
+/* Selected work, ahead of the bands */
+.timeline__selected { margin-bottom: 56px; }
+.timeline__selected-title {
+  display: flex; align-items: center; gap: 10px; margin: 0 0 16px;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.timeline--dark .timeline__selected-title { color: rgba(255, 255, 255, 0.82); }
+.timeline--light .timeline__selected-title { color: rgba(20, 20, 24, 0.78); }
+.timeline__selected-prism { --s: 16px; --h: 10px; }
+.timeline__selected .lab__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 900px) { .timeline__selected .lab__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Selected work shows its pictures; the rest of the record keeps them as ghosts until opened */
+.timeline__selected .lab-tile__img { opacity: 0.78; filter: none; transform: scale(1.02); }
+.timeline__selected .lab-tile__fog { background: linear-gradient(to top, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.35) 45%, rgba(0, 0, 0, 0) 70%); }
+.timeline__selected .lab--light .lab-tile__fog { background: linear-gradient(to top, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.45) 45%, rgba(255, 255, 255, 0) 70%); }
 .timeline__tiles .timeline__item { margin-bottom: 0; }
 .timeline__tiles .timeline__item--open { grid-column: 1 / -1; }
 
