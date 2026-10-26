@@ -1,4 +1,5 @@
 import { forwardRef, useMemo, useRef } from 'react'
+import { lightTheme } from '../hooks/lightTheme'
 import { extend, useFrame, useThree } from '@react-three/fiber'
 import { shaderMaterial } from '@react-three/drei'
 import * as THREE from 'three'
@@ -23,7 +24,9 @@ const RainbowMaterial = shaderMaterial(
     pulseAmt: 0,
     pulseWave: 0,
     flash: 0,
-    dispersion: 0.4
+    dispersion: 0.4,
+    lightSat: 1,
+    lightGain: 1
   },
   /*glsl*/ ` varying vec2 vUv;
     void main() {
@@ -33,6 +36,8 @@ const RainbowMaterial = shaderMaterial(
     }`,
   /*glsl*/ ` varying vec2 vUv;
     uniform float fade;
+    uniform float lightSat;
+    uniform float lightGain;
     uniform float speed;
     uniform float startRadius;
     uniform float endRadius;
@@ -136,7 +141,9 @@ const RainbowMaterial = shaderMaterial(
         // On white, light cannot be added, so the colour is laid over the page and fades with its brightness.
         // A smooth fade, where a cutoff used to leave the fan's edges jagged.
         float luminance = dot(finalColor, vec3(0.299, 0.587, 0.114));
-        gl_FragColor = vec4(pow(finalColor, vec3(0.8)) * 1.2, smoothstep(0.02, 0.3, luminance));
+        vec3 laid = pow(finalColor, vec3(0.8)) * 1.2;
+        laid = mix(vec3(dot(laid, vec3(0.299, 0.587, 0.114))), laid, lightSat); // the light theme's saturation
+        gl_FragColor = vec4(laid, smoothstep(0.02, 0.3, luminance) * lightGain);
       } else {
         gl_FragColor = vec4(finalColor, 1.0);
       }
@@ -190,6 +197,8 @@ export const Rainbow = forwardRef(({ lightMode, startRadius = 0, endRadius = 0.5
         blending={blendingMode}
         transparent={true}
         lightMode={lightMode}
+        lightSat={lightTheme.rainbow.sat}
+        lightGain={lightTheme.rainbow.gain}
       />
     </mesh>
   )

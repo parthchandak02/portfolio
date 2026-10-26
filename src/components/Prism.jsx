@@ -2,7 +2,7 @@ import { useLoader } from '@react-three/fiber'
 import { MeshTransmissionMaterial } from '@react-three/drei'
 import { GLTFLoader } from 'three-stdlib'
 
-export function Prism({ onRayOver, onRayOut, onRayMove, ...props }) {
+export function Prism({ onRayOver, onRayOut, onRayMove, finish, ...props }) {
   const { nodes } = useLoader(GLTFLoader, '/gltf/prism.glb')
   return (
     <group {...props}>
@@ -12,7 +12,7 @@ export function Prism({ onRayOver, onRayOut, onRayMove, ...props }) {
       </mesh>
       {/* The visible hi-res prism */}
       <mesh position={[0, 0, 0.6]} renderOrder={10} scale={2} dispose={null} geometry={nodes.Cone.geometry}>
-        <MeshTransmissionMaterial clearcoat={1} transmission={1} thickness={0.9} roughness={0} anisotropy={0.1} chromaticAberration={1} toneMapped={false} />
+        <MeshTransmissionMaterial clearcoat={1} transmission={1} thickness={0.9} roughness={0} anisotropy={0.1} chromaticAberration={1} toneMapped={false} {...finish} />
       </mesh>
     </group>
   )

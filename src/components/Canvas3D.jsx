@@ -4,6 +4,7 @@ import { Canvas, useLoader } from '@react-three/fiber';
 import { Bloom, EffectComposer, LUT } from '@react-three/postprocessing';
 import { LUTCubeLoader } from 'postprocessing';
 import Scene from './Scene';
+import { lightTheme } from '../hooks/lightTheme';
 
 const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave }) => {
   const texture = useLoader(LUTCubeLoader, '/lut/F-6800-STD.cube');
@@ -37,7 +38,7 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave }) => {
         pointerEvents: 'none' // Allow UI events to pass through, global tracking handles 3D
       }}
     >
-      <color attach="background" args={[lightMode ? 'white' : 'black']} />
+      <color attach="background" args={[lightMode ? lightTheme.page : 'black']} />
       <Scene 
         lightMode={lightMode} 
         viewportPosition={viewportPosition} 

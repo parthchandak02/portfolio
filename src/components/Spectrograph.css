@@ -69,7 +69,13 @@
 
 /* Selected work: a fuller line with its diamond just above it */
 .spectro__line--featured { width: 3px; opacity: 1; }
-.spectro__mark { position: absolute; left: 0; top: calc((var(--row-h) - 16px) / -2 - 2px); transform: translate(-50%, -100%); pointer-events: none; }
+.spectro__mark {
+  --d: 5px; position: absolute; left: 0; top: calc((var(--row-h) - 16px) / -2 - 3px);
+  transform: translate(-50%, -100%); transform-origin: 50% 100%; pointer-events: none;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* A picked line grows 5px taller at each end, so its diamond rises clear of it and grows */
+.spectro__mark.is-on { transform: translate(-50%, calc(-100% - 7px)) scale(1.4); }
 /* The diamonds belong to the strip: hidden while the lanes are open, they appear once every line has
    stacked back into one row, flashing white as the last lane lands (1.1s into the fold, see FOLD_MS) and
    cooling to grey. A picked line's diamond stays lit (SelectedMark.css). */

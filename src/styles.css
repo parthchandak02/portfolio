@@ -357,7 +357,41 @@ html.dark-mode {
 }
 
 html.light-mode {
-  background: white;
+  background: var(--page-light);
+}
+
+/* Light themes (src/hooks/lightTheme.js): the page colour, the ink, and matte surfaces for the glass.
+   The scene's half of each theme (prism, squares, rainbow) is in that file. */
+html { --page-light: #ffffff; }
+html.lt-paper {
+  --page-light: #eee8de;
+  --color-text-primary-light: #2b2621; --color-text-secondary-light: #5f574d;
+}
+html.lt-paper.light-mode {
+  --glass-bg-base: rgba(250, 246, 239, 0.6); --glass-bg-hover: rgba(252, 249, 243, 0.75);
+  --glass-border-base: rgba(70, 52, 30, 0.13); --glass-border-hover: rgba(70, 52, 30, 0.2);
+  --glass-shadow-base: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 24px rgba(70, 50, 25, 0.07);
+  --glass-blur-subtle: blur(14px) saturate(1.05); --glass-blur-strong: blur(22px) saturate(1.05);
+}
+html.lt-studio {
+  --page-light: #e2e5e9;
+  --color-text-primary-light: #1c2026; --color-text-secondary-light: #4c535c;
+}
+html.lt-studio.light-mode {
+  --glass-bg-base: rgba(244, 246, 248, 0.62); --glass-bg-hover: rgba(248, 250, 251, 0.78);
+  --glass-border-base: rgba(28, 38, 50, 0.11); --glass-border-hover: rgba(28, 38, 50, 0.18);
+  --glass-shadow-base: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 10px 28px rgba(20, 30, 45, 0.08);
+  --glass-blur-subtle: blur(14px) saturate(1.0); --glass-blur-strong: blur(22px) saturate(1.0);
+}
+html.lt-gallery {
+  --page-light: #f6f6f3;
+  --color-text-primary-light: #1d1d1b; --color-text-secondary-light: #5a5a56;
+}
+html.lt-gallery.light-mode {
+  --glass-bg-base: rgba(255, 255, 255, 0.72); --glass-bg-hover: rgba(255, 255, 255, 0.86);
+  --glass-border-base: rgba(0, 0, 0, 0.06); --glass-border-hover: rgba(0, 0, 0, 0.1);
+  --glass-shadow-base: 0 18px 50px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0, 0, 0, 0.03);
+  --glass-blur-subtle: blur(18px) saturate(1.0); --glass-blur-strong: blur(26px) saturate(1.0);
 }
 
 body,
@@ -383,7 +417,7 @@ body.dark-mode {
 }
 
 body.light-mode {
-  background: white;
+  background: var(--page-light);
 }
 
 /* Typography hierarchy */

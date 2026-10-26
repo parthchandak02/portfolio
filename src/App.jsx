@@ -17,6 +17,7 @@ import { bandForSection } from './data/spectrum';
 import { TypewriterHighlightProvider } from './contexts/TypewriterHighlightContext';
 import ScrollTypewriterController from './components/ScrollTypewriterController';
 import Spectrograph from './components/Spectrograph';
+import { lightThemeKey } from './hooks/lightTheme';
 
 // three.js is most of the download, so the scene loads on its own and the text doesn't wait for it
 const Canvas3D = lazy(() => import('./components/Canvas3D'));
@@ -181,7 +182,8 @@ export default function App() {
   // Sync html and body background with light mode to prevent edge bleeding
   useEffect(() => {
     const className = lightMode ? 'light-mode' : 'dark-mode';
-    document.documentElement.className = className;
+    // The light theme's class carries its page colour and surfaces (src/hooks/lightTheme.js)
+    document.documentElement.className = `${className} lt-${lightThemeKey}`;
     document.body.className = className;
   }, [lightMode]);
 

@@ -9,6 +9,7 @@ import { Box } from './Box';
 import { SwarmLight } from './SwarmLight';
 import { calculateRefractionAngle, lerp, lerpV3 } from '../util';
 import { onPrismGlow } from '../hooks/prismGlow';
+import { lightTheme } from '../hooks/lightTheme';
 
 const PULSE_MS = 1500; // the pulse's run from the prism to the rainbow's far end
 const CATCH_MS = 900; // the flare's swell and settle
@@ -121,6 +122,9 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
     lerp(ambient.current, 'intensity', lightMode ? 0.8 : 0, 0.025);
   });
 
+  // Light mode's squares take the light theme's tone
+  const boxLook = lightMode ? { color: lightTheme.box, idle: lightTheme.boxIdle } : {};
+
   return (
     <>
       {/* Lights */}
@@ -132,10 +136,10 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
 
       {/* Prism + blocks + reflect beam */}
       <Beam ref={boxreflect} bounce={10} far={20}>
-        <Prism position={[0, -0.5, 0]} onRayOver={rayOver} onRayOut={rayOut} onRayMove={rayMove} />
-        <Box position={[2.25, -3.5, 0]} rotation={[0, 0, Math.PI / 3.5]} />
-        <Box position={[-2.5, -2.5, 0]} rotation={[0, 0, Math.PI / 4]} />
-        <Box position={[-3, 1, 0]} rotation={[0, 0, Math.PI / 4]} />
+        <Prism position={[0, -0.5, 0]} onRayOver={rayOver} onRayOut={rayOut} onRayMove={rayMove} finish={lightMode ? lightTheme.prism : undefined} />
+        <Box position={[2.25, -3.5, 0]} rotation={[0, 0, Math.PI / 3.5]} {...boxLook} />
+        <Box position={[-2.5, -2.5, 0]} rotation={[0, 0, Math.PI / 4]} {...boxLook} />
+        <Box position={[-3, 1, 0]} rotation={[0, 0, Math.PI / 4]} {...boxLook} />
       </Beam>
       
       {/* Rainbow and flares */}
