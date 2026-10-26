@@ -161,7 +161,7 @@ const prefersReducedMotion = () =>
 
 const noise = (i, k) => { const v = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return v - Math.floor(v); };
 
-const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
+const Spectrograph = ({ lightMode = false, handedOver = false, onBand, onReading }) => {
   // Section links and reduced motion skip the show and start folded
   const [intro, setIntro] = useState(() => typeof window !== 'undefined' && !window.location.hash && !prefersReducedMotion());
   const [expanded, setExpanded] = useState(intro);
@@ -175,6 +175,23 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   useEffect(() => {
     if (onBand) onBand(band);
   }, [band, onBand]);
+
+  // Someone is reading the strip while a mouse is over it, a finger has touched it, or the keyboard is in
+  // it; the scene behind steps back meanwhile. A touch counts until the next touch lands somewhere else.
+  const sectionRef = useRef(null);
+  const [hovering, setHovering] = useState(false);
+  const [touched, setTouched] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const reading = hovering || touched || focused;
+  useEffect(() => {
+    if (onReading) onReading(reading);
+  }, [reading, onReading]);
+  useEffect(() => {
+    if (!touched) return undefined;
+    const onDown = (e) => { if (!sectionRef.current?.contains(e.target)) setTouched(false); };
+    document.addEventListener('pointerdown', onDown);
+    return () => document.removeEventListener('pointerdown', onDown);
+  }, [touched]);
 
   const all = useMemo(
     () => spectrumBands.flatMap((band) => band.items.map((item) => ({ item, band }))),
@@ -405,6 +422,12 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
 
   return (
     <section
+      ref={sectionRef}
+      onPointerEnter={(e) => { if (e.pointerType !== 'touch') setHovering(true); }}
+      onPointerLeave={(e) => { if (e.pointerType !== 'touch') setHovering(false); }}
+      onPointerDown={(e) => { if (e.pointerType === 'touch') setTouched(true); }}
+      onFocus={() => setFocused(true)}
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false); }}
       className={`spectro ${expanded ? 'spectro--expanded' : 'spectro--collapsed'}${intro ? ' spectro--intro' : ''} ${active ? 'spectro--picking' : ''} ${lightMode ? 'spectro--light' : 'spectro--dark'}`}
       aria-label="Record spectrograph"
     >

@@ -74,7 +74,7 @@
   color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); opacity: 0.72;
 }
 .spectro__label.is-on { opacity: 1; }
-.spectro--picking .spectro__label:not(.is-on) { opacity: 0.4; }
+.spectro--expanded.spectro--picking .spectro__label:not(.is-on) { opacity: 0.4; }
 .spectro--collapsed .spectro__label { opacity: 0; }
 @media (max-width: 560px) { .spectro__label { font-size: 0.58rem; letter-spacing: 0.05em; } }
 

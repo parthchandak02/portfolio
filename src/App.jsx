@@ -132,6 +132,10 @@ export default function App() {
   const handedOver = !isPlayMode && visibleCategory !== 'all';
   // The rainbow lights the band you are reading in the record, or the one picked on the strip above it
   const litBand = handedOver ? bandForSection(visibleCategory) : focusBand;
+  // While someone reads, on the strip or down in the record, the scene steps back to a third of its
+  // strength so it doesn't compete with the text. Play mode is the prism's own screen, so it stays bright.
+  const [stripReading, setStripReading] = useState(false);
+  const dimScene = !isPlayMode && (handedOver || stripReading);
 
   // Sync html and body background with light mode to prevent edge bleeding
   useEffect(() => {
@@ -154,6 +158,7 @@ export default function App() {
             viewportPosition={viewportPosition}
             isLocked={isLocked}
             focusWave={litBand?.wave ?? null}
+            dim={dimScene}
           />
         </Suspense>
         
@@ -174,7 +179,7 @@ export default function App() {
             <UITypewriter lightMode={lightMode} />
 
             {/* Record spectrograph - visible in both modes */}
-            <Spectrograph lightMode={lightMode} handedOver={handedOver} onBand={setFocusBand} />
+            <Spectrograph lightMode={lightMode} handedOver={handedOver} onBand={setFocusBand} onReading={setStripReading} />
             
             {/* Resume content - Hidden in play mode */}
             {!isPlayMode && (

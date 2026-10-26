@@ -5,7 +5,9 @@ import { Bloom, EffectComposer, LUT } from '@react-three/postprocessing';
 import { LUTCubeLoader } from 'postprocessing';
 import Scene from './Scene';
 
-const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave }) => {
+const DIM = 0.35; // the scene's strength while someone is reading
+
+const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, dim = false }) => {
   const texture = useLoader(LUTCubeLoader, '/lut/F-6800-STD.cube');
   // Dither the final image: the soft glow over a dark page otherwise shows steps when it is cut to 8 bits
   const composer = useRef(null);
@@ -34,6 +36,9 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave }) => {
         minWidth: '100%', // Fallback for better support
         minHeight: '100%', // Fallback for better support
         zIndex: 0, // Behind UI elements
+        // The page behind is the scene's own black or white, so fading it reads as the scene dimming
+        opacity: dim ? DIM : 1,
+        transition: 'opacity 0.6s ease',
         pointerEvents: 'none' // Allow UI events to pass through, global tracking handles 3D
       }}
     >
