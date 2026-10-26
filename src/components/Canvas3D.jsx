@@ -4,7 +4,6 @@ import { Canvas, useLoader } from '@react-three/fiber';
 import { Bloom, EffectComposer, LUT } from '@react-three/postprocessing';
 import { LUTCubeLoader } from 'postprocessing';
 import Scene from './Scene';
-import { SceneDim } from './SceneDim';
 
 const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave }) => {
   const texture = useLoader(LUTCubeLoader, '/lut/F-6800-STD.cube');
@@ -48,7 +47,6 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave }) => {
       <EffectComposer ref={composer} disableNormalPass>
         <Bloom mipmapBlur levels={9} intensity={1.5} luminanceThreshold={1} luminanceSmoothing={1} />
         <LUT lut={texture} />
-        <SceneDim lightMode={lightMode} />
       </EffectComposer>
     </Canvas>
   );

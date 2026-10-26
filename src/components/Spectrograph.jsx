@@ -5,7 +5,6 @@ import { ChevronDown, ExternalLink } from 'lucide-react';
 import { spectrumBands } from '../data/spectrum';
 import { glowPrism } from '../hooks/prismGlow';
 import { swarmLight } from '../hooks/swarmLight';
-import { sceneDim } from '../hooks/sceneDim';
 import MiniPrism from './MiniPrism';
 import './Spectrograph.css';
 
@@ -179,37 +178,7 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     if (onBand) onBand(band);
   }, [band, onBand]);
 
-  // Someone is reading the strip while a mouse is over it, a finger has touched it, or the keyboard is in
-  // it; the scene behind steps back meanwhile. A touch counts until the next touch lands somewhere else.
-  // Kept in refs and the shared sceneDim, so none of it re-renders the page.
   const sectionRef = useRef(null);
-  const readRef = useRef({ hovering: false, touched: false, focused: false });
-  const setReading = useCallback((key, on) => {
-    readRef.current[key] = on;
-    const r = readRef.current;
-    sceneDim.strip = r.hovering || r.touched || r.focused;
-  }, []);
-  const inStrip = (node) => Boolean(node && sectionRef.current?.contains(node));
-  useEffect(() => {
-    const onDown = (e) => {
-      if (readRef.current.touched && !sectionRef.current?.contains(e.target)) setReading('touched', false);
-    };
-    // Hover on the element itself: React counts its portalled toggle as inside, so its enter and leave
-    // would keep the scene dim while the pointer is on the toggle
-    const section = sectionRef.current;
-    const onEnter = (e) => { if (e.pointerType !== 'touch') setReading('hovering', true); };
-    const onLeave = (e) => { if (e.pointerType !== 'touch') setReading('hovering', false); };
-    section.addEventListener('pointerenter', onEnter);
-    section.addEventListener('pointerleave', onLeave);
-    document.addEventListener('pointerdown', onDown);
-    return () => {
-      section.removeEventListener('pointerenter', onEnter);
-      section.removeEventListener('pointerleave', onLeave);
-      document.removeEventListener('pointerdown', onDown);
-      sceneDim.strip = false;
-    };
-  }, [setReading]);
-
   const all = useMemo(
     () => spectrumBands.flatMap((band) => band.items.map((item) => ({ item, band }))),
     []
@@ -463,12 +432,6 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   return (
     <section
       ref={sectionRef}
-      // The toggle is portalled into the button column, and React still bubbles its events here, so each
-      // check asks whether the event really came from inside the strip (hover is watched on the element
-      // itself, below). Focus counts only from the keyboard; a clicked row keeps focus after the mouse leaves.
-      onPointerDown={(e) => { if (e.pointerType === 'touch' && inStrip(e.target)) setReading('touched', true); }}
-      onFocus={(e) => { if (inStrip(e.target) && e.target.matches(':focus-visible')) setReading('focused', true); }}
-      onBlur={(e) => { if (!inStrip(e.relatedTarget)) setReading('focused', false); }}
       className={`spectro ${expanded ? 'spectro--expanded' : 'spectro--collapsed'}${intro ? ' spectro--intro' : ''} ${active ? 'spectro--picking' : ''} ${lightMode ? 'spectro--light' : 'spectro--dark'}`}
       aria-label="Record spectrograph"
     >
