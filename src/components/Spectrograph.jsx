@@ -19,6 +19,18 @@ const KNOTS = [
 ];
 const MIN_GAP = 3.5; // px between neighbouring lines
 const EDGE = 4; // px kept free at each end of a track
+const SWITCH_MS = 140; // ms a mouse must rest on another lane before it takes over, so heading for the link doesn't pick lanes on the way
+
+// What the readout's link opens, in words, from where it points
+const linkLabel = (url) => {
+  if (/patents\.google/.test(url)) return 'View patent';
+  if (/doi\.org/.test(url)) return 'Read paper';
+  if (/github\.com/.test(url)) return 'View code';
+  if (/youtube\.com|youtu\.be/.test(url)) return 'Watch';
+  if (/photos\.app\.goo\.gl/.test(url)) return 'See photos';
+  if (/freepressjournal/.test(url)) return 'Read article';
+  return 'Open link';
+};
 
 const warp = (t) => {
   for (let i = 1; i < KNOTS.length; i += 1) {
@@ -83,18 +95,19 @@ export const useWidth = () => {
  * drag or tap on a phone), and the arrow keys step through lines. The lines themselves are drawn once,
  * for every row, by the Spectrograph, so they can travel between the strip and the lanes.
  */
-const Track = ({ band, placed, active, onActive, top, height }) => {
+const Track = ({ band, placed, active, onActive, onLeave, top, left = 0, height }) => {
   const trackRef = useRef(null);
 
   const pick = useCallback(
-    (clientX) => {
+    (e) => {
+      const clientX = e.clientX;
       const rect = trackRef.current.getBoundingClientRect();
       const x = clientX - rect.left;
       let best = placed[0];
       placed.forEach((p) => {
         if (Math.abs(p.x - x) < Math.abs(best.x - x)) best = p;
       });
-      onActive(best);
+      onActive(best, e.pointerType);
     },
     [placed, onActive]
   );
@@ -117,12 +130,13 @@ const Track = ({ band, placed, active, onActive, top, height }) => {
     <div
       ref={trackRef}
       className="spectro__track"
-      style={{ top: `${top}px`, height: `${height}px` }}
+      style={{ top: `${top}px`, left: `${left}px`, height: `${height}px` }}
       role="group"
       tabIndex={0}
       aria-label={`${band ? band.name : 'All bands'}: use left and right arrow keys to move between items`}
-      onPointerMove={(e) => pick(e.clientX)}
-      onPointerDown={(e) => pick(e.clientX)}
+      onPointerMove={pick}
+      onPointerDown={(e) => pick({ clientX: e.clientX, pointerType: 'touch' })}
+      onPointerLeave={onLeave}
       onKeyDown={onKeyDown}
     />
   );
@@ -175,16 +189,33 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   // where the strip is, so opening drops lines down onto their lanes and closing lifts them back up.
   const [stageRef, width] = useWidth();
   const rowH = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches ? 52 : 46;
+  // Open, each lane keeps a margin on the left for its band's name
+  const gutter = width < 560 ? 84 : 104;
   const stripPlaced = useMemo(() => place(all, width), [all, width]);
-  const lanes = useMemo(() => rows.map(({ band, entries }) => ({ band, placed: place(entries, width) })), [rows, width]);
+  const lanes = useMemo(() => rows.map(({ band, entries }) => ({ band, placed: place(entries, width - gutter) })), [rows, width, gutter]);
   const lines = useMemo(() => {
     const laneOf = new Map();
     lanes.forEach(({ placed }, lane) => placed.forEach((p) => laneOf.set(p.item, { lane, x: p.x })));
     return stripPlaced.map((p, i) => {
       const home = laneOf.get(p.item);
-      return { ...p, sx: p.x, bx: home.x, lane: home.lane, jitter: (i * 37) % 90 };
+      return { ...p, sx: p.x, bx: gutter + home.x, lane: home.lane, jitter: (i * 37) % 90 };
     });
-  }, [stripPlaced, lanes]);
+  }, [stripPlaced, lanes, gutter]);
+
+  // A mouse crossing other lanes on its way down to the readout's link leaves the picked line alone: a
+  // line in another lane takes over only once the mouse rests there. Within a lane, and on touch, it is
+  // immediate.
+  const activeRef = useRef(null);
+  activeRef.current = active;
+  const switchRef = useRef(0);
+  const pick = useCallback((entry, pointerType) => {
+    clearTimeout(switchRef.current);
+    const current = activeRef.current;
+    if (pointerType === 'touch' || !current || current.band === entry.band) { setActive(entry); return; }
+    switchRef.current = setTimeout(() => setActive(entry), SWITCH_MS);
+  }, []);
+  const cancelPick = useCallback(() => clearTimeout(switchRef.current), []);
+  useEffect(() => () => clearTimeout(switchRef.current), []);
 
   // The toggle is one more round button in the column with the other three, so it lives in the fixed UI
   // layer. It steps aside while the band bar has the spot; that is decided once, in useScrollHighlight,
@@ -386,7 +417,17 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
         {/* Hairlines: the strip's own, and one per lane that draws in as its lines arrive */}
         <span className="spectro__rule spectro__rule--strip" style={{ top: `${rowH / 2}px` }} />
         {lanes.map(({ band }, lane) => (
-          <span key={band.key} className="spectro__rule spectro__rule--lane" style={{ top: `${lane * rowH + rowH / 2}px`, '--lane': lane }} />
+          <span key={band.key} className="spectro__rule spectro__rule--lane" style={{ top: `${lane * rowH + rowH / 2}px`, left: `${gutter}px`, '--lane': lane }} />
+        ))}
+        {lanes.map(({ band }, lane) => (
+          <span
+            key={band.key}
+            className={`spectro__label${band === active?.band ? ' is-on' : ''}`}
+            style={{ top: `${lane * rowH}px`, height: `${rowH}px`, '--lane': lane, '--hue': band.hue }}
+            aria-hidden="true"
+          >
+            {band.name}
+          </span>
         ))}
 
         {/* Every line once. The outer span carries it along the row, the inner one between rows. */}
@@ -414,9 +455,9 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
 
         {expanded
           ? lanes.map(({ band, placed }, lane) => (
-            <Track key={band.key} band={band} placed={placed} active={active} onActive={setActive} top={lane * rowH} height={rowH} />
+            <Track key={band.key} band={band} placed={placed} active={active} onActive={pick} onLeave={cancelPick} top={lane * rowH} left={gutter} height={rowH} />
           ))
-          : <Track placed={stripPlaced} active={active} onActive={setActive} top={0} height={rowH} />}
+          : <Track placed={stripPlaced} active={active} onActive={pick} onLeave={cancelPick} top={0} height={rowH} />}
       </div>
 
       <div className={`spectro__readout${active ? '' : ' is-idle'}`} style={{ '--hue': active ? active.band.hue : 'currentColor' }} aria-live="polite">
@@ -427,8 +468,8 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
             <span className="spectro__meta">
               <span className="spectro__metatext">{active.item.meta}</span>
               {active.item.url && (
-                <a className="spectro__proof" href={active.item.url} target="_blank" rel="noopener noreferrer">
-                  View proof <ExternalLink size={13} />
+                <a className="spectro__link" href={active.item.url} target="_blank" rel="noopener noreferrer">
+                  {linkLabel(active.item.url)} <ExternalLink size={13} />
                 </a>
               )}
             </span>
@@ -438,7 +479,7 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
         )}
       </div>
 
-      {/* Plain list for screen readers: every item with its proof link */}
+      {/* Plain list for screen readers: every item with its link */}
       <ul className="spectro__sr">
         {all.map(({ item, band }) => (
           <li key={`${band.key}-${item.title}`}>
