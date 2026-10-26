@@ -888,14 +888,15 @@ export const timelineDataByCategory = {
         ]
     },
     {
-        "title": "IEEE Hardware Hackathon - Sunlight-Following Robot",
+        "title": "Centicede, a Sunlight-Following Robot",
         "date": "October 2017",
         "category": "projects",
-        "location": "Washington State University",
+        "location": "IEEE Hardware Hackathon, Washington State University",
         "company": "WSU",
         "companyLogo": "/logos/wsu-logo.png",
-        "projectImage": "/images/engineering-gear-system-for-parallax-bot.png",
-        "description": "Designed and programmed a centipede robot with phototropic behavior that autonomously follows sunlight. Integrated sensors, microcontrollers, and mechanical design for bio-inspired robotics.",
+        "video": { "id": "QSV7GRafcYE", "title": "Centicede vision demo, March 2018" },
+        "url": "https://www.youtube.com/watch?v=QSV7GRafcYE",
+        "description": "Built Centicede with team Caffeine Cycle at the IEEE Hardware Hackathon: an insect-like walking robot with laser-cut clear acrylic legs, moved in tandem by servos, made to carry plants and walk them into sunlight. In March 2018 the team gave it webcam vision with Python and OpenCV, and won first place at Crimson Code.",
         "typewriterTitle": "Maker",
         "typewriterPrefix": "I am a",
         "skills": [
@@ -926,7 +927,7 @@ export const timelineDataByCategory = {
         "company": "WSU",
         "companyLogo": "/logos/wsu-logo.png",
         "location": "Pullman, WA",
-        "description": "First place winner for developing advanced image processing capabilities for neural networks in robotic systems. Demonstrated innovation in computer vision and AI integration."
+        "description": "First place (Tier 1) with team Caffeine Cycle for Centicede's vision: a webcam and OpenCV software that steer the walking robot, built at the 2017 IEEE Hardware Hackathon, toward sunlight."
     },
     {
         "title": "Guy E. Thornton Engineering Scholarship",

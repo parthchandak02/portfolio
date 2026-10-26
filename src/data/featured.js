@@ -4,8 +4,8 @@
 export const FEATURED = [
   { title: 'jobwright', name: 'jobwright', kind: 'AI job search · 2026' },
   { title: 'Calendar and Alarm Productivity System', name: 'calarm', kind: 'iOS app · 2024' },
-  { title: 'LLM Assisted Research Platform', name: 'Literature review assistant', kind: 'Research AI · 2024' },
-  { title: 'IEEE Hardware Hackathon - Sunlight-Following Robot', name: 'Centipede robot', kind: 'Robotics · 2017' }
+  { title: 'Audio Prioritization (US20260003563A1)', name: 'Audio prioritization patent', kind: 'Patent · Zoox · 2026' },
+  { title: 'Centicede, a Sunlight-Following Robot', name: 'Centicede', kind: 'Robotics · 2017' }
 ];
 
 const featured = new Set(FEATURED.map((f) => f.title));

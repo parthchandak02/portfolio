@@ -3,6 +3,7 @@
 // Add `url` only when a public proof page exists. `sections` lists the timeline categories a band
 // covers, and `card` (found automatically when the titles match) is the card a line jumps to.
 import { timelineDataByCategory } from './timelineData';
+import { FEATURED } from './featured';
 
 export const SPECTRUM_START = 2015;
 export const SPECTRUM_END = 2027;
@@ -195,6 +196,16 @@ spectrumBands.forEach((band) => {
     if (!item.card && item.meta.startsWith('Peer reviewer')) item.card = 'Peer Reviewer, Springer Nature';
     if (!item.card) item.card = CARD_FOR_BAND[band.key] || CARD_OVERRIDES[item.title] || findCard(item.title);
   });
+});
+
+// Selected work wears its mini prism on one line per card: the line that links where the card does
+// (the patent's US publication, not its filing or its international copy), else the newest
+FEATURED.forEach(({ title }) => {
+  const card = allCards.find((c) => c.title === title);
+  const lines = spectrumBands.flatMap((band) => band.items).filter((item) => item.card === title);
+  const linked = (item) => Number(Boolean(card?.url) && item.url === card.url);
+  const pick = [...lines].sort((a, b) => linked(b) - linked(a) || b.t - a.t)[0];
+  if (pick) pick.featured = true;
 });
 
 export const bandForSection = (section) => spectrumBands.find((band) => band.sections.includes(section)) || null;

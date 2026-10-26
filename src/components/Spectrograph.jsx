@@ -6,7 +6,6 @@ import { spectrumBands } from '../data/spectrum';
 import { glowPrism } from '../hooks/prismGlow';
 import { swarmLight } from '../hooks/swarmLight';
 import { sceneDim } from '../hooks/sceneDim';
-import { isFeatured } from '../data/featured';
 import MiniPrism from './MiniPrism';
 import './Spectrograph.css';
 
@@ -233,7 +232,7 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     lanes.forEach(({ placed }, lane) => placed.forEach((p) => laneOf.set(p.item, { lane, x: p.x })));
     return stripPlaced.map((p, i) => {
       const home = laneOf.get(p.item);
-      return { ...p, sx: p.x, bx: gutter + home.x, lane: home.lane, jitter: (i * 37) % 90, featured: isFeatured(p.item.card) };
+      return { ...p, sx: p.x, bx: gutter + home.x, lane: home.lane, jitter: (i * 37) % 90, featured: Boolean(p.item.featured) };
     });
   }, [stripPlaced, lanes, gutter]);
 
@@ -531,7 +530,7 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
         {active ? (
           <>
             <span className="spectro__kicker">
-              {isFeatured(active.item.card) && <><MiniPrism hue={active.band.hue} className="spectro__kicker-prism" />Selected · </>}
+              {active.item.featured && <><MiniPrism hue={active.band.hue} className="spectro__kicker-prism" />Selected · </>}
               {active.band.name} · {active.item.when}
             </span>
             <span className="spectro__title">{active.item.title}</span>
