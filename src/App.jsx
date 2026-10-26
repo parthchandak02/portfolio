@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState, useMemo } from 'react';
 import './styles.css';
 import Layout from './components/Layout';
 // GlassNavigation removed - replaced with white space placeholder
@@ -79,6 +79,38 @@ export default function App() {
     }
   };
   
+  // Play mode hides the record, so scrolling there used to do nothing and the page felt locked. Any move
+  // to scroll down, by wheel, swipe or key, opens the record instead, and the gesture carries on into it.
+  const togglePlayRef = useRef(togglePlayMode);
+  togglePlayRef.current = togglePlayMode;
+  useEffect(() => {
+    if (!isPlayMode) return undefined;
+    let touchY = null;
+    let done = false;
+    const open = () => {
+      if (done) return;
+      done = true;
+      togglePlayRef.current();
+    };
+    const onWheel = (e) => { if (e.deltaY > 4) open(); };
+    const onTouchStart = (e) => { touchY = e.touches[0].clientY; };
+    const onTouchMove = (e) => { if (touchY !== null && touchY - e.touches[0].clientY > 30) open(); };
+    const onKey = (e) => {
+      if (e.target.closest?.('input, textarea, [contenteditable]')) return;
+      if (['ArrowDown', 'PageDown', 'End', ' '].includes(e.key) && !e.target.closest?.('button, a, .spectro__track')) open();
+    };
+    window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [isPlayMode]);
+
   // Get unique categories for filter buttons (excluding 'all')
   const categories = useMemo(() => {
     return [...new Set(timelineData.map(item => item.category?.toLowerCase()).filter(Boolean))];
