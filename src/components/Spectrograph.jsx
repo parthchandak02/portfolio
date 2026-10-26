@@ -5,6 +5,7 @@ import { ChevronDown, ExternalLink } from 'lucide-react';
 import { spectrumBands } from '../data/spectrum';
 import { glowPrism } from '../hooks/prismGlow';
 import { swarmLight } from '../hooks/swarmLight';
+import { sceneDim } from '../hooks/sceneDim';
 import './Spectrograph.css';
 
 // Time is not linear on the track: the sparse early years are compressed so the busy recent
@@ -19,7 +20,8 @@ const KNOTS = [
 ];
 const MIN_GAP = 3.5; // px between neighbouring lines
 const EDGE = 4; // px kept free at each end of a track
-const SWITCH_MS = 140; // ms a mouse must rest on another lane before it takes over, so heading for the link doesn't pick lanes on the way
+const SWITCH_MS = 140; // ms a mouse aimed at the readout's link must rest before a line it passes takes over
+const AIM_SLACK = 48; // px either side of the link that still counts as aiming at it
 
 // What the readout's link opens, in words, from where it points
 const linkLabel = (url) => {
@@ -107,7 +109,7 @@ const Track = ({ band, placed, active, onActive, onLeave, top, left = 0, height 
       placed.forEach((p) => {
         if (Math.abs(p.x - x) < Math.abs(best.x - x)) best = p;
       });
-      onActive(best, e.pointerType);
+      onActive(best, e);
     },
     [placed, onActive]
   );
@@ -135,7 +137,7 @@ const Track = ({ band, placed, active, onActive, onLeave, top, left = 0, height 
       tabIndex={0}
       aria-label={`${band ? band.name : 'All bands'}: use left and right arrow keys to move between items`}
       onPointerMove={pick}
-      onPointerDown={(e) => pick({ clientX: e.clientX, pointerType: 'touch' })}
+      onPointerDown={(e) => pick({ clientX: e.clientX, clientY: e.clientY, pointerType: e.pointerType, press: true })}
       onPointerLeave={onLeave}
       onKeyDown={onKeyDown}
     />
@@ -161,7 +163,7 @@ const prefersReducedMotion = () =>
 
 const noise = (i, k) => { const v = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return v - Math.floor(v); };
 
-const Spectrograph = ({ lightMode = false, handedOver = false, onBand, onReading }) => {
+const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   // Section links and reduced motion skip the show and start folded
   const [intro, setIntro] = useState(() => typeof window !== 'undefined' && !window.location.hash && !prefersReducedMotion());
   const [expanded, setExpanded] = useState(intro);
@@ -178,20 +180,34 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand, onReading
 
   // Someone is reading the strip while a mouse is over it, a finger has touched it, or the keyboard is in
   // it; the scene behind steps back meanwhile. A touch counts until the next touch lands somewhere else.
+  // Kept in refs and the shared sceneDim, so none of it re-renders the page.
   const sectionRef = useRef(null);
-  const [hovering, setHovering] = useState(false);
-  const [touched, setTouched] = useState(false);
-  const [focused, setFocused] = useState(false);
-  const reading = hovering || touched || focused;
+  const readRef = useRef({ hovering: false, touched: false, focused: false });
+  const setReading = useCallback((key, on) => {
+    readRef.current[key] = on;
+    const r = readRef.current;
+    sceneDim.strip = r.hovering || r.touched || r.focused;
+  }, []);
+  const inStrip = (node) => Boolean(node && sectionRef.current?.contains(node));
   useEffect(() => {
-    if (onReading) onReading(reading);
-  }, [reading, onReading]);
-  useEffect(() => {
-    if (!touched) return undefined;
-    const onDown = (e) => { if (!sectionRef.current?.contains(e.target)) setTouched(false); };
+    const onDown = (e) => {
+      if (readRef.current.touched && !sectionRef.current?.contains(e.target)) setReading('touched', false);
+    };
+    // Hover on the element itself: React counts its portalled toggle as inside, so its enter and leave
+    // would keep the scene dim while the pointer is on the toggle
+    const section = sectionRef.current;
+    const onEnter = (e) => { if (e.pointerType !== 'touch') setReading('hovering', true); };
+    const onLeave = (e) => { if (e.pointerType !== 'touch') setReading('hovering', false); };
+    section.addEventListener('pointerenter', onEnter);
+    section.addEventListener('pointerleave', onLeave);
     document.addEventListener('pointerdown', onDown);
-    return () => document.removeEventListener('pointerdown', onDown);
-  }, [touched]);
+    return () => {
+      section.removeEventListener('pointerenter', onEnter);
+      section.removeEventListener('pointerleave', onLeave);
+      document.removeEventListener('pointerdown', onDown);
+      sceneDim.strip = false;
+    };
+  }, [setReading]);
 
   const all = useMemo(
     () => spectrumBands.flatMap((band) => band.items.map((item) => ({ item, band }))),
@@ -219,16 +235,39 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand, onReading
     });
   }, [stripPlaced, lanes, gutter]);
 
-  // A mouse crossing other lanes on its way down to the readout's link leaves the picked line alone: a
-  // line in another lane takes over only once the mouse rests there. Within a lane, and on touch, it is
-  // immediate.
+  // The pick follows the pointer at once, along a lane and across lanes, except for one case: a mouse whose
+  // path, carried on, lands on the readout's link, which is someone heading for it. Then the lines it passes,
+  // in its own lane or others, don't take over unless it rests on one. Touch and clicks always pick at once.
   const activeRef = useRef(null);
   activeRef.current = active;
   const switchRef = useRef(0);
-  const pick = useCallback((entry, pointerType) => {
+  const anchorRef = useRef(null);
+  const headingRef = useRef({ dx: 0, dy: 0 });
+  const pick = useCallback((entry, e) => {
     clearTimeout(switchRef.current);
+    // The heading is taken over at least 8 px of travel, since a mouse reports small, jittery steps
+    const anchor = anchorRef.current;
+    if (!anchor) anchorRef.current = { x: e.clientX, y: e.clientY };
+    else if (Math.hypot(e.clientX - anchor.x, e.clientY - anchor.y) >= 8) {
+      headingRef.current = { dx: e.clientX - anchor.x, dy: e.clientY - anchor.y };
+      anchorRef.current = { x: e.clientX, y: e.clientY };
+    }
     const current = activeRef.current;
-    if (pointerType === 'touch' || !current || current.band === entry.band) { setActive(entry); return; }
+    if (e.press || e.pointerType === 'touch' || !current) { setActive(entry); return; }
+    // Carried on, does the path cross the link? Where it passes the link's top and bottom edges brackets it
+    const { dx, dy } = headingRef.current;
+    const link = sectionRef.current?.querySelector('.spectro__link');
+    let aiming = false;
+    if (link && dy > 0) {
+      const r = link.getBoundingClientRect();
+      if (r.top > e.clientY) {
+        const at = (y) => e.clientX + (dx * (y - e.clientY)) / dy;
+        const a = at(r.top);
+        const b = at(r.bottom);
+        aiming = Math.max(a, b) > r.left - AIM_SLACK && Math.min(a, b) < r.right + AIM_SLACK;
+      }
+    }
+    if (!aiming) { setActive(entry); return; }
     switchRef.current = setTimeout(() => setActive(entry), SWITCH_MS);
   }, []);
   const cancelPick = useCallback(() => clearTimeout(switchRef.current), []);
@@ -423,11 +462,12 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand, onReading
   return (
     <section
       ref={sectionRef}
-      onPointerEnter={(e) => { if (e.pointerType !== 'touch') setHovering(true); }}
-      onPointerLeave={(e) => { if (e.pointerType !== 'touch') setHovering(false); }}
-      onPointerDown={(e) => { if (e.pointerType === 'touch') setTouched(true); }}
-      onFocus={() => setFocused(true)}
-      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false); }}
+      // The toggle is portalled into the button column, and React still bubbles its events here, so each
+      // check asks whether the event really came from inside the strip (hover is watched on the element
+      // itself, below). Focus counts only from the keyboard; a clicked row keeps focus after the mouse leaves.
+      onPointerDown={(e) => { if (e.pointerType === 'touch' && inStrip(e.target)) setReading('touched', true); }}
+      onFocus={(e) => { if (inStrip(e.target) && e.target.matches(':focus-visible')) setReading('focused', true); }}
+      onBlur={(e) => { if (!inStrip(e.relatedTarget)) setReading('focused', false); }}
       className={`spectro ${expanded ? 'spectro--expanded' : 'spectro--collapsed'}${intro ? ' spectro--intro' : ''} ${active ? 'spectro--picking' : ''} ${lightMode ? 'spectro--light' : 'spectro--dark'}`}
       aria-label="Record spectrograph"
     >

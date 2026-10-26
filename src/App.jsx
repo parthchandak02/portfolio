@@ -17,6 +17,7 @@ import { bandForSection } from './data/spectrum';
 import { TypewriterHighlightProvider } from './contexts/TypewriterHighlightContext';
 import ScrollTypewriterController from './components/ScrollTypewriterController';
 import Spectrograph from './components/Spectrograph';
+import { sceneDim } from './hooks/sceneDim';
 
 // three.js is most of the download, so the scene loads on its own and the text doesn't wait for it
 const Canvas3D = lazy(() => import('./components/Canvas3D'));
@@ -132,10 +133,12 @@ export default function App() {
   const handedOver = !isPlayMode && visibleCategory !== 'all';
   // The rainbow lights the band you are reading in the record, or the one picked on the strip above it
   const litBand = handedOver ? bandForSection(visibleCategory) : focusBand;
-  // While someone reads, on the strip or down in the record, the scene steps back to a third of its
-  // strength so it doesn't compete with the text. Play mode is the prism's own screen, so it stays bright.
-  const [stripReading, setStripReading] = useState(false);
-  const dimScene = !isPlayMode && (handedOver || stripReading);
+  // While someone reads, on the strip or down in the record, the scene steps back so it doesn't compete
+  // with the text (SceneDim). Play mode is the prism's own screen, so it stays bright.
+  useEffect(() => {
+    sceneDim.record = handedOver;
+    sceneDim.play = isPlayMode;
+  }, [handedOver, isPlayMode]);
 
   // Sync html and body background with light mode to prevent edge bleeding
   useEffect(() => {
@@ -158,7 +161,6 @@ export default function App() {
             viewportPosition={viewportPosition}
             isLocked={isLocked}
             focusWave={litBand?.wave ?? null}
-            dim={dimScene}
           />
         </Suspense>
         
@@ -179,7 +181,7 @@ export default function App() {
             <UITypewriter lightMode={lightMode} />
 
             {/* Record spectrograph - visible in both modes */}
-            <Spectrograph lightMode={lightMode} handedOver={handedOver} onBand={setFocusBand} onReading={setStripReading} />
+            <Spectrograph lightMode={lightMode} handedOver={handedOver} onBand={setFocusBand} />
             
             {/* Resume content - Hidden in play mode */}
             {!isPlayMode && (
