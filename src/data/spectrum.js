@@ -198,7 +198,7 @@ spectrumBands.forEach((band) => {
   });
 });
 
-// Selected work wears its mini prism on one line per card: the line that links where the card does
+// Selected work wears its diamond on one line per card: the line that links where the card does
 // (the patent's US publication, not its filing or its international copy), else the newest
 FEATURED.forEach(({ title }) => {
   const card = allCards.find((c) => c.title === title);

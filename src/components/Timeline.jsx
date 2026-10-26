@@ -5,7 +5,7 @@ import CardTile, { isTile } from './CardTile';
 import { useTypewriterHighlight } from '../contexts/TypewriterHighlightContext';
 import { categoryOrder, timelineDataByCategory } from '../data/timelineData';
 import { FEATURED } from '../data/featured';
-import MiniPrism from './MiniPrism';
+import SelectedMark from './SelectedMark';
 import { bandForSection, spectrumBands, startOf, endOf } from '../data/spectrum';
 import './Timeline.css';
 
@@ -77,7 +77,7 @@ const Timeline = ({
     return out.flatMap((s) => (s.kind === 'tiles' && s.items.length === 1 ? [{ kind: 'card', ...s.items[0] }] : [s]));
   }, [sortedData, firstLabIndex]);
 
-  // Selected work opens the record: the cards marked with a mini prism on the strip, as tiles
+  // Selected work opens the portfolio: the cards marked with a diamond on the strip, as tiles
   const featured = useMemo(() => {
     const cards = Object.values(timelineDataByCategory).flat();
     return FEATURED.map((f) => {
@@ -129,7 +129,7 @@ const Timeline = ({
         {featured.length > 0 && activeFilters.length === 0 && (
           <section className="timeline__selected" id="selected" aria-labelledby="selected-title">
             <h2 id="selected-title" className="timeline__selected-title">
-              <MiniPrism className="timeline__selected-prism" />
+              <SelectedMark on className="timeline__selected-mark" />
               Selected work
             </h2>
             <div className={`timeline__tiles lab ${lightMode ? 'lab--light' : 'lab--dark'}`}>

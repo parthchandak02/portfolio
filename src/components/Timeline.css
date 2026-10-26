@@ -127,7 +127,7 @@
 }
 .timeline--dark .timeline__selected-title { color: rgba(255, 255, 255, 0.82); }
 .timeline--light .timeline__selected-title { color: rgba(20, 20, 24, 0.78); }
-.timeline__selected-prism { --s: 16px; }
+.timeline__selected-mark { --d: 8px; }
 .timeline__selected .lab__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 @media (max-width: 900px) { .timeline__selected .lab__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* Selected work shows its pictures; the rest of the record keeps them as ghosts until opened */

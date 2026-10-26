@@ -5,7 +5,7 @@ import { ChevronDown, ExternalLink } from 'lucide-react';
 import { spectrumBands } from '../data/spectrum';
 import { glowPrism } from '../hooks/prismGlow';
 import { swarmLight } from '../hooks/swarmLight';
-import MiniPrism from './MiniPrism';
+import SelectedMark from './SelectedMark';
 import './Spectrograph.css';
 
 // Time is not linear on the track: the sparse early years are compressed so the busy recent
@@ -468,8 +468,8 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
                 style={{ transform: `translateX(${expanded ? l.bx : l.sx}px)`, '--lane': l.lane, '--j': l.jitter }}
               >
                 <span className="spectro__y" style={{ transform: `translateY(${(expanded ? l.lane * rowH : 0) + rowH / 2}px)` }}>
-                  {/* Selected work wears a mini prism above its line */}
-                  {l.featured && <MiniPrism hue={l.band.hue} className="spectro__prism" />}
+                  {/* Selected work wears a small diamond above its line, lit while the line is picked */}
+                  {l.featured && <SelectedMark on={on} className="spectro__mark" />}
                   <i
                     className={`spectro__line${l.item.future ? ' spectro__line--future' : ''}${l.featured ? ' spectro__line--featured' : ''}${on ? ' spectro__line--on' : ''}`}
                     style={{ '--hue': l.band.hue }}
@@ -493,7 +493,7 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
         {active ? (
           <>
             <span className="spectro__kicker">
-              {active.item.featured && <><MiniPrism hue={active.band.hue} className="spectro__kicker-prism" />Selected · </>}
+              {active.item.featured && <><SelectedMark on className="spectro__kicker-mark" />Selected · </>}
               {active.band.name} · {active.item.when}
             </span>
             <span className="spectro__title">{active.item.title}</span>
