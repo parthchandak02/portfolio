@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useState, useMemo } from 'react';
 import './styles.css';
 import Layout from './components/Layout';
 // GlassNavigation removed - replaced with white space placeholder
@@ -81,35 +81,20 @@ export default function App() {
     }
   };
   
-  // Play mode hides the record, so scrolling there used to do nothing and the page felt locked. Any move
-  // to scroll down, by wheel, swipe or key, opens the record instead, and the gesture carries on into it.
-  const togglePlayRef = useRef(togglePlayMode);
-  togglePlayRef.current = togglePlayMode;
+  // The playground is a true play mode: every drag, by mouse or finger, steers the beam, and only its
+  // button leads back. The page's own gestures (scrolling, pull-to-refresh, the bounce at the edge, a long
+  // press's menu) are switched off while it is up, so a swipe across the screen never fights the beam.
   useEffect(() => {
     if (!isPlayMode) return undefined;
-    let touchY = null;
-    let done = false;
-    const open = () => {
-      if (done) return;
-      done = true;
-      togglePlayRef.current();
+    const root = document.documentElement;
+    root.classList.add('is-playground');
+    const hold = (e) => {
+      if (!e.target.closest?.('.play-mode-toggle')) e.preventDefault();
     };
-    const onWheel = (e) => { if (e.deltaY > 4) open(); };
-    const onTouchStart = (e) => { touchY = e.touches[0].clientY; };
-    const onTouchMove = (e) => { if (touchY !== null && touchY - e.touches[0].clientY > 30) open(); };
-    const onKey = (e) => {
-      if (e.target.closest?.('input, textarea, [contenteditable]')) return;
-      if (['ArrowDown', 'PageDown', 'End', ' '].includes(e.key) && !e.target.closest?.('button, a, .spectro__track')) open();
-    };
-    window.addEventListener('wheel', onWheel, { passive: true });
-    window.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('touchmove', onTouchMove, { passive: true });
-    window.addEventListener('keydown', onKey);
+    document.addEventListener('touchmove', hold, { passive: false });
     return () => {
-      window.removeEventListener('wheel', onWheel);
-      window.removeEventListener('touchstart', onTouchStart);
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('keydown', onKey);
+      root.classList.remove('is-playground');
+      document.removeEventListener('touchmove', hold);
     };
   }, [isPlayMode]);
 
@@ -183,7 +168,8 @@ export default function App() {
   useEffect(() => {
     const className = lightMode ? 'light-mode' : 'dark-mode';
     // The light theme's class carries its page colour and surfaces (src/hooks/lightTheme.js)
-    document.documentElement.className = `${className} lt-${lightThemeKey}`;
+    const root = document.documentElement;
+    root.className = [className, `lt-${lightThemeKey}`, root.classList.contains('is-playground') && 'is-playground'].filter(Boolean).join(' ');
     document.body.className = className;
   }, [lightMode]);
 
