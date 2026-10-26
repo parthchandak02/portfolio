@@ -433,7 +433,7 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     <section
       ref={sectionRef}
       className={`spectro ${expanded ? 'spectro--expanded' : 'spectro--collapsed'}${intro ? ' spectro--intro' : ''} ${active ? 'spectro--picking' : ''} ${lightMode ? 'spectro--light' : 'spectro--dark'}`}
-      aria-label="Record spectrograph"
+      aria-label="Career spectrum"
     >
       {slot && createPortal(toggle, slot)}
       <div

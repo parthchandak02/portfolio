@@ -302,7 +302,7 @@ const BandBar = ({ category, title, lightMode = false }) => {
     <nav
       ref={navRef}
       className={`bandbar ${visible ? 'is-visible' : ''}${morphing ? ' is-morphing' : ''} ${lightMode ? 'bandbar--light' : 'bandbar--dark'}`}
-      aria-label="Where you are in the record"
+      aria-label="Where you are in the portfolio"
       aria-hidden={!visible}
       style={column ? { left: `${column.left}px`, width: `${column.width}px`, transform: 'none' } : undefined}
     >

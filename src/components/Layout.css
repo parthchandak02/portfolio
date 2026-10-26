@@ -110,6 +110,17 @@
 .layout__ui--hints .ui-hint { opacity: 1; transform: translate(0, -50%); }
 .layout__ui--hints .lock-toggle .ui-hint { transition-delay: 0.09s; }
 .layout__ui--hints .light-toggle .ui-hint { transition-delay: 0.18s; }
+/* The playground: the prism alone. Everything steps away but the play button, whose label offers the way back. */
+.main-content-scroll { transition: opacity 0.4s ease, visibility 0.4s; }
+.layout__ui--play .main-content-scroll,
+.layout__ui--play .light-toggle,
+.layout__ui--play .lock-toggle,
+.layout__ui--play .spectro-toggle { opacity: 0; visibility: hidden; pointer-events: none; }
+.layout__ui--play .play-mode-toggle > .ui-hint { opacity: 1; transform: translate(0, -50%); }
+/* Alone, the play button slides up into the top corner, where the light button was */
+.layout__ui--play .play-mode-toggle { translate: 0 -116px; }
+@media (max-width: 768px) { .layout__ui--play .play-mode-toggle { translate: 0 -104px; } }
+
 /* At the very top of the page the play button's label stays up, so the prism's screen is easy to find */
 .layout__ui--top .play-mode-toggle > .ui-hint { opacity: 1; transform: translate(0, -50%); }
 @media (max-width: 768px) { .ui-hint { font-size: 0.75rem; right: calc(100% + 8px); } }
@@ -117,5 +128,5 @@
 @media (max-width: 768px) {
   .layout__ui--hints .light-toggle .ui-hint,
   .layout__ui--hints .lock-toggle .ui-hint,
-  .layout__ui--hints .play-mode-toggle .ui-hint { opacity: 0; }
+  .layout__ui--hints:not(.layout__ui--play) .play-mode-toggle .ui-hint { opacity: 0; }
 }

@@ -5,7 +5,7 @@ export const FEATURED = [
   { title: 'jobwright', name: 'jobwright', kind: 'AI job search · 2026' },
   { title: 'Calendar and Alarm Productivity System', name: 'calarm', kind: 'iOS app · 2024' },
   { title: 'Audio Prioritization (US20260003563A1)', name: 'Audio prioritization patent', kind: 'Patent · Zoox · 2026' },
-  { title: 'Centicede, a Sunlight-Following Robot', name: 'Centicede', kind: 'Robotics · 2017' }
+  { title: 'Centi-seed, a Sunlight-Seeking Robot', name: 'Centi-seed', kind: 'Robotics · 2018' }
 ];
 
 export const featuredName = (title) => FEATURED.find((f) => f.title === title)?.name;

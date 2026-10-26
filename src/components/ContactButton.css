@@ -6,6 +6,9 @@
   bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   font-family: var(--font-family-primary);
 }
+/* The playground hides it with everything else */
+.contact { transition: opacity 0.35s ease, visibility 0.35s; }
+.contact--away { opacity: 0; visibility: hidden; pointer-events: none; }
 .contact--dark { --ink: rgba(255, 255, 255, 0.92); --pane: rgba(30, 28, 34, 0.62); --edge: rgba(255, 255, 255, 0.16); --chip: rgba(255, 255, 255, 0.08); --hover: rgba(255, 255, 255, 0.07); }
 .contact--light { --ink: rgba(20, 20, 24, 0.92); --pane: rgba(250, 249, 247, 0.78); --edge: rgba(0, 0, 0, 0.12); --chip: rgba(0, 0, 0, 0.05); --hover: rgba(0, 0, 0, 0.04); }
 

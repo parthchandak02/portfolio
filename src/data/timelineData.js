@@ -888,15 +888,15 @@ export const timelineDataByCategory = {
         ]
     },
     {
-        "title": "Centicede, a Sunlight-Following Robot",
-        "date": "October 2017",
+        "title": "Centi-seed, a Sunlight-Seeking Robot",
+        "date": "March 2018",
         "category": "projects",
-        "location": "IEEE Hardware Hackathon, Washington State University",
+        "location": "Crimson Code, Washington State University",
         "company": "WSU",
         "companyLogo": "/logos/wsu-logo.png",
-        "video": { "id": "QSV7GRafcYE", "title": "Centicede vision demo, March 2018" },
+        "projectImage": "/images/centi-seed-vision.jpg",
         "url": "https://www.youtube.com/watch?v=QSV7GRafcYE",
-        "description": "Built Centicede with team Caffeine Cycle at the IEEE Hardware Hackathon: an insect-like walking robot with laser-cut clear acrylic legs, moved in tandem by servos, made to carry plants and walk them into sunlight. In March 2018 the team gave it webcam vision with Python and OpenCV, and won first place at Crimson Code.",
+        "description": "Built Centi-seed with team Caffeine Cycle: a walking robot that seeks out sunlight for the plants growing on its back. Its laser-cut acrylic legs and servos came from the Fall 2017 IEEE Hardware Hackathon; at Crimson Code the team gave it webcam vision with Python, OpenCV and Arduino, and won first place.",
         "typewriterTitle": "Maker",
         "typewriterPrefix": "I am a",
         "skills": [
@@ -927,7 +927,7 @@ export const timelineDataByCategory = {
         "company": "WSU",
         "companyLogo": "/logos/wsu-logo.png",
         "location": "Pullman, WA",
-        "description": "First place (Tier 1) with team Caffeine Cycle for Centicede's vision: a webcam and OpenCV software that steer the walking robot, built at the 2017 IEEE Hardware Hackathon, toward sunlight."
+        "description": "First place (Tier 1) with team Caffeine Cycle for Centi-seed's vision: a webcam and OpenCV software that steer the walking robot, built at the Fall 2017 IEEE Hardware Hackathon, toward sunlight."
     },
     {
         "title": "Guy E. Thornton Engineering Scholarship",

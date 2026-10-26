@@ -25,7 +25,7 @@ const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: r
  * panel: the button's own glass grows into the card on a spring, like a phone's Dynamic Island, and the
  * links settle in one after another. Closing springs the same glass back into the circle.
  */
-const ContactButton = ({ lightMode = false }) => {
+const ContactButton = ({ lightMode = false, away = false }) => {
   const [open, setOpen] = useState(false);
   const shellRef = useRef(null);
   const cardRef = useRef(null);
@@ -101,7 +101,7 @@ const ContactButton = ({ lightMode = false }) => {
   useEffect(() => () => runningRef.current.forEach((c) => c.stop()), []);
 
   return (
-    <div className={`contact ${lightMode ? 'contact--light' : 'contact--dark'}`}>
+    <div className={`contact ${lightMode ? 'contact--light' : 'contact--dark'}${away ? ' contact--away' : ''}`} inert={away}>
       <div ref={shellRef} className={`contact__shell${open ? ' is-open' : ''}`}>
         <div ref={cardRef} id="contact-card" className="contact__card" role="dialog" aria-label="Contact" aria-hidden={!open} inert={!open}>
           <ul className="contact__links">

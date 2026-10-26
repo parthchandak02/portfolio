@@ -64,6 +64,8 @@ export default function App() {
   const togglePlayMode = () => {
     const newPlayMode = !isPlayMode;
     setIsPlayMode(newPlayMode);
+    // The playground and the way back both start from the top of the page
+    document.querySelector('.main-content-scroll')?.scrollTo({ top: 0 });
     
     if (newPlayMode) {
       // Entering play mode: automatically unlock the light beam for better UX
@@ -201,10 +203,10 @@ export default function App() {
         </Suspense>
         
         {/* One contact button, always on screen */}
-        <ContactButton lightMode={lightMode} />
+        <ContactButton lightMode={lightMode} away={isPlayMode} />
 
         {/* UI Overlay Layer */}
-        <div className={`layout__ui${handedOver ? ' layout__ui--reading' : ''}${atTop ? ' layout__ui--top' : ''}`}>
+        <div className={`layout__ui${handedOver ? ' layout__ui--reading' : ''}${atTop ? ' layout__ui--top' : ''}${isPlayMode ? ' layout__ui--play' : ''}`}>
           {/* Fixed UI Components */}
           <LightToggle lightMode={lightMode} onToggle={toggleLightMode} />
           <LockToggle isLocked={isLocked} onToggle={toggleLock} />
