@@ -28,6 +28,13 @@ export const scrollCardToLine = (target, scroller) => {
   const k = Math.max(0, row.findIndex((x) => x.el === target));
   const top = Math.min(rect.top, ...row.map((x) => x.r.top));
   const bottom = Math.max(rect.bottom, ...row.map((x) => x.r.bottom));
+  // A block taller than most of the screen (the Lab) is brought in by its top, just under the bar, rather
+  // than centred on the reading line, which would land in its middle
+  const view = scroller.getBoundingClientRect();
+  if (bottom - top > (view.height - BAR_CLEARANCE) * 0.7) {
+    scroller.scrollTo({ top: Math.max(0, scroller.scrollTop + top - (view.top + BAR_CLEARANCE)), behavior: 'smooth' });
+    return;
+  }
   const anchor = top + ((bottom - top) * (k + 0.5)) / n;
   scroller.scrollTo({ top: Math.max(0, scroller.scrollTop + anchor - readingLineOf(scroller)), behavior: 'smooth' });
 };

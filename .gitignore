@@ -233,3 +233,7 @@ dev-debug.log
 .taskmaster
 # Astro
 .astro/
+
+# Screenshots from local checks; only thumbnail.png belongs at the root
+/*.png
+!/thumbnail.png

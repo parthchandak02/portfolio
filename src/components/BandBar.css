@@ -89,7 +89,16 @@
 }
 .bandbar-veil.is-visible { opacity: 1; }
 .bandbar-veil--dark { background: linear-gradient(to bottom, #000 0, #000 92px, rgba(0, 0, 0, 0) 100%); }
-.bandbar-veil--light { background: linear-gradient(to bottom, var(--page-light, #fff) 0, var(--page-light, #fff) 92px, transparent 100%); }
+/* On the light page the bubbles drift up under the bar, so the veil eases out over a longer reach rather than
+   ending on a line across them */
+.bandbar-veil--light {
+  background: linear-gradient(to bottom,
+    var(--page-light, #fff) 0, var(--page-light, #fff) 72px,
+    color-mix(in srgb, var(--page-light, #fff) 82%, transparent) 92px,
+    color-mix(in srgb, var(--page-light, #fff) 45%, transparent) 116px,
+    color-mix(in srgb, var(--page-light, #fff) 12%, transparent) 138px,
+    transparent 150px);
+}
 
 /* The hand-off between the hero strip and the bar: stand-in lines fly between the two while the real
    ones wait out of sight */

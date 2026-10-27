@@ -6,7 +6,6 @@ import { LUTCubeLoader } from 'postprocessing';
 import Scene from './Scene';
 import { Bubbles } from './Bubbles';
 import { SwarmLight } from './SwarmLight';
-import { lightTheme } from '../hooks/lightTheme';
 
 const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, focusHue = null, isPlayMode = false }) => {
   const texture = useLoader(LUTCubeLoader, '/lut/F-6800-STD.cube');
@@ -40,7 +39,7 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, focusHue =
         pointerEvents: 'none' // Allow UI events to pass through, global tracking handles 3D
       }}
     >
-      <color attach="background" args={[lightMode ? lightTheme.page : 'black']} />
+      <color attach="background" args={[lightMode ? 'white' : 'black']} />
       {/* Dark mode is the prism and its beam; light mode, soap bubbles (a white page can't show added light) */}
       {lightMode ? (
         <>

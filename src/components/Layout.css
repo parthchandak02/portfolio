@@ -120,7 +120,7 @@
 /* In the playground a drag anywhere steers the beam: no scrolling, no pull-to-refresh, no edge bounce,
    no text selection or long-press menu */
 html.is-playground, html.is-playground body {
-  touch-action: none; overscroll-behavior: none; overflow: hidden;
+  touch-action: pinch-zoom; overscroll-behavior: none; overflow: hidden;
   -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
 }
 html.is-playground .play-mode-toggle { touch-action: manipulation; }

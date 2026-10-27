@@ -74,11 +74,12 @@ const fragmentShader = `
 // The droplets a burst sheds from its retreating rim
 const dropVert = `
   attribute float aLife; attribute float aSize; attribute vec3 aColor;
+  uniform float uDpr;
   varying float vLife; varying vec3 vColor;
   void main() {
     vLife = aLife; vColor = aColor;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    gl_PointSize = aSize * (0.6 + 0.4 * aLife);
+    gl_PointSize = aSize * uDpr * (0.6 + 0.4 * aLife);
   }`;
 const dropFrag = `
   varying float vLife; varying vec3 vColor;
@@ -93,16 +94,23 @@ const dropFrag = `
 
 const SMALL = 9; // bubbles rising past the big one
 const POP_S = 0.32; // seconds for the hole to sweep the whole bubble
-const DROPS = 320; // droplet pool
+const DROPS = 640; // droplet pool: one big burst sheds about 420, so two can overlap
+const PER_FRAME = 24; // most droplets a burst sheds in one frame
 
-const reduceMotion = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Read once and kept current, rather than asked every frame
+const motionQuery = typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+let still = Boolean(motionQuery?.matches);
+motionQuery?.addEventListener?.('change', (e) => { still = e.matches; });
+const reduceMotion = () => still;
+// Colours here are written straight into shaders that work in sRGB terms, so they are kept as written
+const srgb = (hex) => new THREE.Color().setStyle(hex, THREE.LinearSRGBColorSpace);
 const rand = (a, b) => a + Math.random() * (b - a);
-const PASTELS = ['#9fb6ff', '#c3a6ff', '#8fe3d4', '#ffd29a', '#ffb3c7', '#b9c3d1'].map((c) => new THREE.Color(c));
+const PASTELS = ['#9fb6ff', '#c3a6ff', '#8fe3d4', '#ffd29a', '#ffb3c7', '#b9c3d1'].map(srgb);
 
 export const Bubbles = ({ interactive = false, canPop = false, viewportPosition, tint = null }) => {
-  const { viewport } = useThree();
+  const { viewport, gl } = useThree();
   const time = useMemo(() => ({ value: 0 }), []);
-  const tintColor = useMemo(() => ({ value: new THREE.Color('#ffffff') }), []);
+  const tintColor = useMemo(() => ({ value: srgb('#ffffff') }), []);
   const tintAmt = useMemo(() => ({ value: 0 }), []);
   const glow = useMemo(() => ({ value: 0 }), []);
   const geometry = useMemo(() => new THREE.SphereGeometry(1, 96, 64), []);
@@ -129,7 +137,7 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
     g.setAttribute('aLife', new THREE.BufferAttribute(life, 1));
     g.setAttribute('aSize', new THREE.BufferAttribute(size, 1));
     g.setAttribute('aColor', new THREE.BufferAttribute(color, 3));
-    const material = new THREE.ShaderMaterial({ vertexShader: dropVert, fragmentShader: dropFrag, transparent: true, depthWrite: false, depthTest: false });
+    const material = new THREE.ShaderMaterial({ uniforms: { uDpr: { value: 1 } }, vertexShader: dropVert, fragmentShader: dropFrag, transparent: true, depthWrite: false, depthTest: false });
     return { g, material, pos, life, size, color, vel: new Float32Array(DROPS * 3), age: new Float32Array(DROPS), span: new Float32Array(DROPS), next: 0 };
   }, []);
   const emit = (x, y, z, vx, vy, vz, px) => {
@@ -141,12 +149,14 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
 
   const spawn = (b, fromBelow, vw, vh) => {
     const unit = Math.min(vw, vh);
-    b.r = b.big ? unit * 0.21 : unit * rand(0.03, 0.085);
+    b.k = b.big ? 0.21 : rand(0.03, 0.085);
+    b.r = unit * b.k;
     if (b.big) b.pos.set(vw * 0.06, -vh * 0.04, 0);
-    else b.pos.set(rand(-vw / 2, vw / 2), fromBelow ? -vh / 2 - b.r - rand(0, vh * 0.15) : rand(-vh / 2, vh / 2), rand(-1, 1));
+    // Rising bubbles come up from below the screen; with motion reduced they could never arrive, so they appear in place
+    else b.pos.set(rand(-vw / 2, vw / 2), fromBelow && !reduceMotion() ? -vh / 2 - b.r - rand(0, vh * 0.15) : rand(-vh / 2, vh / 2), rand(-1, 1));
     b.speed = b.big ? 0 : vh * rand(0.025, 0.05);
     b.pop = 0; b.uniforms.uPop.value = 0;
-    b.grow = fromBelow || b.big ? 0 : 1;
+    b.grow = (fromBelow || b.big) && !reduceMotion() ? 0 : 1;
   };
   const placed = useRef(false);
   if (!placed.current) {
@@ -156,7 +166,11 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
 
   // The band being read tints the bubbles, easing in and out
   const tintTarget = useRef(null);
-  tintTarget.current = tint;
+  const tintGoal = useMemo(() => srgb('#ffffff'), []);
+  useEffect(() => {
+    tintTarget.current = tint;
+    if (tint) tintGoal.copy(srgb(tint));
+  }, [tint, tintGoal]);
 
   // The page's cues (the first swarm landing, opening the contact card) make them shimmer, as they make the prism glow
   useEffect(() => {
@@ -173,8 +187,10 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
     const onDown = (e) => {
       if (e.target.closest?.('.play-mode-toggle')) return;
       const { width: vw, height: vh } = view.current;
-      const x = (e.clientX / window.innerWidth - 0.5) * vw;
-      const y = (0.5 - e.clientY / window.innerHeight) * vh;
+      // Mapped against the canvas: it is 100vh, so on a phone it is taller than the window
+      const box = gl.domElement.getBoundingClientRect();
+      const x = ((e.clientX - box.left) / box.width - 0.5) * vw;
+      const y = (0.5 - (e.clientY - box.top) / box.height) * vh;
       const hit = bubbles.filter((b) => !b.pop && b.grow > 0.6 && Math.hypot(b.pos.x + b.push.x - x, b.pos.y + b.push.y - y) < b.r).sort((a, b) => a.r - b.r)[0];
       if (!hit) return;
       const i = bubbles.indexOf(hit); const m = meshes.current[i];
@@ -190,9 +206,17 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
     };
     document.addEventListener('pointerdown', onDown);
     return () => document.removeEventListener('pointerdown', onDown);
-  }, [canPop, bubbles]);
+  }, [canPop, bubbles, gl]);
 
   const tmp = useMemo(() => ({ p: new THREE.Vector3(), t: new THREE.Vector3() }), []);
+
+  // Light mode can be left and re-entered many times; each time the bubbles' buffers and programs are freed
+  useEffect(() => () => {
+    geometry.dispose();
+    bubbles.forEach((b) => b.material.dispose());
+    drops.g.dispose();
+    drops.material.dispose();
+  }, [geometry, bubbles, drops]);
 
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.05);
@@ -200,14 +224,17 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
     const { width: vw, height: vh } = viewport;
     time.value += still ? 0 : dt;
     glow.value *= Math.exp(-dt * 2.2);
-    if (tintTarget.current) tintColor.value.lerp(new THREE.Color(tintTarget.current), 0.06);
+    if (tintTarget.current) tintColor.value.lerp(tintGoal, 0.06);
     tintAmt.value += ((tintTarget.current ? 1 : 0) - tintAmt.value) * 0.05;
     // In the portfolio they rise slowly, in the playground at full pace
     const pace = still ? 0 : canPop ? 1 : 0.45;
+    drops.material.uniforms.uDpr.value = gl.getPixelRatio();
+    const unit = Math.min(vw, vh);
     const px = (viewportPosition?.x ?? 9) * vw / 2;
     const py = (viewportPosition?.y ?? 9) * vh / 2;
     bubbles.forEach((b, i) => {
       const m = meshes.current[i];
+      b.r = unit * b.k; // follows the window as it is resized
       if (!b.big) {
         b.pos.y += b.speed * dt * pace;
         b.pos.x += Math.sin(time.value * 0.6 + b.seed) * 0.003 * pace;
@@ -230,7 +257,7 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
         // the retreating rim sheds droplets, flung onward along the film and a little outward
         if (m && b.basis && k < 1 && !still) {
           const ang = k * 3.3;
-          const n = Math.round(b.r * 26 * dt * 60 / 4) + 2;
+          const n = Math.min(PER_FRAME, Math.round(b.r * 26 * dt * 60 / 4) + 2);
           for (let j = 0; j < n; j++) {
             const phi = Math.random() * Math.PI * 2;
             const { dir, u, w } = b.basis;

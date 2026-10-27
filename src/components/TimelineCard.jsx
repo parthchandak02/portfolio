@@ -3,8 +3,15 @@ import { ExternalLink, FileText, MapPin, Calendar, Play } from 'lucide-react';
 import { iconMap } from '../data/timelineData';
 import './TimelineCard.css';
 
-// A link shows as its address, except a LinkedIn post, whose address is a long activity ID
-const urlText = (url) => (/linkedin\.com\/(feed|posts)\//.test(url) ? 'LinkedIn post' : url.replace(/^https?:\/\//, ''));
+// A link shows as a short name for the common places (the strip's readout names them the same way), and
+// otherwise as its address
+const urlText = (url) => {
+  if (/linkedin\.com\/(feed|posts)\//.test(url)) return 'LinkedIn post';
+  if (/patents\.google\.com/.test(url)) return 'Google Patents';
+  if (/youtube\.com|youtu\.be/.test(url)) return 'YouTube';
+  if (/photos\.app\.goo\.gl/.test(url)) return 'Photos';
+  return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+};
 
 const TimelineCard = ({ 
   title,
@@ -130,7 +137,7 @@ const TimelineCard = ({
             <div className="timeline-card__project-image-container">
               <img 
                 src={projectImage} 
-                alt={`${title} project`}
+                alt={title}
                 className="timeline-card__project-image"
                 onError={(e) => {
                   e.target.style.display = 'none'; // Hide image if it fails to load

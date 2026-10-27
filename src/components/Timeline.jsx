@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import TimelineCard from './TimelineCard';
 import LabShowcase from './LabShowcase';
 import CardTile, { isTile } from './CardTile';
@@ -56,6 +56,25 @@ const Timeline = ({
   // Cards with a picture or a video, and research papers, show as glass tiles, a run of them sharing one grid.
   // Other text-only cards stay wide.
   const [openTile, setOpenTile] = useState(null);
+  // An opened tile becomes a full card in its place. If that place is up under the top bar, the card is
+  // brought down into view so its title and close control aren't hidden; Escape turns it back into a tile.
+  useEffect(() => {
+    if (!openTile) return undefined;
+    const frame = requestAnimationFrame(() => {
+      const card = document.querySelector('.timeline__item--open');
+      const scroller = document.querySelector('.main-content-scroll');
+      if (!card || !scroller) return;
+      const clear = scroller.getBoundingClientRect().top + 120; // below the bar and its veil
+      const top = card.getBoundingClientRect().top;
+      if (top < clear) scroller.scrollBy({ top: top - clear, behavior: 'smooth' });
+    });
+    const onKey = (e) => { if (e.key === 'Escape') setOpenTile(null); };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [openTile]);
   const segments = useMemo(() => {
     const out = [];
     sortedData.forEach((item, index) => {

@@ -249,8 +249,9 @@
 
 @media (max-width: 480px) {
   .ui-typewriter-container {
-    /* Extra spacing for very small screens */
-    margin: calc(var(--space-400) + 90px) auto var(--space-300) auto;
+    /* On a phone the headline starts below the column of round buttons, so a long role like
+       "Creative Technologist" never runs under them */
+    margin: calc(var(--space-400) + 134px) auto var(--space-300) auto;
     gap: var(--space-075);
   }
   

@@ -23,17 +23,17 @@ const roundedBoxGeometry = new THREE.ExtrudeGeometry(s, { depth: 1, bevelEnabled
 roundedBoxGeometry.translate(0, 0, -depth / 2)
 roundedBoxGeometry.computeVertexNormals()
 
-export const Box = forwardRef(({ color = '#333', idle = '#454545', ...props }, ref) => {
+export const Box = forwardRef((props, ref) => {
   const [hovered, hover] = useState(false)
   const inner = useRef(null)
   useFrame(() => {
-    lerpC(inner.current.material.emissive, hovered ? 'white' : idle, 0.1)
+    lerpC(inner.current.material.emissive, hovered ? 'white' : '#454545', 0.1)
   })
   return (
     <group scale={0.5} ref={ref} {...props}>
       <mesh visible={false} onRayOver={() => hover(true)} onRayOut={() => hover(false)} geometry={boxGeometry} />
       <mesh ref={inner} geometry={roundedBoxGeometry}>
-        <meshStandardMaterial color={color} toneMapped={false} emissiveIntensity={2} />
+        <meshStandardMaterial color="#333" toneMapped={false} emissiveIntensity={2} />
       </mesh>
     </group>
   )

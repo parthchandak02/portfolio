@@ -401,6 +401,9 @@
 .timeline-card__url {
   cursor: pointer;
   transition: var(--transition-standard);
+  /* a long address wraps inside the card rather than pushing it wider on a phone */
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .timeline-card__url:hover {

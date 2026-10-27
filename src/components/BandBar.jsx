@@ -258,9 +258,14 @@ const BandBar = ({ category, title, lightMode = false }) => {
     apply();
     scroller.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule);
+    // Opening or closing a card moves everything below it without a scroll, so a change in the content's
+    // size re-measures too; otherwise cards that moved down keep the fade they had near the bar
+    const resized = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(schedule) : null;
+    if (resized) Array.from(scroller.children).forEach((child) => resized.observe(child));
     return () => {
       scroller.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
+      if (resized) resized.disconnect();
       if (frame) cancelAnimationFrame(frame);
       touched.forEach(clearFade);
     };

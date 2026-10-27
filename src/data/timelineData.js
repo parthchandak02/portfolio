@@ -38,6 +38,8 @@ export const iconMap = {
   'Linux': Computer,
   'Git': GitBranch,
   'Arduino': CircuitBoard,
+  'Microcontrollers': CircuitBoard,
+  'Code': Code,
   'Raspberry Pi': Microchip,
   'SolidWorks': PenTool,
   'Fusion 360': Box,
@@ -203,12 +205,12 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Engineering Intern, Charging Special Projects",
-        "company": "Tesla Motors",
+        "company": "Tesla",
         "companyLogo": "/logos/tesla-logo.png",
         "date": "May 2018 - August 2018",
         "category": "experience",
         "location": "Fremont, CA",
-        "description": "Planned and executed a 2000+ mile logistics trip with the Tesla Semi using VBA and PowerQuery for the truck charging program. Designed and built a model library of 20+ Supercharger components for architecture and engineering firms. Designed 10+ civil/architectural sites for next-generation Supercharger in SketchUp.",
+        "description": "Planned and executed a 2,000+ mile logistics trip with the Tesla Semi using VBA and PowerQuery for the truck charging program. Designed and built a model library of 20+ Supercharger components for architecture and engineering firms. Designed 10+ civil/architectural sites for next-generation Supercharger in SketchUp.",
         "skills": [
             "Data Analysis",
             "Electric Vehicles",
@@ -309,7 +311,7 @@ export const timelineDataByCategory = {
         "url": "https://patents.google.com/patent/US20260003563A1/en",
         "description": "Named inventor on a published patent application for context-aware audio prioritization in autonomous vehicles, covering how in-cabin audio behavior can be tested and tuned in realistic prototypes.",
         "typewriterTitle": "Inventor",
-        "typewriterPrefix": "I am an ",
+        "typewriterPrefix": "I am an",
         "skills": [
             "JSON",
             "Linux"
@@ -375,7 +377,7 @@ export const timelineDataByCategory = {
         "location": "Nepal",
         "url": "https://buildon-nepal-trek.vercel.app",
         "projectImage": "/images/buildon-nepal-trek.png",
-        "description": "Raised $55,000 to build a school in Nepal, directly impacting 210+ students (including 108 girls) in a community of 2250 farmers. Led fundraising strategy and participated in construction trek.",
+        "description": "Raised $55,000 to build a school in Nepal, directly impacting 210+ students (including 108 girls) in a community of 2,250 farmers. Led fundraising strategy and participated in construction trek.",
         "skills": [
             "Fundraising",
             "Travel",
@@ -405,7 +407,7 @@ export const timelineDataByCategory = {
         "company": "Mentor Discover Inspire",
         "companyLogo": "/logos/mdi-logo.png",
         "location": "Mentor Discover Inspire",
-        "description": "Expanded team from 6 to 12+ members (↑100%) ; organized 3+ community service and team-building events",
+        "description": "Expanded team from 6 to 12+ members (up 100%); organized 3+ community service and team-building events.",
         "typewriterTitle": "Team Leader",
         "typewriterPrefix": "I am a",
         "skills": [
@@ -928,7 +930,7 @@ export const timelineDataByCategory = {
         "company": "WSU",
         "companyLogo": "/logos/wsu-logo.png",
         "location": "Pullman, WA",
-        "description": "First place (Tier 1) with team Caffeine Cycle for Centi-seed's vision: a webcam and OpenCV software that steer the walking robot, built at the Fall 2017 IEEE Hardware Hackathon, toward sunlight."
+        "description": "First place (Tier 1) with team Caffeine Cycle for Centi-seed's vision: webcam and OpenCV software that steers the walking robot toward sunlight. The robot itself was built at the Fall 2017 IEEE Hardware Hackathon."
     },
     {
         "title": "Guy E. Thornton Engineering Scholarship",

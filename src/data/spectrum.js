@@ -112,7 +112,7 @@ export const spectrumBands = [
       { t: 2026.8, when: 'Oct 19, 2026', title: 'International Journal of Social Robotics', meta: 'Peer reviewer, Springer Nature' },
       { t: 2026.18, when: 'Mar 8, 2026', title: 'HackMerced XI', meta: 'Judge, MLH and UC Merced' },
       { t: 2026.32, when: 'Apr 26, 2026', title: 'LA Hacks 2026', meta: 'Invite-only judge, 1,000+ students' },
-      { t: 2026.81, when: 'Oct 25, 2026', title: 'Cal Hacks 13.0', meta: 'Judge, ~2,000 hackers', url: 'https://www.linkedin.com/feed/update/urn:li:activity:7520588725832212480/' }
+      { t: 2026.81, when: 'Oct 25, 2026', title: 'Cal Hacks 13.0', meta: 'Judge, about 2,000 hackers', url: 'https://www.linkedin.com/feed/update/urn:li:activity:7520588725832212480/' }
     ]
   },
   {
@@ -131,10 +131,10 @@ export const spectrumBands = [
     wave: 500,
     items: [
       { t: 2015.6, when: '2015', title: 'Robert W. Finch Memorial Scholarship', meta: 'Washington State University' },
-      { t: 2015.7, when: '2015-2018', title: 'International Merit Award', meta: 'Washington State University' },
+      { t: 2015.7, when: '2015 - 2018', title: 'International Merit Award', meta: 'Washington State University' },
       { t: 2016.6, when: '2016', title: 'Guy E. Thornton Engineering Scholarship', meta: 'Washington State University' },
-      { t: 2016.8, when: '2016-2018', title: 'Harold Frank Engineering Entrepreneurship Kauffman Award', meta: 'Washington State University' },
-      { t: 2018.1, when: '2018', title: 'Crimson Code Hackathon, 1st place', meta: 'Washington State University', url: 'https://tiny.cc/crimsoncode2018' },
+      { t: 2016.8, when: '2016 - 2018', title: 'Harold Frank Engineering Entrepreneurship Kauffman Award', meta: 'Washington State University' },
+      { t: 2018.17, when: 'Mar 2018', title: 'Crimson Code Hackathon, 1st place', meta: 'Washington State University', url: 'https://tiny.cc/crimsoncode2018' },
       { t: 2025.45, when: 'Jun 2025', title: 'ICETAIA 2025, invited keynote', meta: 'A practical framework for rapid prototyping and fidelity' },
       ...fromCards(['media'])
     ]

@@ -216,6 +216,8 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   const headingRef = useRef({ dx: 0, dy: 0 });
   const pick = useCallback((entry, e) => {
     clearTimeout(switchRef.current);
+    // The keyboard picks with no pointer event; a pick is always immediate then
+    if (!e || e.clientX === undefined) { setActive(entry); return; }
     // The heading is taken over at least 8 px of travel, since a mouse reports small, jittery steps
     const anchor = anchorRef.current;
     if (!anchor) anchorRef.current = { x: e.clientX, y: e.clientY };
@@ -241,7 +243,8 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     if (!aiming) { setActive(entry); return; }
     switchRef.current = setTimeout(() => setActive(entry), SWITCH_MS);
   }, []);
-  const cancelPick = useCallback(() => clearTimeout(switchRef.current), []);
+  // Leaving a track ends the heading too, so coming back in starts fresh rather than aiming from the exit point
+  const cancelPick = useCallback(() => { clearTimeout(switchRef.current); anchorRef.current = null; }, []);
   useEffect(() => () => clearTimeout(switchRef.current), []);
 
   // The toggle is one more round button in the column with the other three, so it lives in the fixed UI
