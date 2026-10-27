@@ -9,4 +9,11 @@ export default defineConfig({
   build: {
     inlineStylesheets: 'never',
   },
+  vite: {
+    build: {
+      // Browsers the CSS is written for. Naming Safari 15 makes the minifier keep -webkit-backdrop-filter
+      // beside backdrop-filter; without targets it kept only one of the pair, and Chrome lost the glass.
+      cssTarget: ['chrome107', 'edge107', 'firefox104', 'safari15', 'ios15'],
+    },
+  },
 });

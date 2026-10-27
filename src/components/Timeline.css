@@ -69,8 +69,8 @@
     0 8px 32px var(--color-highlight-shadow),
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     0 0 0 1px var(--color-highlight-border) !important;
-  backdrop-filter: var(--glass-blur-strong) !important;
   -webkit-backdrop-filter: var(--glass-blur-strong) !important;
+  backdrop-filter: var(--glass-blur-strong) !important;
   transform: scaleY(1.03) !important;
   opacity: 1;
   font-weight: 600;
@@ -84,8 +84,8 @@
     0 12px 48px var(--color-highlight-active-shadow),
     inset 0 1px 0 rgba(255, 255, 255, 0.15),
     0 0 0 2px var(--color-highlight-active-border) !important;
-  backdrop-filter: var(--glass-blur-strong-hover) !important;
   -webkit-backdrop-filter: var(--glass-blur-strong-hover) !important;
+  backdrop-filter: var(--glass-blur-strong-hover) !important;
   transform: scaleY(var(--transform-scale-medium)) translateY(-1px) !important;
 }
 

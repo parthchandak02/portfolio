@@ -162,8 +162,8 @@
 /* Base glass effect */
 .glass {
   background: var(--glass-bg-base);
-  backdrop-filter: var(--glass-blur-subtle);
   -webkit-backdrop-filter: var(--glass-blur-subtle);
+  backdrop-filter: var(--glass-blur-subtle);
   border: 1px solid var(--glass-border-base);
   box-shadow: var(--glass-shadow-base);
   transition: var(--transition-standard);
@@ -177,23 +177,23 @@
   box-shadow: 
     var(--glass-shadow-hover),
     inset 0 1px 0 rgba(255, 255, 255, 0.02);
-  backdrop-filter: var(--glass-blur-subtle-hover);
   -webkit-backdrop-filter: var(--glass-blur-subtle-hover);
+  backdrop-filter: var(--glass-blur-subtle-hover);
   transform: translateY(-0.5px);
 }
 
 /* Strong glass variant */
 .glass-strong {
-  backdrop-filter: var(--glass-blur-strong);
   -webkit-backdrop-filter: var(--glass-blur-strong);
+  backdrop-filter: var(--glass-blur-strong);
   box-shadow: 
     var(--glass-shadow-base),
     inset 0 1px 0 rgba(255, 255, 255, 0.01);
 }
 
 .glass-strong:hover {
-  backdrop-filter: var(--glass-blur-strong-hover);
   -webkit-backdrop-filter: var(--glass-blur-strong-hover);
+  backdrop-filter: var(--glass-blur-strong-hover);
   box-shadow: 
     var(--glass-shadow-hover),
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
@@ -231,8 +231,8 @@
     0 8px 32px var(--color-highlight-shadow),
     inset 0 1px 0 rgba(255, 255, 255, 0.03),
     0 0 0 1px var(--color-highlight-border) !important;
-  backdrop-filter: var(--glass-blur-strong) !important;
   -webkit-backdrop-filter: var(--glass-blur-strong) !important;
+  backdrop-filter: var(--glass-blur-strong) !important;
   transform: scale(1.03) !important;
   transition: var(--transition-bounce) !important;
 }
@@ -247,16 +247,16 @@
     0 12px 48px var(--color-highlight-active-shadow),
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
     0 0 0 2px var(--color-highlight-active-border) !important;
-  backdrop-filter: var(--glass-blur-strong-hover) !important;
   -webkit-backdrop-filter: var(--glass-blur-strong-hover) !important;
+  backdrop-filter: var(--glass-blur-strong-hover) !important;
   transform: scale(var(--transform-scale-medium)) translateY(-1px) !important;
 }
 
 /* Timeline cards get subtle expansion on hover */
 .timeline-card--highlighted:hover {
   transform: scaleY(1.03) translateY(-1px) !important; /* Slightly more expansion on hover */
-  backdrop-filter: var(--glass-blur-strong) !important;
   -webkit-backdrop-filter: var(--glass-blur-strong) !important;
+  backdrop-filter: var(--glass-blur-strong) !important;
 }
 
 
