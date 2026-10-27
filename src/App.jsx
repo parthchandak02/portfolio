@@ -186,6 +186,7 @@ export default function App() {
             lightMode={lightMode}
             viewportPosition={viewportPosition}
             isLocked={isLocked}
+            isPlayMode={isPlayMode}
             focusWave={litBand?.wave ?? null}
           />
         </Suspense>

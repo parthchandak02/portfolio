@@ -4,9 +4,11 @@ import { Canvas, useLoader } from '@react-three/fiber';
 import { Bloom, EffectComposer, LUT } from '@react-three/postprocessing';
 import { LUTCubeLoader } from 'postprocessing';
 import Scene from './Scene';
+import { Bubbles } from './Bubbles';
+import { SwarmLight } from './SwarmLight';
 import { lightTheme } from '../hooks/lightTheme';
 
-const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave }) => {
+const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, isPlayMode = false }) => {
   const texture = useLoader(LUTCubeLoader, '/lut/F-6800-STD.cube');
   // Dither the final image: the soft glow over a dark page otherwise shows steps when it is cut to 8 bits
   const composer = useRef(null);
@@ -39,12 +41,20 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave }) => {
       }}
     >
       <color attach="background" args={[lightMode ? lightTheme.page : 'black']} />
-      <Scene 
-        lightMode={lightMode} 
-        viewportPosition={viewportPosition} 
-        isLocked={isLocked}
-        focusWave={focusWave}
-      />
+      {/* Dark mode is the prism and its beam; light mode, soap bubbles (a white page can't show added light) */}
+      {lightMode ? (
+        <>
+          <Bubbles interactive={isPlayMode} viewportPosition={viewportPosition} />
+          <SwarmLight lightMode />
+        </>
+      ) : (
+        <Scene 
+          lightMode={lightMode} 
+          viewportPosition={viewportPosition} 
+          isLocked={isLocked}
+          focusWave={focusWave}
+        />
+      )}
       <EffectComposer ref={composer} disableNormalPass>
         <Bloom mipmapBlur levels={9} intensity={1.5} luminanceThreshold={1} luminanceSmoothing={1} />
         <LUT lut={texture} />
