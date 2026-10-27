@@ -31,6 +31,7 @@ const linkLabel = (url) => {
   if (/youtube\.com|youtu\.be/.test(url)) return 'Watch';
   if (/photos\.app\.goo\.gl/.test(url)) return 'See photos';
   if (/freepressjournal/.test(url)) return 'Read article';
+  if (/linkedin\.com\/(feed|posts)/.test(url)) return 'Read post';
   return 'Open link';
 };
 

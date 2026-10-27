@@ -3,6 +3,9 @@ import { ExternalLink, FileText, MapPin, Calendar, Play } from 'lucide-react';
 import { iconMap } from '../data/timelineData';
 import './TimelineCard.css';
 
+// A link shows as its address, except a LinkedIn post, whose address is a long activity ID
+const urlText = (url) => (/linkedin\.com\/(feed|posts)\//.test(url) ? 'LinkedIn post' : url.replace(/^https?:\/\//, ''));
+
 const TimelineCard = ({ 
   title,
   company,
@@ -116,7 +119,7 @@ const TimelineCard = ({
                   onClick={(e) => e.stopPropagation()}
                 >
                   <ExternalLink size={14} />
-                  {url.replace(/^https?:\/\//, '')}
+                  {urlText(url)}
                 </a>
               )}
             </div>

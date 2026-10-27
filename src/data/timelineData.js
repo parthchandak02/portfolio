@@ -711,11 +711,12 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Cal Hacks 13.0, Judge",
-        "date": "October 23-25, 2026",
+        "date": "October 25, 2026",
         "projectImage": "/images/judging/cal-hacks-13.jpg",
+        "url": "https://www.linkedin.com/feed/update/urn:li:activity:7520588725832212480/",
         "category": "judging",
         "location": "San Francisco, CA",
-        "description": "Judge at Cal Hacks 13.0.",
+        "description": "Judged at Cal Hacks 13.0, about 2,000 hackers over a weekend in San Francisco. Standouts included Freshly, which tracks what is in your fridge from a photo of a grocery receipt, Digital Twin Biomedical, a 3D twin of a patient with live vitals so nurses can catch decline early, and PrintCommons, a 3D printing service that printed for nine other teams.",
         "skills": [
             "Advisor",
             "Innovation"
