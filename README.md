@@ -4,7 +4,7 @@
 
 <p><b>A portfolio you shine a light through.</b></p>
 
-<p><i>Parth Chandak's personal site: a 3D glass prism that splits a beam into a rainbow, and a career record that splits the same way into eight coloured bands.</i></p>
+<p><i>Parth Chandak's personal site: a 3D glass prism that splits a beam into a rainbow, and a portfolio that splits the same way into eight coloured bands. In light mode, soap bubbles take the prism's place.</i></p>
 
 <h6>
 
@@ -20,25 +20,26 @@
 
 <a href="https://parthchandak.info"><b>Live demo</b></a> ·
 <a href="#how-it-works"><b>How it works</b></a> ·
-<a href="#the-record"><b>The record</b></a> ·
+<a href="#the-portfolio"><b>The portfolio</b></a> ·
 <a href="#run-it"><b>Run it</b></a>
 
 <br><br>
 
-<a href="https://parthchandak.info"><img src="docs/assets/readme/hero.jpg" width="100%" alt="A glass prism on a black background splitting a white beam into an orange, blue and violet rainbow, under the typed lines 'Hi, my name is Parth Chandak' and 'I am a Creative Technologist', with a strip of coloured timeline ticks across the middle, four round buttons in the top-right corner and a round contact button in the bottom-right corner"></a>
+<a href="https://parthchandak.info"><img src="docs/assets/readme/hero.jpg" width="100%" alt="A glass prism on a black background splitting a white beam into an orange, blue and violet rainbow, under the typed lines 'Hi, my name is Parth Chandak' and 'I am a Researcher', with a strip of coloured timeline ticks across the middle carrying four small diamonds, four round buttons in the top-right corner with the label 'Play with prism', and a round contact button in the bottom-right corner"></a>
 
-<sub>Play mode on the live site, October 2026.</sub>
+<sub>The top of the portfolio on the live site, October 2026.</sub>
 
 </div>
 
 <br>
 
-A first visit opens in **play mode**: a beam of light follows the mouse, hits a 3D glass prism and
-leaves as a rainbow, while a typewriter cycles through roles. A thin strip of coloured ticks sits
-across the screen, one tick per dated item in the record. Press the reading-glasses button (or
-arrive on a `#section` link, or come back a second time) and the page becomes **the record**: the
-full career, research, patent, judging and project history as glass cards, with the beam held
-still behind them.
+A first visit opens the **playground**: the prism alone on a black page. A beam of light follows
+the pointer (on a phone, any drag steers it), hits a 3D glass prism and leaves as a rainbow. The only
+control is **Back to the portfolio**. Returning visitors and `#section` links open **the portfolio**:
+a typewriter cycling through roles, a strip of coloured ticks (one per dated item), then **Selected
+work** and the full career, research, patent, judging and project history as glass cards, with the
+beam held still behind them. In light mode the toy is **soap bubbles** instead of the prism: they drift
+from the pointer and burst when tapped.
 
 ## How it works
 
@@ -65,10 +66,12 @@ sends the strip's colours flying into the chevron as light.
 </td>
 <td width="33%" valign="top">
 
-**3 · The record**
+**3 · The portfolio**
 
-Scrolling hands the strip over to a sticky band bar that tracks which band and card you are on.
-Cards with a picture or video show as glass tiles, the rest as wide cards, newest first.
+It opens with Selected work: jobwright, calarm, the audio prioritization patent and Centi-seed, each
+marked on the strip by a small diamond. Scrolling hands the strip over to a sticky band bar that tracks
+which band and card you are on. Cards with a picture or video show as glass tiles, the rest as wide
+cards, newest first.
 
 </td>
 </tr>
@@ -86,9 +89,34 @@ Cards with a picture or video show as glass tiles, the rest as wide cards, newes
 page: the strip measures each pill in screen pixels and flies it on [Motion](https://motion.dev)
 springs, and the scene places it with the canvas's own box and the camera's zoom, so it lands exactly on
 the button on any screen. When it lands, the prism catches the light and a pulse runs out along the
-rainbow. Picking an item, or scrolling into a band of the record, lights that band's colour in the rainbow.
+rainbow. Picking an item, or scrolling into a band of the portfolio, lights that band's colour in the rainbow.
 
-## The record
+### Light mode: soap bubbles
+
+<div align="center">
+
+<img src="docs/assets/readme/bubbles.jpg" width="720" alt="The same top screen in light mode on a white page: iridescent soap bubbles, one large behind the timeline strip and several small ones around it, with thin rainbow-coloured rims, under the typed lines 'Hi, my name is Parth Chandak' and 'I am an Inventor', and the round buttons labelled 'Play with bubbles'">
+
+<sub>Light mode: the bubbles float behind the page.</sub>
+
+</div>
+
+A white page can't show added light, so a beam that glows on black only smears on white. In light mode
+the light-splitting object is the soap bubble instead: nearly clear, seen by the room reflected in its
+skin and coloured by thin-film interference, worked out in a small shader from the film's thickness
+(thinner at the top, as it drains) and the viewing angle. The band you are reading tints the film. In
+the playground the bubbles drift from the pointer, and a tap bursts one: the film tears open where it
+was touched, the hole races round it, and the retreating rim sheds droplets that fly on, fall and fade.
+
+## The portfolio
+
+<div align="center">
+
+<img src="docs/assets/readme/selected.jpg" width="720" alt="Selected work: a row of four glass tiles, jobwright, calarm, Audio prioritization patent and Centi-seed, under a sticky bar reading 'Selected work', above the first career card, with the prism's rainbow glowing through the glass">
+
+<sub>Selected work, reached with <code>parthchandak.info/#selected</code>.</sub>
+
+</div>
 
 <div align="center">
 
@@ -113,23 +141,23 @@ The eight bands, each with its own colour on the strip and the bar:
 
 <div align="center">
 
-<img src="docs/assets/readme/mobile.jpg" width="32%" alt="The same play-mode screen on a phone: the typed greeting and role, the coloured strip drawn as dense full-width ticks, the prism and rainbow below, the four round buttons stacked on the right and the contact button in the bottom-right corner">
+<img src="docs/assets/readme/mobile.jpg" width="32%" alt="The portfolio's top screen in light mode on a phone: soap bubbles over a white page, the four round buttons stacked on the right with the label 'Play with bubbles', the typed greeting and role below them, the coloured strip drawn as dense full-width ticks and the contact button in the bottom-right corner">
 
-<sub>Play mode on a phone-sized screen.</sub>
+<sub>Light mode on a phone-sized screen.</sub>
 
 </div>
 
 ## Features
 
-- **Two modes, one page.** Play mode is the 3D scene; the record is the readable résumé. First-time visitors get play mode, returning visitors and deep links get the record.
-- **Deep links per band.** `#experience`, `#research`, `#projects` and the rest open the record scrolled to that section.
-- **Light and dark.** A toggle swaps the theme for the scene and the glass UI together.
-- **Beam lock.** Hold the beam still so it stops chasing the pointer while you read.
+- **Two modes, one page.** The playground is the 3D toy; the portfolio is the readable résumé. First-time visitors get the playground (its button reads "Play with prism", or "Play with bubbles" in light mode); returning visitors and deep links get the portfolio. In the playground every drag steers, and only its button leads back.
+- **Deep links per band.** `#selected`, `#experience`, `#research`, `#projects` and the rest open the portfolio scrolled to that section.
+- **Light and dark.** Dark mode shows the prism; light mode floats soap bubbles that burst when tapped and take the colour of the band you are reading.
+- **Hold still.** The lock holds the beam, or the bubbles in light mode, still while you read.
 - **One contact button.** A glass button in the corner whose own glass springs open into the contact card (email, LinkedIn, GitHub, résumé, booking), and springs back.
 - **Respects reduced motion.** With reduced motion set, the opening, the swarm and the glow are skipped.
-- **Proof links.** Ticks with a public source (a DOI, a patent page, a live project) link straight to it.
+- **Source links.** Ticks with a public source (a DOI, a patent page, a live project, a post) link straight to it, named for what they open: View patent, Read paper, Read post.
 - **One data file per thing.** Cards live in `src/data/timelineData.js`, the Lab in `src/data/lab.js`, bands in `src/data/spectrum.js`.
-- **Readable before it loads.** Astro writes the whole record into the HTML from the same data files, so search engines and link previews see every card; the 3D scene loads after the text.
+- **Readable before it loads.** Astro writes the whole portfolio into the HTML from the same data files, so search engines and link previews see every card; the 3D scene loads after the text.
 - **Static and locked down.** No backend. Cloudflare Pages serves it with HSTS, a strict Content Security Policy and a sitemap.
 
 ## Run it
@@ -154,15 +182,17 @@ Add `[skip ci]` to a commit message to skip the build for docs-only changes.
 
 ```
 src/
-  pages/index.astro         The page: head tags, and the record as plain HTML until the app loads
-  App.jsx                   Play mode / record switch, deep links, theme
+  pages/index.astro         The page: head tags, and the portfolio as plain HTML until the app loads
+  App.jsx                   Playground / portfolio switch, deep links, theme
   components/
     Canvas3D.jsx, Scene.jsx R3F canvas, post-processing, scene setup, the prism's catch and pulse
+    Bubbles.jsx             Light mode's soap bubbles: thin-film shader, bursts and droplets
     Beam.jsx, Prism.jsx,
     Rainbow.jsx, Flare.jsx  The light beam, the GLTF prism, the spectral rainbow and flare
     SwarmLight.jsx          The strip's swarm, drawn as light in the scene
     Spectrograph.jsx        The tick strip and its eight lanes
-    BandBar.jsx             Sticky band bar in the record
+    SelectedMark.jsx        The small diamond that marks selected work
+    BandBar.jsx             Sticky band bar in the portfolio
     Timeline.jsx, TimelineCard.jsx, CardTile.jsx, LabShowcase.jsx
                             Cards, glass tiles and the Lab card
     UITypewriter.jsx        The greeting and cycling roles
@@ -170,6 +200,7 @@ src/
   data/
     timelineData.js         Every card, by category
     spectrum.js             Band names, colours and dated items
+    featured.js             The selected work, in order
     lab.js                  Public side projects
   hooks/                    Mouse, light mode, scroll tracking; prismGlow.js and swarmLight.js
                             connect the page to the scene
