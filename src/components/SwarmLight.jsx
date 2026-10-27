@@ -24,7 +24,9 @@ const fragmentShader = `varying vec2 vUv; varying vec4 vColor; uniform bool ligh
  * Draws the strip's swarm inside the 3D scene, so the pills glow like the rainbow and pass behind the page's
  * glass. The pills live in screen pixels; each frame they are placed with the canvas's own box and the camera's
  * zoom, which is exact because the camera is orthographic. The canvas is sized to 100vh, taller than the
- * visible window on phones, so its box is read every frame rather than taken from the window.
+ * visible window on phones, so its own box is used rather than the window's. It is read when the canvas or the
+ * window changes size, not every frame: reading it in a frame forces the browser to restyle the page first,
+ * which, just after the page changes colour, took a phone a few hundred milliseconds.
  */
 export const SwarmLight = ({ lightMode }) => {
   const mesh = useRef(null);
@@ -42,8 +44,8 @@ export const SwarmLight = ({ lightMode }) => {
 
   useEffect(() => {
     material.uniforms.lightMode.value = lightMode;
+    // blending is drawing state, not part of the shader, so this needs no recompile
     material.blending = lightMode ? THREE.NormalBlending : THREE.AdditiveBlending;
-    material.needsUpdate = true;
   }, [lightMode, material]);
 
   useEffect(() => {
@@ -52,10 +54,21 @@ export const SwarmLight = ({ lightMode }) => {
   }, []);
   useEffect(() => () => { geometry.dispose(); material.dispose(); }, [geometry, material]);
 
+  const box = useRef(null);
+  useEffect(() => {
+    const read = () => { box.current = gl.domElement.getBoundingClientRect(); };
+    read();
+    const watch = new ResizeObserver(read);
+    watch.observe(gl.domElement);
+    window.addEventListener('resize', read);
+    return () => { watch.disconnect(); window.removeEventListener('resize', read); };
+  }, [gl]);
+
   useFrame(() => {
     const inst = mesh.current;
     if (!inst) return;
-    const rect = gl.domElement.getBoundingClientRect();
+    const rect = box.current;
+    if (!rect) return;
     const zoom = camera.zoom;
     const colour = geometry.attributes.aColor;
     const now = performance.now();

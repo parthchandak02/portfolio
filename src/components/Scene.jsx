@@ -13,7 +13,9 @@ import { modeShift, shiftTime, SHATTER, VORTEX, smooth, easeOutBack } from '../h
 const PULSE_MS = 1500; // the pulse's run from the prism to the rainbow's far end
 const CATCH_MS = 900; // the flare's swell and settle
 
-const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null, shift = null }) => {
+// `active` is false while light mode is up: the scene stays mounted, so its shaders and buffers are ready the
+// moment you switch back, but it is hidden and does no work.
+const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null, shift = null, active = true }) => {
   const [isPrismHit, hitPrism] = useState(false);
   const flare = useRef(null);
   const ambient = useRef(null);
@@ -88,6 +90,8 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null, shift 
   }, []);
 
   useFrame((state) => {
+    beamLight.paused = !active;
+    if (!active) { root.current.visible = false; return; }
     // Always update positions if viewportPosition is available (whether locked or not)
     if (viewportPosition) {
       // Update flare position
@@ -118,7 +122,7 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null, shift 
       prism.current?.scale.setScalar(grow);
       boxes.current.forEach((b) => b?.scale.setScalar(0.5 * Math.max(0.001, easeOutBack((k - 0.08) / 0.42))));
       lit = smooth((k - 0.2) / 0.4);
-    }
+    } else root.current.visible = true;
     beamLight.value = lit * (1 + overload * 1.2);
     
     // Glide the highlight to the picked band's wavelength; with nothing picked, ease back to the full spectrum
@@ -158,7 +162,7 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null, shift 
 
       {/* Prism + blocks + reflect beam */}
       <Beam ref={boxreflect} bounce={10} far={20} light={beamLight}>
-        <Prism ref={prism} position={[0, -0.5, 0]} onRayOver={rayOver} onRayOut={rayOut} onRayMove={rayMove} />
+        <Prism ref={prism} paused={!active} position={[0, -0.5, 0]} onRayOver={rayOver} onRayOut={rayOut} onRayMove={rayMove} />
         <Box ref={(b) => { boxes.current[0] = b; }} position={[2.25, -3.5, 0]} rotation={[0, 0, Math.PI / 3.5]} />
         <Box ref={(b) => { boxes.current[1] = b; }} position={[-2.5, -2.5, 0]} rotation={[0, 0, Math.PI / 4]} />
         <Box ref={(b) => { boxes.current[2] = b; }} position={[-3, 1, 0]} rotation={[0, 0, Math.PI / 4]} />

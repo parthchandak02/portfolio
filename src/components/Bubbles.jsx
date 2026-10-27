@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { onPrismGlow } from '../hooks/prismGlow';
+import { isPhone } from '../hooks/quality';
 import { modeShift, shiftTime, wipeAt, SHATTER, VORTEX, CENTRE, smooth, easeInOut3, easeOutBack } from '../hooks/modeShift';
 
 // Light mode's scene. The prism's beam is light added to black, which a white page can't show, so here the
@@ -123,13 +124,15 @@ const burst = (b, m, dir) => {
   b.pop = reduceMotion() ? POP_S : 0.0001;
 };
 
-export const Bubbles = ({ interactive = false, canPop = false, viewportPosition, tint = null, shift = null }) => {
+// `active` is false while dark mode is up: they stay mounted, so their shaders are ready for the switch back,
+// but are hidden and do no work. Each time light mode comes up they start afresh.
+export const Bubbles = ({ interactive = false, canPop = false, viewportPosition, tint = null, shift = null, active = true }) => {
   const { viewport, gl } = useThree();
   const time = useMemo(() => ({ value: 0 }), []);
   const tintColor = useMemo(() => ({ value: srgb('#ffffff') }), []);
   const tintAmt = useMemo(() => ({ value: 0 }), []);
   const glow = useMemo(() => ({ value: 0 }), []);
-  const geometry = useMemo(() => new THREE.SphereGeometry(1, 96, 64), []);
+  const geometry = useMemo(() => (isPhone ? new THREE.SphereGeometry(1, 64, 40) : new THREE.SphereGeometry(1, 96, 64)), []);
   const meshes = useRef([]);
 
   // One big bubble where the prism stands, and small ones rising past it, sized to the screen
@@ -176,6 +179,8 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
   };
   const placed = useRef(false);
   const departing = useRef(false);
+  const root = useRef(null);
+  const awake = useRef(active);
   if (!placed.current) {
     bubbles.forEach((b) => { spawn(b, false, viewport.width, viewport.height); b.grow = 1; });
     placed.current = true;
@@ -200,7 +205,7 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
   const view = useRef(viewport);
   view.current = viewport;
   useEffect(() => {
-    if (!canPop) return undefined;
+    if (!canPop || !active) return undefined;
     const onDown = (e) => {
       if (e.target.closest?.('.play-mode-toggle')) return;
       const { width: vw, height: vh } = view.current;
@@ -217,7 +222,7 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
     };
     document.addEventListener('pointerdown', onDown);
     return () => document.removeEventListener('pointerdown', onDown);
-  }, [canPop, bubbles, gl]);
+  }, [canPop, active, bubbles, gl]);
 
   const tmp = useMemo(() => ({ p: new THREE.Vector3(), t: new THREE.Vector3() }), []);
 
@@ -230,6 +235,18 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
   }, [geometry, bubbles, drops]);
 
   useFrame((_, delta) => {
+    if (root.current) root.current.visible = active;
+    if (!active) { awake.current = false; return; }
+    if (!awake.current) {
+      awake.current = true;
+      departing.current = false;
+      bubbles.forEach((b) => {
+        spawn(b, false, viewport.width, viewport.height);
+        Object.assign(b, { grow: 1, gone: false, arrived: false, when: Infinity, basis: null });
+        b.push.set(0, 0, 0);
+      });
+      drops.life.fill(0);
+    }
     const dt = Math.min(delta, 0.05);
     const still = reduceMotion();
     const { width: vw, height: vh } = viewport;
@@ -374,11 +391,11 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
   });
 
   return (
-    <>
+    <group ref={root}>
       {bubbles.map((b, i) => (
         <mesh key={i} ref={(m) => { meshes.current[i] = m; }} geometry={geometry} material={b.material} renderOrder={5} />
       ))}
       <points ref={(p) => { drops.points = p; }} geometry={drops.g} material={drops.material} frustumCulled={false} renderOrder={6} />
-    </>
+    </group>
   );
 };

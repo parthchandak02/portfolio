@@ -25,6 +25,8 @@ export const Beam = forwardRef(({ children, position, stride = 4, width = 8, lig
   let range = 0
 
   useFrame(() => {
+    // the scene is hidden: no rays to trace
+    if (light?.paused) return
     range = reflect.current.update() - 1
     // dimmed and brightened as the modes switch
     const k = light ? light.value : 1

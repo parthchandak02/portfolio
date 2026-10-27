@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
+import { QUALITY } from '../hooks/quality';
 import { modeShift, shiftTime, wipeAt, SHATTER, VORTEX, CENTRE, TRIANGLE, smooth } from '../hooks/modeShift';
 
 // The 3D half of switching modes (see hooks/modeShift): the page's colour sweeping in a circle, the prism's
-// shards, the sparks the rainbow bursts into, and the light that gathers where the prism forms. It is mounted
-// only for the length of a switch, alongside both scenes.
+// shards, the sparks the rainbow bursts into, and the light that gathers where the prism forms.
 
 const SMALL = 9; // the bubbles the shards become (Bubbles.jsx keeps this many small ones)
 const SPARKS = 900;
@@ -98,7 +98,7 @@ function fracture(a, b, c, depth, out) {
 function shardGeometry() {
   const [a, b, c] = TRIANGLE.map(([x, y]) => new THREE.Vector2(x, y));
   const pieces = [];
-  fracture(a, b, c, 6, pieces);
+  fracture(a, b, c, QUALITY.shards, pieces);
   const pos = []; const nor = []; const edge = []; const cen = []; const rnd = []; const info = [];
   const H = 0.3;
   pieces.forEach(([p, q, r]) => {
@@ -139,7 +139,9 @@ const shardAt = (s, t) => {
 };
 const shardVel = (s, t) => [Math.cos(s.ang) * s.sp * Math.exp(-2.2 * t), Math.sin(s.ang) * s.sp * Math.exp(-2.2 * t) - 1.8 * t];
 
-export const ModeShift = ({ kind, onDone }) => {
+// Mounted for good, so its shaders are compiled before the first switch; between switches (kind null) it is
+// hidden and does no work
+export const ModeShift = ({ kind = null, onDone }) => {
   const { viewport, gl, camera } = useThree();
   const wipe = useMemo(() => ({
     uWC: { value: new THREE.Vector2(CENTRE.x, CENTRE.y) }, uWR: { value: 0 }, uWIn: { value: 1 }, uWOut: { value: 0 }
@@ -151,25 +153,14 @@ export const ModeShift = ({ kind, onDone }) => {
     vertexShader: bgVert, fragmentShader: bgFrag, depthTest: false, depthWrite: false
   }), [wipe, time]);
 
-  const shards = useMemo(() => {
-    if (kind !== 'shatter') return null;
-    const { g, info } = shardGeometry();
-    const material = new THREE.ShaderMaterial({
-      uniforms: { ...wipe, uT: { value: -1 }, uEdge: { value: 0 }, uBody: { value: 0 } },
-      vertexShader: shardVert, fragmentShader: shardFrag, transparent: true, depthWrite: false, side: THREE.DoubleSide
-    });
-    // The shards the small bubbles grow from: spread round the circle, and not the slivers
-    let pool = info.map((s, i) => ({ s, i })).filter((x) => x.s.area > 0.05);
-    if (pool.length < SMALL) pool = info.map((s, i) => ({ s, i }));
-    pool.sort((x, y) => x.s.ang - y.s.ang);
-    modeShift.spawns = Array.from({ length: SMALL }, (_, k) => {
-      const s = pool[Math.floor(((k + 0.5) * pool.length) / SMALL)].s;
-      const when = SHATTER.BREAK + 0.42 + k * 0.025;
-      const at = shardAt(s, when - SHATTER.BREAK); const vel = shardVel(s, when - SHATTER.BREAK);
-      return { when, x: at[0], y: at[1], vx: vel[0], vy: vel[1] };
-    });
-    return { g, material };
-  }, [kind, wipe]);
+  // The shard material lives as long as the scene, so its shader is compiled before the first switch; each
+  // shatter breaks the glass afresh into a new geometry
+  const shardMaterial = useMemo(() => new THREE.ShaderMaterial({
+    uniforms: { ...wipe, uT: { value: -1 }, uEdge: { value: 0 }, uBody: { value: 0 } },
+    vertexShader: shardVert, fragmentShader: shardFrag, transparent: true, depthWrite: false, side: THREE.DoubleSide
+  }), [wipe]);
+  const shardMesh = useRef(null);
+  const [firstShards] = useState(() => shardGeometry().g);
 
   const sparks = useMemo(() => {
     const g = new THREE.BufferGeometry();
@@ -195,14 +186,36 @@ export const ModeShift = ({ kind, onDone }) => {
   const glowMesh = useRef(null);
 
   useEffect(() => () => {
-    bg.dispose(); glow.dispose(); sparks.g.dispose(); sparks.material.dispose();
-    if (shards) { shards.g.dispose(); shards.material.dispose(); }
-  }, [bg, glow, sparks, shards]);
+    bg.dispose(); glow.dispose(); sparks.g.dispose(); sparks.material.dispose(); shardMaterial.dispose();
+    shardMesh.current?.geometry.dispose();
+  }, [bg, glow, sparks, shardMaterial]);
 
+  // Each switch starts clean
   const state = useRef({ broke: false, done: false });
+  useEffect(() => {
+    if (!kind) return;
+    state.current = { broke: false, done: false };
+    sparks.life.fill(0);
+    shardMaterial.uniforms.uT.value = -1; shardMaterial.uniforms.uEdge.value = 0; shardMaterial.uniforms.uBody.value = 0;
+    if (kind !== 'shatter' || !shardMesh.current) return;
+    const { g, info } = shardGeometry();
+    shardMesh.current.geometry.dispose();
+    shardMesh.current.geometry = g;
+    // The shards the small bubbles grow from: spread round the circle, and not the slivers
+    let pool = info.map((x) => x).filter((x) => x.area > 0.05);
+    if (pool.length < SMALL) pool = info;
+    pool.sort((x, y) => x.ang - y.ang);
+    modeShift.spawns = Array.from({ length: SMALL }, (_, k) => {
+      const sh = pool[Math.floor(((k + 0.5) * pool.length) / SMALL)];
+      const when = SHATTER.BREAK + 0.42 + k * 0.025;
+      const at = shardAt(sh, when - SHATTER.BREAK); const vel = shardVel(sh, when - SHATTER.BREAK);
+      return { when, x: at[0], y: at[1], vx: vel[0], vy: vel[1] };
+    });
+  }, [kind, sparks, shardMaterial]);
   const colour = useMemo(() => new THREE.Color(), []);
 
   useFrame((_, delta) => {
+    if (!kind) return;
     const dt = Math.min(delta, 0.05);
     const t = shiftTime();
     time.value += dt;
@@ -214,7 +227,7 @@ export const ModeShift = ({ kind, onDone }) => {
     let glowAmt = 0; let glowSize = 2.4;
 
     if (kind === 'shatter') {
-      const u = shards.material.uniforms;
+      const u = shardMaterial.uniforms;
       if (t < SHATTER.BREAK) {
         // cracks of light run through the glass, flickering, as the beam overloads it
         const c = smooth(t / SHATTER.BREAK);
@@ -275,15 +288,15 @@ export const ModeShift = ({ kind, onDone }) => {
   });
 
   return (
-    <>
+    <group visible={Boolean(kind)}>
       <mesh material={bg} frustumCulled={false} renderOrder={-100}>
         <planeGeometry args={[2, 2]} />
       </mesh>
-      {shards && <mesh geometry={shards.g} material={shards.material} frustumCulled={false} renderOrder={12} />}
+      <mesh ref={shardMesh} geometry={firstShards} material={shardMaterial} frustumCulled={false} renderOrder={12} visible={kind === 'shatter'} />
       <points geometry={sparks.g} material={sparks.material} frustumCulled={false} renderOrder={14} />
       <mesh ref={glowMesh} material={glow} position={[CENTRE.x, CENTRE.y, 8]} renderOrder={15} visible={false}>
         <planeGeometry />
       </mesh>
-    </>
+    </group>
   );
 };
