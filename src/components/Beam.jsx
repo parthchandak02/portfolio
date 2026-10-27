@@ -4,7 +4,7 @@ import { useFrame } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import { Reflect } from './Reflect'
 
-export const Beam = forwardRef(({ children, position, stride = 4, width = 8, ...props }, fRef) => {
+export const Beam = forwardRef(({ children, position, stride = 4, width = 8, light = null, ...props }, fRef) => {
   const streaks = useRef(null)
   const glow = useRef(null)
   const reflect = useRef(null)
@@ -26,6 +26,10 @@ export const Beam = forwardRef(({ children, position, stride = 4, width = 8, ...
 
   useFrame(() => {
     range = reflect.current.update() - 1
+    // dimmed and brightened as the modes switch
+    const k = light ? light.value : 1
+    streaks.current.material.opacity = 1.5 * k
+    glow.current.material.opacity = k
 
     for (i = 0; i < range; i++) {
       // Position 1

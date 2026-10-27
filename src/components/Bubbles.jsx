@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { onPrismGlow } from '../hooks/prismGlow';
+import { modeShift, shiftTime, wipeAt, SHATTER, VORTEX, CENTRE, smooth, easeInOut3, easeOutBack } from '../hooks/modeShift';
 
 // Light mode's scene. The prism's beam is light added to black, which a white page can't show, so here the
 // light-splitting object is the soap bubble: nearly invisible, seen by the room reflected in its skin and
@@ -75,21 +76,26 @@ const fragmentShader = `
 const dropVert = `
   attribute float aLife; attribute float aSize; attribute vec3 aColor;
   uniform float uDpr;
-  varying float vLife; varying vec3 vColor;
+  varying float vLife; varying vec3 vColor; varying vec2 vW;
   void main() {
-    vLife = aLife; vColor = aColor;
+    vLife = aLife; vColor = aColor; vW = position.xy;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     gl_PointSize = aSize * uDpr * (0.6 + 0.4 * aLife);
   }`;
 const dropFrag = `
-  varying float vLife; varying vec3 vColor;
+  uniform vec2 uWC; uniform float uWR; uniform float uWDark;
+  varying float vLife; varying vec3 vColor; varying vec2 vW;
   void main() {
     vec2 c = gl_PointCoord - 0.5; float r = length(c);
     if (r > 0.5 || vLife <= 0.0) discard;
     // a tiny bead: a darker edge and a bright glint
     float bead = smoothstep(0.5, 0.32, r);
     vec3 col = mix(vColor * 0.75, vec3(1.0), smoothstep(0.22, 0.0, length(c - vec2(-0.12, 0.12))));
-    gl_FragColor = vec4(pow(col, vec3(2.2)), bead * vLife * 0.85);
+    // switching to dark, the page goes dark outside a closing circle, and there a droplet glows instead
+    float dark = uWDark * smoothstep(uWR - 0.03, uWR + 0.03, length(vW - uWC));
+    col = mix(col, mix(vColor, vec3(1.0), 0.6) * 1.6, dark);
+    float a = mix(bead * 0.85, exp(-r * r * 18.0), dark);
+    gl_FragColor = vec4(pow(col, vec3(2.2)), a * vLife);
   }`;
 
 const SMALL = 9; // bubbles rising past the big one
@@ -107,7 +113,17 @@ const srgb = (hex) => new THREE.Color().setStyle(hex, THREE.LinearSRGBColorSpace
 const rand = (a, b) => a + Math.random() * (b - a);
 const PASTELS = ['#9fb6ff', '#c3a6ff', '#8fe3d4', '#ffd29a', '#ffb3c7', '#b9c3d1'].map(srgb);
 
-export const Bubbles = ({ interactive = false, canPop = false, viewportPosition, tint = null }) => {
+// A burst starting at a point on the bubble's surface, given as a direction on screen from its centre
+const burst = (b, m, dir) => {
+  dir = dir.clone().normalize().applyQuaternion(m.quaternion.clone().invert());
+  b.uniforms.uRupture.value.copy(dir);
+  const a = Math.abs(dir.x) < 0.9 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
+  const u = new THREE.Vector3().crossVectors(dir, a).normalize(); const w = new THREE.Vector3().crossVectors(dir, u);
+  b.basis = { dir, u, w };
+  b.pop = reduceMotion() ? POP_S : 0.0001;
+};
+
+export const Bubbles = ({ interactive = false, canPop = false, viewportPosition, tint = null, shift = null }) => {
   const { viewport, gl } = useThree();
   const time = useMemo(() => ({ value: 0 }), []);
   const tintColor = useMemo(() => ({ value: srgb('#ffffff') }), []);
@@ -125,7 +141,7 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
     return {
       big: i === 0, seed: Math.random() * 10, uniforms,
       material: new THREE.ShaderMaterial({ uniforms, vertexShader, fragmentShader, transparent: true, depthWrite: false, side: THREE.DoubleSide }),
-      pos: new THREE.Vector3(), push: new THREE.Vector3(), r: 1, speed: 0, grow: 1, pop: 0, basis: null
+      pos: new THREE.Vector3(), push: new THREE.Vector3(), vel: new THREE.Vector2(), r: 1, speed: 0, grow: 1, pop: 0, basis: null, when: Infinity, gone: false, arrived: false
     };
   }), [time, tintColor, tintAmt, glow]);
 
@@ -137,7 +153,7 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
     g.setAttribute('aLife', new THREE.BufferAttribute(life, 1));
     g.setAttribute('aSize', new THREE.BufferAttribute(size, 1));
     g.setAttribute('aColor', new THREE.BufferAttribute(color, 3));
-    const material = new THREE.ShaderMaterial({ uniforms: { uDpr: { value: 1 } }, vertexShader: dropVert, fragmentShader: dropFrag, transparent: true, depthWrite: false, depthTest: false });
+    const material = new THREE.ShaderMaterial({ uniforms: { uDpr: { value: 1 }, uWC: { value: new THREE.Vector2(CENTRE.x, CENTRE.y) }, uWR: { value: 1e4 }, uWDark: { value: 0 } }, vertexShader: dropVert, fragmentShader: dropFrag, transparent: true, depthWrite: false, depthTest: false });
     return { g, material, pos, life, size, color, vel: new Float32Array(DROPS * 3), age: new Float32Array(DROPS), span: new Float32Array(DROPS), next: 0 };
   }, []);
   const emit = (x, y, z, vx, vy, vz, px) => {
@@ -159,6 +175,7 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
     b.grow = (fromBelow || b.big) && !reduceMotion() ? 0 : 1;
   };
   const placed = useRef(false);
+  const departing = useRef(false);
   if (!placed.current) {
     bubbles.forEach((b) => { spawn(b, false, viewport.width, viewport.height); b.grow = 1; });
     placed.current = true;
@@ -193,16 +210,10 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
       const y = (0.5 - (e.clientY - box.top) / box.height) * vh;
       const hit = bubbles.filter((b) => !b.pop && b.grow > 0.6 && Math.hypot(b.pos.x + b.push.x - x, b.pos.y + b.push.y - y) < b.r).sort((a, b) => a.r - b.r)[0];
       if (!hit) return;
-      const i = bubbles.indexOf(hit); const m = meshes.current[i];
-      // The rupture is where the finger touched the front of the bubble, in the bubble's own frame
+      const m = meshes.current[bubbles.indexOf(hit)];
+      // The rupture is where the finger touched the front of the bubble
       const lx = (x - m.position.x) / m.scale.x; const ly = (y - m.position.y) / m.scale.y;
-      const dir = new THREE.Vector3(lx, ly, Math.sqrt(Math.max(0, 1 - lx * lx - ly * ly))).normalize();
-      dir.applyQuaternion(m.quaternion.clone().invert());
-      hit.uniforms.uRupture.value.copy(dir);
-      const a = Math.abs(dir.x) < 0.9 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
-      const u = new THREE.Vector3().crossVectors(dir, a).normalize(); const w = new THREE.Vector3().crossVectors(dir, u);
-      hit.basis = { dir, u, w };
-      hit.pop = reduceMotion() ? POP_S : 0.0001;
+      burst(hit, m, new THREE.Vector3(lx, ly, Math.sqrt(Math.max(0, 1 - lx * lx - ly * ly))));
     };
     document.addEventListener('pointerdown', onDown);
     return () => document.removeEventListener('pointerdown', onDown);
@@ -232,9 +243,57 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
     const unit = Math.min(vw, vh);
     const px = (viewportPosition?.x ?? 9) * vw / 2;
     const py = (viewportPosition?.y ?? 9) * vh / 2;
+    // Switching modes (see hooks/modeShift)
+    const st = shift ? shiftTime() : 0;
+    const wipe = shift === 'vortex' ? wipeAt('vortex', st) : null;
+    drops.material.uniforms.uWDark.value = wipe ? 1 : 0;
+    drops.material.uniforms.uWR.value = wipe ? wipe.r : 1e4;
+    // Leaving for dark: they burst from the outside in, the big one last
+    if (shift === 'vortex' && !departing.current) {
+      departing.current = true;
+      const d = (b) => Math.hypot(b.pos.x + b.push.x - CENTRE.x, b.pos.y + b.push.y - CENTRE.y);
+      const far = Math.max(1e-3, ...bubbles.map(d));
+      bubbles.forEach((b) => { b.when = b.big ? 0.5 : 0.04 + 0.4 * (1 - d(b) / far); });
+    }
     bubbles.forEach((b, i) => {
       const m = meshes.current[i];
       b.r = unit * b.k; // follows the window as it is resized
+      // Arriving from the shattered prism: the big one swells out of its core, the small ones grow from shards
+      if (shift === 'shatter') {
+        let shown = false;
+        if (b.big) {
+          const k = (st - SHATTER.BREAK - 0.12) / 0.95;
+          if (k > 0) {
+            const e = easeInOut3(k);
+            const rx = vw * 0.06 + Math.sin(time.value * 0.31) * vw * 0.01; const ry = -vh * 0.04 + Math.sin(time.value * 0.5) * vh * 0.012;
+            b.pos.set(CENTRE.x + (rx - CENTRE.x) * e, CENTRE.y + (ry - CENTRE.y) * e, 0);
+            b.s = b.r * easeOutBack(k); shown = true;
+          }
+        } else {
+          const sp = modeShift.spawns[i - 1];
+          if (sp && st >= sp.when) {
+            if (!b.arrived) { b.arrived = true; b.pos.set(sp.x, sp.y, b.pos.z); b.vel.set(sp.vx, sp.vy); }
+            b.vel.multiplyScalar(Math.exp(-dt * 2.5));
+            b.pos.x += b.vel.x * dt; b.pos.y += b.vel.y * dt;
+            b.s = b.r * easeOutBack((st - sp.when) / 0.55); shown = true;
+          }
+        }
+        if (m) {
+          m.visible = shown;
+          m.position.copy(b.pos); m.scale.setScalar(Math.max(b.s || 0, 0.0001));
+          m.rotation.y += dt * 0.08; m.rotation.x += dt * 0.03;
+        }
+        return;
+      }
+      if (b.gone) { if (m) m.visible = false; return; }
+      if (m) m.visible = true;
+      if (shift === 'vortex' && !b.pop && st >= b.when && m) {
+        // burst on the side facing the centre, so the droplets are flung inward
+        const to = new THREE.Vector3(CENTRE.x - m.position.x, CENTRE.y - m.position.y, 0);
+        if (to.lengthSq() < 1e-4) to.set(0, 0, 1);
+        to.normalize(); to.z = 0.7;
+        burst(b, m, to);
+      }
       if (!b.big) {
         b.pos.y += b.speed * dt * pace;
         b.pos.x += Math.sin(time.value * 0.6 + b.seed) * 0.003 * pace;
@@ -269,7 +328,10 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
               tmp.t.x * sp + tmp.p.x * b.r * 0.6, tmp.t.y * sp + tmp.p.y * b.r * 0.6, 0, rand(2.5, 5.5));
           }
         }
-        if (b.pop > POP_S + 0.12) spawn(b, !b.big, vw, vh);
+        if (b.pop > POP_S + 0.12) {
+          // leaving for dark, a burst bubble is gone for good
+          if (shift === 'vortex') { b.gone = true; b.pop = 0; b.uniforms.uPop.value = 0; } else spawn(b, !b.big, vw, vh);
+        }
       }
       if (!m) return;
       m.position.set(b.pos.x + b.push.x, b.pos.y + b.push.y, b.pos.z);
@@ -277,10 +339,26 @@ export const Bubbles = ({ interactive = false, canPop = false, viewportPosition,
       if (!b.pop) { m.rotation.y += dt * 0.08 * pace; m.rotation.x += dt * 0.03 * pace; }
     });
 
-    // droplets fly, slow in the air, fall and fade
+    // droplets fly, slow in the air, fall and fade. Leaving for dark, they are drawn into a spiral to the
+    // centre instead, each one caught there feeding the light the prism forms from.
+    const attract = shift === 'vortex' ? smooth((st - 0.15) / 0.5) : 0;
+    const formed = shift === 'vortex' && st >= VORTEX.FORM;
     let live = 0;
     for (let i = 0; i < DROPS; i++) {
       if (drops.life[i] <= 0) continue;
+      if (formed) { drops.life[i] = 0; continue; }
+      if (attract > 0) {
+        const ix = i * 3; const iy = ix + 1;
+        const tx = CENTRE.x - drops.pos[ix]; const ty = CENTRE.y - drops.pos[iy]; const d = Math.hypot(tx, ty) || 1e-3;
+        if (d < 0.22 * attract + 0.02) { drops.life[i] = 0; modeShift.core += 1; continue; }
+        const pull = 22 * attract; const turn = 11 * attract;
+        drops.vel[ix] += ((tx / d) * pull - (ty / d) * turn) * dt; drops.vel[iy] += ((ty / d) * pull + (tx / d) * turn) * dt;
+        const damp = Math.exp(-dt * 2.2 * attract); drops.vel[ix] *= damp; drops.vel[iy] *= damp;
+        drops.pos[ix] += drops.vel[ix] * dt; drops.pos[iy] += drops.vel[iy] * dt;
+        drops.life[i] = Math.max(drops.life[i], 0.7);
+        live += 1;
+        continue;
+      }
       drops.age[i] += dt;
       const f = 1 - drops.age[i] / drops.span[i];
       if (f <= 0) { drops.life[i] = 0; continue; }

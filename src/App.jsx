@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState, useMemo } from 'react';
+import { flushSync } from 'react-dom';
 import './styles.css';
 import Layout from './components/Layout';
 // GlassNavigation removed - replaced with white space placeholder
@@ -10,6 +11,7 @@ import BandBar from './components/BandBar';
 import ContactButton from './components/ContactButton';
 import UITypewriter from './components/UITypewriter';
 import useLightMode from './hooks/useLightMode';
+import { switchMode } from './hooks/modeShift';
 import useGlobalMouse from './hooks/useGlobalMouse';
 import useScrollHighlight, { scrollCardToLine } from './hooks/useScrollHighlight';
 import { timelineData } from './data/timelineData';
@@ -164,14 +166,22 @@ export default function App() {
   // The rainbow lights the band you are reading in the record, or the one picked on the strip above it
   const litBand = handedOver ? bandForSection(visibleCategory) : focusBand;
 
-  // Sync html and body background with light mode to prevent edge bleeding
-  useEffect(() => {
-    const className = lightMode ? 'light-mode' : 'dark-mode';
-    // Keep the playground's class, which its own effect sets on the same element
-    const root = document.documentElement;
-    root.className = [className, root.classList.contains('is-playground') && 'is-playground'].filter(Boolean).join(' ');
-    document.body.className = className;
-  }, [lightMode]);
+  // Sync html and body background with light mode to prevent edge bleeding. Only the mode's own classes are
+  // touched: the playground and the mode switch keep theirs on the same element.
+  const paintMode = (light) => {
+    [document.documentElement, document.body].forEach((el) => {
+      el.classList.toggle('light-mode', light);
+      el.classList.toggle('dark-mode', !light);
+    });
+  };
+  useEffect(() => paintMode(lightMode), [lightMode]);
+
+  // The prism shatters into bubbles, or the bubbles collapse into the prism (see hooks/modeShift). The page
+  // changes inside the switch's capture, so its new colours are there to sweep in.
+  const flipMode = () => switchMode(!lightMode, () => {
+    flushSync(toggleLightMode);
+    paintMode(!lightMode);
+  });
 
   return (
     <TypewriterHighlightProvider>
@@ -198,7 +208,7 @@ export default function App() {
         {/* UI Overlay Layer */}
         <div className={`layout__ui${handedOver ? ' layout__ui--reading' : ''}${atTop ? ' layout__ui--top' : ''}${isPlayMode ? ' layout__ui--play' : ''}`}>
           {/* Fixed UI Components */}
-          <LightToggle lightMode={lightMode} onToggle={toggleLightMode} />
+          <LightToggle lightMode={lightMode} onToggle={flipMode} />
           <LockToggle isLocked={isLocked} onToggle={toggleLock} lightMode={lightMode} />
           <PlayModeToggle isPlayMode={isPlayMode} onToggle={togglePlayMode} lightMode={lightMode} />
           {!isPlayMode && <BandBar category={visibleCategory} title={visibleTitle} lightMode={lightMode} />}

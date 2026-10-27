@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, useEffect } from 'react';
+import { useRef, useCallback, useState, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Beam } from './Beam';
@@ -6,20 +6,25 @@ import { Rainbow } from './Rainbow';
 import { Prism } from './Prism';
 import { Flare } from './Flare';
 import { Box } from './Box';
-import { SwarmLight } from './SwarmLight';
 import { calculateRefractionAngle, lerp, lerpV3 } from '../util';
 import { onPrismGlow } from '../hooks/prismGlow';
+import { modeShift, shiftTime, SHATTER, VORTEX, smooth, easeOutBack } from '../hooks/modeShift';
 
 const PULSE_MS = 1500; // the pulse's run from the prism to the rainbow's far end
 const CATCH_MS = 900; // the flare's swell and settle
 
-const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
+const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null, shift = null }) => {
   const [isPrismHit, hitPrism] = useState(false);
   const flare = useRef(null);
   const ambient = useRef(null);
   const spot = useRef(null);
   const boxreflect = useRef(null);
   const rainbow = useRef(null);
+  const root = useRef(null);
+  const prism = useRef(null);
+  const boxes = useRef([]);
+  const hit = useRef({ x: 0, y: 0 });
+  const beamLight = useMemo(() => ({ value: 1 }), []);
   
   const { viewport, invalidate } = useThree();
 
@@ -63,6 +68,7 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
     vecRef.current.toArray(api.positions, api.number++ * 3);
     // Set flare
     flare.current.position.set(position.x, position.y, -0.5);
+    hit.current.x = position.x; hit.current.y = position.y;
     flare.current.rotation.set(0, 0, -Math.atan2(direction.x, direction.y));
     // Calculate refraction angles
     let angleScreenCenter = Math.atan2(-position.y, -position.x);
@@ -93,7 +99,27 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
       const mouseX = (viewportPosition.x * viewport.width) / 2;
       const mouseY = (viewportPosition.y * viewport.height) / 2;
       boxreflect.current.setRay([mouseX, mouseY, 0], [0, 0, 0]);
+      // where the light runs, for the switch to light mode to scatter it
+      modeShift.beam = { fx: mouseX, fy: mouseY, hx: hit.current.x, hy: hit.current.y, ox: 0, oy: 0, out: rainbow.current.rotation.z };
     }
+
+    // Switching modes (see hooks/modeShift). To light: the beam overloads the prism, then the scene gives way
+    // to its shards. To dark: the scene waits unseen until the droplets' flash, then the prism and the boxes
+    // spring out of it and the light comes back on.
+    let lit = 1; let overload = 0;
+    if (shift === 'shatter') {
+      const t = shiftTime();
+      overload = smooth(t / SHATTER.BREAK);
+      root.current.visible = t < SHATTER.BREAK;
+    } else if (shift === 'vortex') {
+      const k = shiftTime() - VORTEX.FORM;
+      root.current.visible = k >= 0;
+      const grow = Math.max(0.001, easeOutBack(k / 0.42));
+      prism.current?.scale.setScalar(grow);
+      boxes.current.forEach((b) => b?.scale.setScalar(0.5 * Math.max(0.001, easeOutBack((k - 0.08) / 0.42))));
+      lit = smooth((k - 0.2) / 0.4);
+    }
+    beamLight.value = lit * (1 + overload * 1.2);
     
     // Glide the highlight to the picked band's wavelength; with nothing picked, ease back to the full spectrum
     const m = rainbow.current.material;
@@ -111,18 +137,18 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
     m.pulseAmt = p < 1 ? Math.sin(Math.min(1, p * 6) * Math.PI / 2) * (1 - p) : 0;
     m.pulseWave = g ? g.wave : 0;
     m.flash = swell * 0.3;
-    if (flare.current) flare.current.scale.setScalar(1.25 * (1 + swell * 0.4));
+    if (flare.current) flare.current.scale.setScalar(1.25 * (1 + swell * 0.4) * (1 + overload * 1.6) * Math.max(lit, 0.001));
     if (p >= 1) glow.current = null;
 
     // Animate rainbow intensity
-    lerp(rainbow.current.material, 'emissiveIntensity', isPrismHit ? 2.5 : 0, 0.1);
+    lerp(rainbow.current.material, 'emissiveIntensity', isPrismHit ? 2.5 * lit * (1 + overload * 0.6) : 0, lit < 1 ? 1 : 0.1);
     spot.current.intensity = rainbow.current.material.emissiveIntensity;
     // Animate ambience
     lerp(ambient.current, 'intensity', lightMode ? 0.8 : 0, 0.025);
   });
 
   return (
-    <>
+    <group ref={root}>
       {/* Lights */}
       <ambientLight ref={ambient} intensity={lightMode ? 0.8 : 0} />
       <pointLight position={[10, -10, 0]} intensity={0.05} />
@@ -131,18 +157,17 @@ const Scene = ({ lightMode, viewportPosition, isLocked, focusWave = null }) => {
       <spotLight ref={spot} intensity={1} distance={7} angle={1} penumbra={1} position={[0, 0, 1]} />
 
       {/* Prism + blocks + reflect beam */}
-      <Beam ref={boxreflect} bounce={10} far={20}>
-        <Prism position={[0, -0.5, 0]} onRayOver={rayOver} onRayOut={rayOut} onRayMove={rayMove} />
-        <Box position={[2.25, -3.5, 0]} rotation={[0, 0, Math.PI / 3.5]} />
-        <Box position={[-2.5, -2.5, 0]} rotation={[0, 0, Math.PI / 4]} />
-        <Box position={[-3, 1, 0]} rotation={[0, 0, Math.PI / 4]} />
+      <Beam ref={boxreflect} bounce={10} far={20} light={beamLight}>
+        <Prism ref={prism} position={[0, -0.5, 0]} onRayOver={rayOver} onRayOut={rayOut} onRayMove={rayMove} />
+        <Box ref={(b) => { boxes.current[0] = b; }} position={[2.25, -3.5, 0]} rotation={[0, 0, Math.PI / 3.5]} />
+        <Box ref={(b) => { boxes.current[1] = b; }} position={[-2.5, -2.5, 0]} rotation={[0, 0, Math.PI / 4]} />
+        <Box ref={(b) => { boxes.current[2] = b; }} position={[-3, 1, 0]} rotation={[0, 0, Math.PI / 4]} />
       </Beam>
       
       {/* Rainbow and flares */}
       <Rainbow ref={rainbow} lightMode={lightMode} startRadius={0} endRadius={0.5} fade={0} />
-      <SwarmLight lightMode={lightMode} />
       <Flare ref={flare} visible={isPrismHit} renderOrder={10} scale={1.25} streak={[12.5, 20, 1]} />
-    </>
+    </group>
   );
 };
 

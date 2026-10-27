@@ -1,11 +1,12 @@
+import { forwardRef } from 'react'
 import { useLoader } from '@react-three/fiber'
 import { MeshTransmissionMaterial } from '@react-three/drei'
 import { GLTFLoader } from 'three-stdlib'
 
-export function Prism({ onRayOver, onRayOut, onRayMove, ...props }) {
+export const Prism = forwardRef(function Prism({ onRayOver, onRayOut, onRayMove, ...props }, ref) {
   const { nodes } = useLoader(GLTFLoader, '/gltf/prism.glb')
   return (
-    <group {...props}>
+    <group ref={ref} {...props}>
       {/* A low-res, invisible representation of the prism that gets hit by the raycaster */}
       <mesh visible={false} scale={1.9} rotation={[Math.PI / 2, Math.PI, 0]} onRayOver={onRayOver} onRayOut={onRayOut} onRayMove={onRayMove}>
         <cylinderGeometry args={[1, 1, 1, 3, 1]} />
@@ -16,4 +17,4 @@ export function Prism({ onRayOver, onRayOut, onRayMove, ...props }) {
       </mesh>
     </group>
   )
-}
+})
