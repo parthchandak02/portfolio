@@ -122,6 +122,17 @@ const useScrollHighlight = (activeFilter) => {
       centermostTitle = timelineRect(readingLine) ? null : edge.getAttribute('data-title');
     }
 
+    // Selected work is a single row on a wide screen, so the reading line passes it while its tiles are still
+    // in full view. While they are, the bar keeps saying Selected work rather than naming the card below.
+    const selected = document.getElementById('selected');
+    if (selected && centermostCategory !== 'selected') {
+      const r = selected.getBoundingClientRect();
+      if (r.top < readingLine && r.bottom > containerRect.top + BAR_CLEARANCE + 60) {
+        centermostCategory = 'selected';
+        centermostTitle = null;
+      }
+    }
+
     // Only update if category changed (reduce unnecessary re-renders)
     const key = `${centermostCategory}|${centermostTitle}`;
     if (key !== lastKeyRef.current) {
