@@ -8,7 +8,7 @@ import { Bubbles } from './Bubbles';
 import { SwarmLight } from './SwarmLight';
 import { lightTheme } from '../hooks/lightTheme';
 
-const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, isPlayMode = false }) => {
+const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, focusHue = null, isPlayMode = false }) => {
   const texture = useLoader(LUTCubeLoader, '/lut/F-6800-STD.cube');
   // Dither the final image: the soft glow over a dark page otherwise shows steps when it is cut to 8 bits
   const composer = useRef(null);
@@ -44,7 +44,7 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, isPlayMode
       {/* Dark mode is the prism and its beam; light mode, soap bubbles (a white page can't show added light) */}
       {lightMode ? (
         <>
-          <Bubbles interactive={isPlayMode} viewportPosition={viewportPosition} />
+          <Bubbles interactive={isPlayMode || !isLocked} canPop={isPlayMode} viewportPosition={viewportPosition} tint={focusHue} />
           <SwarmLight lightMode />
         </>
       ) : (

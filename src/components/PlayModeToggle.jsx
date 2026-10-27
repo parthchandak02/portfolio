@@ -1,12 +1,15 @@
-import { Rainbow, Glasses, Pyramid, FileUser } from 'lucide-react';
+import { Rainbow, Glasses, Pyramid, FileUser, Bubbles, Droplet } from 'lucide-react';
 import './PlayModeToggle.css';
 
-const PlayModeToggle = ({ isPlayMode, onToggle }) => {
+// The playground's toy: the prism in dark mode, soap bubbles in light mode
+const PlayModeToggle = ({ isPlayMode, onToggle, lightMode = false }) => {
+  const play = lightMode ? 'Play with bubbles' : 'Play with prism';
+  const [First, Second] = lightMode ? [Bubbles, Droplet] : [Pyramid, Rainbow];
   return (
     <button
       className={`play-mode-toggle glass glass-interactive ${isPlayMode ? 'play-mode' : ''}`}
       onClick={onToggle}
-      aria-label={isPlayMode ? 'Back to the portfolio' : 'Play with prism'}
+      aria-label={isPlayMode ? 'Back to the portfolio' : play}
     >
       <span className="play-mode-toggle__icon">
         {isPlayMode ? (
@@ -21,15 +24,15 @@ const PlayModeToggle = ({ isPlayMode, onToggle }) => {
         ) : (
           <span className="play-mode-toggle__icon-container play-mode-toggle__icon-container--reading-mode">
             <span className="play-mode-toggle__icon-primary">
-              <Pyramid size={18} />
+              <First size={18} />
             </span>
             <span className="play-mode-toggle__icon-secondary">
-              <Rainbow size={18} />
+              <Second size={18} />
             </span>
           </span>
         )}
       </span>
-      <span className="ui-hint" aria-hidden="true">{isPlayMode ? 'Back to the portfolio' : 'Play with prism'}</span>
+      <span className="ui-hint" aria-hidden="true">{isPlayMode ? 'Back to the portfolio' : play}</span>
     </button>
   );
 };

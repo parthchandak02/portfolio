@@ -188,6 +188,7 @@ export default function App() {
             isLocked={isLocked}
             isPlayMode={isPlayMode}
             focusWave={litBand?.wave ?? null}
+            focusHue={litBand?.hue ?? null}
           />
         </Suspense>
         
@@ -198,8 +199,8 @@ export default function App() {
         <div className={`layout__ui${handedOver ? ' layout__ui--reading' : ''}${atTop ? ' layout__ui--top' : ''}${isPlayMode ? ' layout__ui--play' : ''}`}>
           {/* Fixed UI Components */}
           <LightToggle lightMode={lightMode} onToggle={toggleLightMode} />
-          <LockToggle isLocked={isLocked} onToggle={toggleLock} />
-          <PlayModeToggle isPlayMode={isPlayMode} onToggle={togglePlayMode} />
+          <LockToggle isLocked={isLocked} onToggle={toggleLock} lightMode={lightMode} />
+          <PlayModeToggle isPlayMode={isPlayMode} onToggle={togglePlayMode} lightMode={lightMode} />
           {!isPlayMode && <BandBar category={visibleCategory} title={visibleTitle} lightMode={lightMode} />}
           
           {/* Main Content Area - Typewriter always shows, other content conditional */}
