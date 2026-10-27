@@ -489,30 +489,6 @@ p, span, div, button, input, textarea {
   text-shadow: 0 0 6px rgba(229, 90, 43, 0.2);
 }
 
-/* Switching modes (see hooks/modeShift): the browser captures the page before and after, and a circle sweeps
-   the new one in along the same edge as the 3D. Only the page's layer is captured, not the whole document,
-   whose capture would carry an opaque background; the scene's canvas is kept out of it and shown live
-   beneath, so it keeps moving. */
-@property --shift-r { syntax: '<length>'; inherits: true; initial-value: 0px; }
-html.is-shifting { view-transition-name: none; }
-/* the page's own background steps aside at once (its usual colour fade would leave it opaque in the capture,
-   over the scene) */
-html.is-shifting .layout { view-transition-name: page; background: transparent !important; transition: none !important; }
-html.is-shifting .scene3d { view-transition-name: scene3d; }
-::view-transition-group(scene3d) { z-index: 0; animation: none; }
-/* the live canvas is drawn over the frozen one, which only shows until the live one has its first frame */
-::view-transition-old(scene3d),
-::view-transition-new(scene3d) { animation: none; mix-blend-mode: normal; }
-::view-transition-group(page) { z-index: 1; animation: none; }
-::view-transition-old(page),
-::view-transition-new(page) { animation: none; mix-blend-mode: normal; }
-html.is-shifting--shatter::view-transition-new(page),
-html.is-shifting--vortex::view-transition-old(page) {
-  -webkit-mask-image: radial-gradient(circle at var(--shift-x) var(--shift-y), #000 var(--shift-r), transparent calc(var(--shift-r) + 1px));
-  mask-image: radial-gradient(circle at var(--shift-x) var(--shift-y), #000 var(--shift-r), transparent calc(var(--shift-r) + 1px));
-}
-html.is-shifting--shatter::view-transition-old(page),
-html.is-shifting--vortex::view-transition-new(page) {
-  -webkit-mask-image: radial-gradient(circle at var(--shift-x) var(--shift-y), transparent var(--shift-r), #000 calc(var(--shift-r) + 1px));
-  mask-image: radial-gradient(circle at var(--shift-x) var(--shift-y), transparent var(--shift-r), #000 calc(var(--shift-r) + 1px));
-}
+/* Switching modes (see hooks/modeShift): the page fades out and changes colour unseen, so its usual colour
+   fades are skipped */
+html.is-shifting, html.is-shifting * { transition: none !important; }

@@ -12,40 +12,47 @@ import { modeShift, endShift } from '../hooks/modeShift';
 import { QUALITY } from '../hooks/quality';
 
 // Both scenes and the switch's effects stay mounted (the one not showing hidden and idle), so no shader is
-// compiled at the moment you switch, which stalled phones for a second or two. Once the page has settled,
-// this compiles the hidden ones' shaders too, while nothing is happening. three.js keys a
-// compiled shader partly on where it draws: the scene draws into the post-processing's off-screen buffer, not
-// to the screen, so the compile is aimed at a buffer of the same kind, or the shaders it made would not match.
+// compiled at the moment you switch, which stalled phones for a second or two. As soon as the scene is up,
+// this prepares the hidden ones too. It starts the moment the scene loads rather than waiting for a quiet
+// moment: with the scene animating every frame the browser is rarely idle, and a late warm-up landed on the
+// first switch and froze it for up to two seconds.
+// three.js keys a compiled shader partly on where it draws: the scene draws into the post-processing's
+// off-screen buffer, not to the screen, so the warm-up aims at a buffer of the same kind, or the shaders it
+// made would not match. It also keys on the number of lights, so it runs twice: with the dark scene's lights,
+// and without them (light mode, and a switch once the prism has gone).
 const Warmup = () => {
   const { gl, scene, camera } = useThree();
   useEffect(() => {
-    const run = () => {
+    let live = true;
+    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType });
+    // Runs `fn` with everything shown (three.js prepares every material, seen or not, but only counts the lights
+    // it can see) and drawing into the buffer, then puts it all back
+    const exposed = (lightsOn, fn) => {
       const hidden = [];
-      // shown for the moment, so the hidden scene's lights are counted (three.js prepares every material,
-      // seen or not, but only counts the lights it can see)
       scene.traverse((o) => { if (!o.visible) { hidden.push(o); o.visible = true; } });
       const lights = [];
       scene.traverse((o) => { if (o.isLight) lights.push(o); });
-      const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType });
       const before = gl.getRenderTarget();
       try {
+        lights.forEach((l) => { l.visible = lightsOn; });
         gl.setRenderTarget(target);
-        // twice: with the dark scene's lights, and without them (light mode, and a switch once the prism has
-        // gone), since the number of lights is part of the key too
-        // (compileAsync sets the shaders up straight away, then lets the browser finish them off the main thread)
-        const compile = () => (gl.compileAsync ? gl.compileAsync(scene, camera).catch(() => {}) : gl.compile(scene, camera));
-        compile();
-        lights.forEach((l) => { l.visible = false; });
-        compile();
+        return fn();
       } finally {
         lights.forEach((l) => { l.visible = true; });
         gl.setRenderTarget(before);
-        target.dispose();
         hidden.forEach((o) => { o.visible = false; });
       }
     };
-    const idle = window.requestIdleCallback ? window.requestIdleCallback(run, { timeout: 4000 }) : setTimeout(run, 2500);
-    return () => (window.cancelIdleCallback ? window.cancelIdleCallback(idle) : clearTimeout(idle));
+    // compileAsync hands the shaders to the GPU to build in the background, without holding up the page. Once
+    // they're built, the scene is drawn once with them: that sends the meshes' geometry and textures to the
+    // GPU, and finishes setting each shader up, both of which otherwise happen the first time each one shows
+    const prepare = async (lightsOn) => {
+      const built = exposed(lightsOn, () => (gl.compileAsync ? gl.compileAsync(scene, camera) : gl.compile(scene, camera)));
+      await Promise.resolve(built).catch(() => {});
+      if (live) exposed(lightsOn, () => gl.render(scene, camera));
+    };
+    prepare(true).then(() => live && prepare(false)).finally(() => target.dispose());
+    return () => { live = false; };
   }, [gl, scene, camera]);
   return null;
 };
@@ -96,6 +103,12 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, focusHue =
   const want = lightMode ? 'light' : 'dark';
   const [shown, setShown] = useState(want);
   const [shift, setShift] = useState(null);
+  // the scene starts its half the moment you switch, before the page has changed (see hooks/modeShift)
+  useEffect(() => {
+    const start = () => setShift(modeShift.kind);
+    window.addEventListener('modeshift', start);
+    return () => window.removeEventListener('modeshift', start);
+  }, []);
   useEffect(() => {
     if (want === shown) return;
     if (modeShift.kind) setShift(modeShift.kind);
@@ -109,6 +122,9 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, focusHue =
     <Canvas 
       orthographic 
       gl={{ antialias: false, powerPreference: 'high-performance' }}
+      // three.js asks the GPU for each shader's error log the first time it draws with it, which makes the
+      // page wait for the GPU to finish building it; the shaders are known good, so the live site doesn't ask
+      onCreated={({ gl }) => { gl.debug.checkShaderErrors = !import.meta.env.PROD; }}
       dpr={QUALITY.dpr}
       camera={{ position: [0, 0, 100], zoom: 60 }}
       className="scene3d"

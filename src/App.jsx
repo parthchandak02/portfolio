@@ -1,5 +1,4 @@
-import { lazy, Suspense, useEffect, useState, useMemo } from 'react';
-import { flushSync } from 'react-dom';
+import { lazy, startTransition, Suspense, useEffect, useState, useMemo } from 'react';
 import './styles.css';
 import Layout from './components/Layout';
 // GlassNavigation removed - replaced with white space placeholder
@@ -177,10 +176,10 @@ export default function App() {
   useEffect(() => paintMode(lightMode), [lightMode]);
 
   // The prism shatters into bubbles, or the bubbles collapse into the prism (see hooks/modeShift). The page
-  // changes inside the switch's capture, so its new colours are there to sweep in.
+  // changes while it is faded out, rendered in slices so the scene keeps its frames.
   const flipMode = () => switchMode(!lightMode, () => {
-    flushSync(toggleLightMode);
     paintMode(!lightMode);
+    startTransition(toggleLightMode);
   });
 
   return (
