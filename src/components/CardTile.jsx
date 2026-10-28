@@ -1,5 +1,6 @@
 import { Play } from 'lucide-react';
 import { bandForSection } from '../data/spectrum';
+import { layoutOf } from '../data/sections';
 import './LabShowcase.css';
 import './CardTile.css';
 
@@ -10,10 +11,8 @@ export const tileImageFor = (item) => {
   return null;
 };
 
-// Jobs and degrees follow one another, so they stay a timeline of wide cards; everything else is a body of
-// separate pieces and shows as tiles
-const TIMELINE_SECTIONS = new Set(['experience', 'education']);
-export const isTile = (item) => !TIMELINE_SECTIONS.has(item.category);
+// Each section's layout (src/data/sections.js) decides: a timeline of wide cards, or tiles
+export const isTile = (item) => layoutOf(item.category) === 'tiles';
 
 // Who it's from (the journal for a paper, else the organisation), and the line under the title
 const venueOf = (item) => (item.volume ? item.volume.split(',')[0] : item.company) || '';

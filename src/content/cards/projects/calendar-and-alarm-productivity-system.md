@@ -1,0 +1,13 @@
+---
+title: Calendar and Alarm Productivity System
+projectImage: /images/calarm-live-activity.jpg
+url: https://github.com/parthchandak02/calarm
+date: September 2024 - October 2026
+skills:
+  - TypeScript
+  - JavaScript
+  - Shell
+typewriterTitle: Programmer
+typewriterPrefix: I am a
+---
+Advanced productivity system combining intelligent calendar management with context-aware alarm systems for optimized time management and task completion.
