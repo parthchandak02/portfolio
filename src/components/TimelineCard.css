@@ -529,3 +529,12 @@
 .timeline-card__video-button:focus-visible { outline: 2px solid #ff6b35; outline-offset: -2px; }
 .timeline-card__video-frame { width: 100%; height: 100%; border: 0; display: block; }
 .timeline-card.collapsed .timeline-card__video { display: none; }
+
+/* Projects done in a role, inside its card: a row of video stills, each with its title and a line about it */
+.timeline-card__subs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 14px; margin: 14px 0 4px; }
+.timeline-card__sub { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.timeline-card__sub-video { margin: 0; }
+.timeline-card__sub-text { display: grid; gap: 2px; }
+.timeline-card__sub-title { font-weight: 600; font-size: 14px; }
+.timeline-card__sub-date { font-size: 12px; opacity: 0.65; }
+.timeline-card__sub-desc { margin: 4px 0 0; font-size: 13px; line-height: 1.5; opacity: 0.8; }

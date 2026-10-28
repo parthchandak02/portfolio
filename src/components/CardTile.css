@@ -1,0 +1,69 @@
+/* Cards as tiles (see CardTile): two styles with one size and one layout, so a grid lines up whatever its mix.
+   The glass, border and focus ring come from .lab-tile. */
+.timeline__tiles .lab__grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.ctile {
+  width: 100%; padding: 0; font: inherit; text-align: left;
+  aspect-ratio: 4 / 3;
+  display: flex; flex-direction: column;
+}
+.ctile__img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
+.ctile__text { margin-top: auto; display: grid; gap: 3px; padding: 0 14px 13px; min-width: 0; }
+.ctile__name {
+  font-size: 0.92rem; font-weight: 600; line-height: 1.28;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.ctile__meta { font-size: 0.72rem; opacity: 0.72; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Photo tile: the picture fills it, shaded at the foot so the title reads; the logo sits in a chip */
+.ctile--photo { color: #fff; }
+.ctile--photo .ctile__img { transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.ctile--photo::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.86) 0%, rgba(0, 0, 0, 0.42) 42%, rgba(0, 0, 0, 0) 70%);
+}
+.ctile--photo .ctile__name { text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5); }
+.ctile__chip {
+  position: absolute; top: 10px; left: 10px;
+  display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.ctile__chip img { width: 22px; height: 22px; object-fit: contain; }
+.ctile__play {
+  position: absolute; top: 10px; right: 10px;
+  display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5); color: #fff;
+}
+@media (hover: hover) { .ctile--photo:hover .ctile__img { transform: scale(1.04); } }
+
+/* Info tile: the logo and who it's from up top, in the band's colour; any picture is a soft ghost behind */
+.ctile--info .ctile__img { opacity: 0.18; filter: blur(5px) saturate(1.1); transform: scale(1.08); }
+.ctile--info .ctile__name { -webkit-line-clamp: 3; }
+.ctile__top { display: flex; align-items: center; gap: 9px; padding: 13px 14px 0; min-width: 0; }
+.ctile__logo { height: 26px; width: auto; max-width: 64px; object-fit: contain; flex: none; opacity: 0.9; }
+.ctile__venue {
+  font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--hue, #ff9a3d);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ctile--info::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  background: var(--hue, #ff9a3d); opacity: 0.6;
+}
+.lab--light .ctile--info .ctile__logo { filter: invert(1) brightness(0.8); }
+.lab--light .ctile--info .ctile__venue { color: color-mix(in srgb, var(--hue, #ff9a3d) 62%, #000); }
+
+/* Phones: square tiles, two across, with room for one more line of title */
+@media (max-width: 560px) {
+  .timeline__tiles .lab__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .ctile { aspect-ratio: 1; }
+  .ctile__top { padding: 11px 12px 0; }
+  .ctile__text { padding: 0 12px 11px; }
+  .ctile__name { font-size: 0.86rem; -webkit-line-clamp: 3; }
+  .ctile--info .ctile__name { -webkit-line-clamp: 4; }
+  .ctile__logo { height: 22px; max-width: 52px; }
+}
+@media (prefers-reduced-motion: reduce) { .ctile__img { transition: none; } }
+
+/* The tile whose card the typewriter names */
+.ctile.is-highlighted { border-color: rgba(255, 107, 53, 0.7); box-shadow: 0 0 0 1px rgba(255, 107, 53, 0.35), 0 0 24px rgba(255, 107, 53, 0.18); }

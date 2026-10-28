@@ -13,6 +13,38 @@ const urlText = (url) => {
   return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
 };
 
+// A project done inside a role, shown in the role's card: its video still, which plays in place when clicked
+const SubProject = ({ item }) => {
+  const [playing, setPlaying] = useState(false);
+  return (
+    <div className="timeline-card__sub">
+      {item.video && (
+        <div className="timeline-card__video timeline-card__sub-video">
+          {playing ? (
+            <iframe
+              className="timeline-card__video-frame"
+              src={`https://www.youtube-nocookie.com/embed/${item.video.id}?autoplay=1&rel=0`}
+              title={item.video.title}
+              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+              allowFullScreen
+            />
+          ) : (
+            <button type="button" className="timeline-card__video-button" onClick={(e) => { e.stopPropagation(); setPlaying(true); }} aria-label={`Play video: ${item.video.title}`}>
+              <img src={`https://i.ytimg.com/vi/${item.video.id}/hqdefault.jpg`} alt="" className="timeline-card__video-thumb" loading="lazy" />
+              <span className="timeline-card__video-play"><Play size={18} fill="currentColor" /></span>
+            </button>
+          )}
+        </div>
+      )}
+      <div className="timeline-card__sub-text">
+        <span className="timeline-card__sub-title">{item.title}</span>
+        <span className="timeline-card__sub-date">{item.date}</span>
+        <p className="timeline-card__sub-desc">{item.description}</p>
+      </div>
+    </div>
+  );
+};
+
 const TimelineCard = ({ 
   title,
   company,
@@ -26,6 +58,7 @@ const TimelineCard = ({
   url, // New URL field for external links
   video, // Optional { id, title } for a click-to-load YouTube embed
   skills = [], // Skill/technology icons for this card
+  subprojects = [], // Projects done in this role, shown inside it
   isTypewriterHighlighted = false,
   lightMode = false,
   className = '',
@@ -181,6 +214,12 @@ const TimelineCard = ({
             <p className="timeline-card__description">{description}</p>
           )}
           
+          {subprojects?.length > 0 && (
+            <div className="timeline-card__subs">
+              {subprojects.map((sub) => <SubProject key={sub.title} item={sub} />)}
+            </div>
+          )}
+
                       {/* Skills/Technology Icons - at the bottom */}
           {skills && skills.length > 0 && (
             <div className="timeline-card__skills">

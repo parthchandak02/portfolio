@@ -153,6 +153,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Find My Zoox",
+        "parent": "Creative Technologist",
         "company": "Zoox",
         "companyLogo": "/logos/zoox-logo.png",
         "date": "May 2026",
@@ -171,6 +172,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "ZooxCast",
+        "parent": "Creative Technologist",
         "company": "Zoox",
         "companyLogo": "/logos/zoox-logo.png",
         "date": "May 2026",
@@ -385,35 +387,20 @@ export const timelineDataByCategory = {
         ]
     },
     {
-        "title": "Manager, Team Innovation Program",
+        "title": "Team Leader and Manager, Team Innovation Program",
         "date": "May 2025 - Present",
         "category": "impact",
         "company": "Mentor Discover Inspire",
         "companyLogo": "/logos/mdi-logo.png",
         "location": "Mentor Discover Inspire",
-        "description": "Leading 3+ cross-team initiatives to enhance inter- and intra-team cohesion. Managing innovative mentorship programs and organizational development.",
-        "typewriterTitle": "Team Leader",
-        "typewriterPrefix": "I am a",
-        "skills": [
-            "Team Management",
-            "Process Optimization",
-            "Innovation"
-        ]
-    },
-    {
-        "title": "Team Leader",
-        "date": "May 2025 - Present",
-        "category": "impact",
-        "company": "Mentor Discover Inspire",
-        "companyLogo": "/logos/mdi-logo.png",
-        "location": "Mentor Discover Inspire",
-        "description": "Expanded team from 6 to 12+ members (up 100%); organized 3+ community service and team-building events.",
+        "description": "Grew the team from 6 to 12+ members (up 100%) and organized 3+ community service and team-building events. Lead 3+ cross-team initiatives to strengthen cohesion within and across teams, and manage its mentorship programs.",
         "typewriterTitle": "Team Leader",
         "typewriterPrefix": "I am a",
         "skills": [
             "Leadership",
-            "Relationships",
-            "Collaboration"
+            "Team Management",
+            "Collaboration",
+            "Innovation"
         ]
     }
   ],
@@ -923,6 +910,7 @@ export const timelineDataByCategory = {
     },
     {
         "title": "Crimson Code Software Hackathon - 1st Place (Tier 1)",
+        "tile": "info",
         "date": "March 2018",
         "projectImage": "/images/crimson-code-2018-caffeine-cycle.png",
         "url": "https://tiny.cc/crimsoncode2018",

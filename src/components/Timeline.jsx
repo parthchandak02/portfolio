@@ -22,14 +22,19 @@ const Timeline = ({
   const { getCurrentHighlights } = useTypewriterHighlight();
   const highlights = getCurrentHighlights();
   
+  // Projects done inside a role (they name it as their parent) show in that role's card, not on their own
+  const childrenOf = useMemo(() => {
+    const out = {};
+    data.forEach((item) => { if (item.parent) (out[item.parent] ||= []).push(item); });
+    return out;
+  }, [data]);
+
   // Filter data based on active filters
   const filteredData = useMemo(() => {
-    if (activeFilters.length === 0) {
-      // No filters selected - show all data
-      return data;
-    }
+    const own = data.filter((item) => !item.parent);
+    if (activeFilters.length === 0) return own;
     // Show items that match any of the active filters
-    return data.filter(item => activeFilters.includes(item.category?.toLowerCase()));
+    return own.filter(item => activeFilters.includes(item.category?.toLowerCase()));
   }, [data, activeFilters]);
   
   // Cards follow the bands of the spectrograph (Career, Patent, Research, ...), so a band's cards sit together.
@@ -54,8 +59,7 @@ const Timeline = ({
   const labItems = sortedData.filter((item) => item.category === 'lab');
   const firstLabIndex = sortedData.findIndex((item) => item.category === 'lab');
 
-  // Cards with a picture or a video, and research papers, show as glass tiles, a run of them sharing one grid.
-  // Other text-only cards stay wide.
+  // Everything but jobs and degrees shows as glass tiles, a band's run of them sharing one grid
   // An opened tile stays as it is and its details open in a row under it (see TileGrid); Escape closes them
   const [openTile, setOpenTile] = useState(null);
   useEffect(() => {
@@ -83,8 +87,7 @@ const Timeline = ({
         out.push({ kind: 'card', item, index });
       }
     });
-    // A lone tile would look stranded, so a run of one stays a wide card
-    return out.flatMap((s) => (s.kind === 'tiles' && s.items.length === 1 ? [{ kind: 'card', ...s.items[0] }] : [s]));
+    return out;
   }, [sortedData, firstLabIndex]);
 
   // Selected work opens the portfolio: the cards marked with a diamond on the strip, as tiles
@@ -119,6 +122,7 @@ const Timeline = ({
       url={item.url}
       video={item.video}
       skills={item.skills || []}
+      subprojects={childrenOf[item.title]}
       lightMode={lightMode}
       className="timeline__card"
       isTypewriterHighlighted={highlights.timelineCards.includes(item.title)}

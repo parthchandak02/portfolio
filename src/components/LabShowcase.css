@@ -87,54 +87,11 @@
   .lab-tile:hover .lab-tile__reveal { opacity: 1; transform: none; }
 }
 
-/* Record cards shown as tiles: a button, so reset its defaults; titles can run longer than a project name */
-.timeline__tiles .lab__grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-.lab-tile--card { width: 100%; padding: 0; font: inherit; text-align: left; aspect-ratio: 4 / 3; }
-.lab-tile--card .lab-tile__name {
-  font-size: 0.95rem; line-height: 1.25;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-}
-.lab-tile--card .lab-tile__desc { -webkit-line-clamp: 2; }
-.lab-tile.is-highlighted { border-color: rgba(255, 107, 53, 0.7); box-shadow: 0 0 0 1px rgba(255, 107, 53, 0.35), 0 0 24px rgba(255, 107, 53, 0.18); }
-.lab-tile__badge {
-  position: absolute; top: 10px; right: 10px; z-index: 4;
-  display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
-  background: rgba(0, 0, 0, 0.45); color: #fff;
-}
-
 @media (max-width: 560px) {
   .lab__grid, .timeline__tiles .lab__grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .lab-tile--card { aspect-ratio: 1; }
-  .lab-tile--card .lab-tile__fog, .lab-tile--card .lab-tile__reveal { padding-left: 12px; padding-right: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .lab-tile__img, .lab-tile__fog, .lab-tile__reveal { transition: none; }
 }
 
-/* Text tiles (research): the venue up top in the band's colour, the title given room to run */
-.lab-tile--text .lab-tile__fog { justify-content: space-between; background: none; text-shadow: none; }
-.lab-tile--text .lab-tile__venue {
-  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--hue, #ff9a3d);
-  padding-right: 34px; /* clear of the topic mark */
-}
-.lab-tile--text .lab-tile__name { -webkit-line-clamp: 4; margin-top: auto; }
-.lab--light .lab-tile--text .lab-tile__venue { color: color-mix(in srgb, var(--hue, #ff9a3d) 62%, #000); }
-.lab--light .lab-tile--text .lab-tile__fog { text-shadow: none; }
-/* The topic mark, faint in the corner until the tile is the one being read or opened */
-.lab-tile__logo {
-  position: absolute; top: 10px; right: 10px; z-index: 2;
-  width: 30px; height: 30px;
-  opacity: 0.32;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-}
-.lab-tile.is-highlighted .lab-tile__logo, .lab-tile.is-open .lab-tile__logo, .lab-tile:focus-visible .lab-tile__logo { opacity: 0.85; }
-@media (hover: hover) { .lab-tile:hover .lab-tile__logo { opacity: 0.85; } }
-.lab--light .lab-tile__logo { filter: invert(1) brightness(0.8); }
-@media (max-width: 560px) {
-  .lab-tile--text { aspect-ratio: auto; min-height: 168px; }
-  .lab-tile--text .lab-tile__fog { position: relative; inset: auto; min-height: 168px; }
-  .lab-tile--text .lab-tile__name { -webkit-line-clamp: 6; }
-}

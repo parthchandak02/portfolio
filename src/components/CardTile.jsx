@@ -1,52 +1,66 @@
-import { Maximize2, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { bandForSection } from '../data/spectrum';
 import './LabShowcase.css';
+import './CardTile.css';
 
-// The picture a card shows as a tile: its own image, else its video's still. Cards without one stay wide.
+// The picture a card shows as a tile: its own image, else its video's still
 export const tileImageFor = (item) => {
   if (item.projectImage) return item.projectImage;
   if (item.video) return `https://i.ytimg.com/vi/${item.video.id}/hqdefault.jpg`;
   return null;
 };
 
-// Research papers have no pictures but still sit together as tiles, so the list reads as one body of work
-const TEXT_TILE_CATEGORIES = new Set(['research']);
-export const isTile = (item) => Boolean(tileImageFor(item)) || TEXT_TILE_CATEGORIES.has(item.category);
+// Jobs and degrees follow one another, so they stay a timeline of wide cards; everything else is a body of
+// separate pieces and shows as tiles
+const TIMELINE_SECTIONS = new Set(['experience', 'education']);
+export const isTile = (item) => !TIMELINE_SECTIONS.has(item.category);
+
+// Who it's from (the journal for a paper, else the organisation), and the line under the title
+const venueOf = (item) => (item.volume ? item.volume.split(',')[0] : item.company) || '';
+const metaOf = (item) => {
+  const venue = venueOf(item);
+  const rest = item.volume ? item.volume.split(',').slice(1).join(',').trim() : item.location;
+  return [item.date, rest && rest !== venue ? rest : null].filter(Boolean).join(' · ');
+};
 
 /**
- * A card shown as a glass tile, like the Lab's. Hover or focus lifts the fog to show what it is; clicking opens
- * its details in a row under it (see TileGrid), and clicking again closes them.
+ * A card as a tile, in one of two styles that share one size and layout. A photo tile leads with its picture,
+ * with the logo as a small chip; an info tile leads with the logo and who it's from, with any picture as a soft
+ * ghost behind. Cards with a picture get a photo tile unless they ask for `tile: 'info'`. Clicking opens the
+ * details in a row under the tile (see TileGrid).
  */
 const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
   const image = tileImageFor(item);
-  const venue = item.volume ? item.volume.split(',')[0] : item.company;
+  const photo = Boolean(image) && item.tile !== 'info';
+  const venue = venueOf(item);
+  const meta = metaOf(item);
   const band = bandForSection(item.category);
+  const logo = typeof item.companyLogo === 'string' ? item.companyLogo : null;
 
   return (
     <button
       type="button"
-      className={`lab-tile lab-tile--card${image ? '' : ' lab-tile--text'}${highlighted ? ' is-highlighted' : ''}${open ? ' is-open' : ''}`}
+      className={`lab-tile ctile ${photo ? 'ctile--photo' : 'ctile--info'}${highlighted ? ' is-highlighted' : ''}${open ? ' is-open' : ''}`}
       style={band ? { '--hue': band.hue } : undefined}
       onClick={onOpen}
       aria-expanded={open}
       aria-label={`${item.title}, ${item.date}. ${open ? 'Close' : 'Show'} the details`}
     >
-      {image && <img className="lab-tile__img" src={image} alt="" loading="lazy" />}
-      {item.video && <span className="lab-tile__badge" aria-hidden="true"><Play size={12} fill="currentColor" /></span>}
-      {!image && item.companyLogo && <img className="lab-tile__logo" src={item.companyLogo} alt="" aria-hidden="true" />}
-
-      <span className="lab-tile__fog" aria-hidden="true">
-        {!image && venue && <span className="lab-tile__venue">{venue}</span>}
-        <span className="lab-tile__name">{item.title}</span>
-        <span className="lab-tile__tag">{item.date}</span>
-      </span>
-
-      <span className="lab-tile__reveal" aria-hidden="true">
-        <span className="lab-tile__name">{item.title}</span>
-        <span className="lab-tile__desc">{item.description}</span>
-        <span className="lab-tile__open">
-          {open ? 'Close' : item.video ? 'Watch' : 'Details'} <Maximize2 size={13} />
+      {image && <img className="ctile__img" src={image} alt="" loading="lazy" />}
+      {photo ? (
+        <>
+          {logo && <span className="ctile__chip" aria-hidden="true"><img src={logo} alt="" /></span>}
+          {item.video && <span className="ctile__play" aria-hidden="true"><Play size={12} fill="currentColor" /></span>}
+        </>
+      ) : (
+        <span className="ctile__top" aria-hidden="true">
+          {logo && <img className="ctile__logo" src={logo} alt="" />}
+          {venue && <span className="ctile__venue">{venue}</span>}
         </span>
+      )}
+      <span className="ctile__text">
+        <span className="ctile__name">{item.title}</span>
+        {meta && <span className="ctile__meta">{meta}</span>}
       </span>
     </button>
   );

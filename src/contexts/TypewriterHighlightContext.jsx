@@ -33,7 +33,7 @@ const createHighlightMappings = () => {
   Object.entries(cardsByTitle).forEach(([title, cards]) => {
     mappings[title] = {
       skills: cards[0].skills || [],
-      timelineCards: cards.map(card => card.title),
+      timelineCards: [...new Set(cards.map(card => card.parent || card.title))], // a project lights its role's card
       sidebarCategories: [...new Set(cards.map(card => card.category))]
     };
   });

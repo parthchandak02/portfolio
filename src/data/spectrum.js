@@ -38,7 +38,7 @@ const fromCards = (categories) =>
         when: card.date,
         title: card.title,
         meta: [card.company, card.location].filter(Boolean).join(', '),
-        card: card.title,
+        card: card.parent || card.title, // a project inside a role jumps to the role's card
         ...(card.url ? { url: card.url } : {})
       }))
   );
