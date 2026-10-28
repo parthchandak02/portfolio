@@ -177,6 +177,9 @@ Every push to `main` also deploys to Cloudflare Pages (build command `npm run bu
 `npm run deploy` needs `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in the environment.
 Add `[skip ci]` to a commit message to skip the build for docs-only changes.
 
+To debug the 3D scene or the mode switch, or to measure it on a real device, see
+[docs/3d-debugging.md](docs/3d-debugging.md).
+
 <details>
 <summary><b>Project layout</b></summary>
 
