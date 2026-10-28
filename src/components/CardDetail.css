@@ -1,0 +1,99 @@
+/* An opened card's content (see CardDetail): a picture that dissolves into the glass, then the text. Colours
+   come from --fg / --muted, set by whatever holds it, so it reads in both modes. */
+.cdetail {
+  --fg: rgba(255, 255, 255, 0.94);
+  --muted: rgba(255, 255, 255, 0.62);
+  --chip: rgba(255, 255, 255, 0.05);
+  --chip-edge: rgba(255, 255, 255, 0.09);
+  display: grid; gap: 20px 28px;
+  color: var(--fg);
+}
+.timeline--light .cdetail {
+  --fg: rgba(20, 20, 24, 0.92);
+  --muted: rgba(20, 20, 24, 0.6);
+  --chip: rgba(20, 20, 24, 0.04);
+  --chip-edge: rgba(20, 20, 24, 0.09);
+}
+.cdetail__text { display: grid; gap: 12px; align-content: start; min-width: 0; }
+
+.cdetail__eyebrow {
+  display: flex; align-items: center; gap: 10px; min-width: 0;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--band-hue, #ff9a3d);
+}
+.cdetail__eyebrow span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cdetail__logo { height: 20px; width: auto; max-width: 56px; object-fit: contain; }
+.timeline--light .cdetail__logo { filter: invert(1) brightness(0.8); }
+.timeline--light .cdetail__eyebrow { color: color-mix(in srgb, var(--band-hue, #ff9a3d) 62%, #000); }
+.cdetail__title { margin: 0; font-size: 1.3rem; font-weight: 600; line-height: 1.25; letter-spacing: -0.005em; text-wrap: balance; }
+
+.cdetail__meta { margin: 0; display: flex; flex-wrap: wrap; gap: 2px 0; font-size: 0.82rem; color: var(--muted); }
+.cdetail__meta span + span::before { content: "·"; margin: 0 8px; opacity: 0.7; }
+.cdetail__desc { margin: 0; font-size: 0.95rem; line-height: 1.65; color: var(--fg); opacity: 0.86; max-width: 66ch; text-wrap: pretty; }
+
+.cdetail__link {
+  justify-self: start;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.82rem; font-weight: 600; text-decoration: none;
+  color: var(--band-hue, #ff9a3d);
+  padding: 6px 12px; border-radius: 999px;
+  background: color-mix(in srgb, var(--band-hue, #ff9a3d) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--band-hue, #ff9a3d) 30%, transparent);
+  transition: background 0.25s ease;
+}
+.cdetail__link:hover { background: color-mix(in srgb, var(--band-hue, #ff9a3d) 18%, transparent); }
+.cdetail__link:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; }
+.timeline--light .cdetail__link { color: color-mix(in srgb, var(--band-hue, #ff9a3d) 62%, #000); }
+
+.cdetail__tags { list-style: none; margin: 2px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.cdetail__tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.76rem; color: var(--muted);
+  padding: 5px 10px; border-radius: 999px;
+  background: var(--chip); border: 1px solid var(--chip-edge);
+}
+
+/* The picture: its edges fade into the glass, over a blurred glow of itself */
+.cdetail__media {
+  position: relative; margin: 0; isolation: isolate;
+  display: block; width: 100%; padding: 0; border: 0; background: none; font: inherit; color: inherit;
+}
+.cdetail__img {
+  display: block; width: 100%; height: auto; max-height: 340px; object-fit: cover;
+  border-radius: 14px;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
+  mask-composite: intersect;
+}
+.cdetail__glow {
+  position: absolute; inset: 6%; z-index: -1;
+  width: 88%; height: 88%; object-fit: cover;
+  filter: blur(36px) saturate(1.5); opacity: 0.5; transform: scale(1.1);
+  pointer-events: none;
+}
+.timeline--light .cdetail__glow { opacity: 0.35; }
+.cdetail__media--video { cursor: pointer; }
+.cdetail__media--video .cdetail__img { aspect-ratio: 16 / 9; }
+.cdetail__play {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%;
+  color: #fff; background: rgba(255, 107, 53, 0.88);
+  box-shadow: 0 0 0 8px rgba(255, 107, 53, 0.16), 0 6px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cdetail__media--compact .cdetail__play { width: 42px; height: 42px; }
+.cdetail__media--video:hover .cdetail__play { transform: translate(-50%, -50%) scale(1.08); }
+.cdetail__media--video:focus-visible { outline: 2px solid #ff6b35; outline-offset: 4px; border-radius: 14px; }
+.cdetail__player { border-radius: 14px; overflow: hidden; aspect-ratio: 16 / 9; background: #000; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35); }
+.cdetail__player iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+/* Projects done in a role: their videos side by side, each with a line about it */
+.cdetail__subs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 20px; }
+.cdetail__sub { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.cdetail__sub-text { display: grid; gap: 2px; }
+.cdetail__sub-title { font-weight: 600; font-size: 0.92rem; }
+.cdetail__sub-date { font-size: 0.76rem; color: var(--muted); }
+.cdetail__sub-text p { margin: 6px 0 0; font-size: 0.85rem; line-height: 1.55; color: var(--fg); opacity: 0.8; }
+
+@media (prefers-reduced-motion: reduce) { .cdetail__play, .cdetail__link { transition: none; } }

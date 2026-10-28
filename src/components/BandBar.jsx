@@ -12,7 +12,7 @@ const LAB_TITLES = new Set(timelineDataByCategory.lab.map((card) => card.title))
 
 // Everything that scrolls under the bar fades out before it reaches it. Each element is faded on its
 // own (not the whole scroll area) so the glass cards keep their blur of the scene behind them.
-const FADE_SELECTOR = '.ui-typewriter-container, .spectro, .timeline__item > *';
+const FADE_SELECTOR = '.ui-typewriter-container, .spectro, .timeline__item:not(.company__role) > *, .timeline__company > .company';
 const clearFade = (el) => {
   el.classList.remove('is-top-fading');
   el.style.removeProperty('--fade-cut');

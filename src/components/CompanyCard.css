@@ -1,0 +1,73 @@
+/* An organisation in the timeline (see CompanyCard): one glass card, its roles on a line inside it */
+.company {
+  --line: rgba(255, 255, 255, 0.14);
+  --fg: rgba(255, 255, 255, 0.94);
+  --muted: rgba(255, 255, 255, 0.58);
+  position: relative;
+  border-radius: 18px;
+  padding: 20px 24px 10px;
+  margin-bottom: 32px;
+  color: var(--fg);
+}
+.company--light { --line: rgba(20, 20, 24, 0.14); --fg: rgba(20, 20, 24, 0.92); --muted: rgba(20, 20, 24, 0.58); }
+
+.company__head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 6px; }
+.company__who { display: grid; gap: 3px; min-width: 0; }
+.company__name { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--band-hue, #e4dccf); }
+.company--light .company__name { color: rgba(20, 20, 24, 0.75); }
+.company__where { font-size: 0.8rem; color: var(--muted); }
+.company__logo { height: 34px; width: auto; max-width: 84px; object-fit: contain; flex: none; opacity: 0.92; }
+.company--light .company__logo { filter: invert(1) brightness(0.8); }
+
+/* The roles: a hairline down the left, a node per role; the current role's node glows */
+.company__roles { list-style: none; margin: 6px 0 0; padding: 0; position: relative; }
+.company--many .company__roles::before {
+  content: ""; position: absolute; left: 5px; top: 22px; bottom: 26px; width: 1px;
+  background: linear-gradient(to bottom, var(--line), var(--line) 85%, transparent);
+}
+.company__role { position: relative; margin: 0; padding-left: 26px; }
+.company__node {
+  position: absolute; left: 0; top: 21px; width: 11px; height: 11px; border-radius: 50%;
+  background: var(--bg-node, #0b0b0e); border: 1.5px solid var(--line);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.company--light .company__node { --bg-node: #f6f4f1; }
+.company__role.is-current .company__node {
+  border-color: var(--band-hue, #e4dccf); background: var(--band-hue, #e4dccf);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--band-hue, #e4dccf) 18%, transparent), 0 0 14px color-mix(in srgb, var(--band-hue, #e4dccf) 45%, transparent);
+}
+.company__role[data-current] .company__node, .company__role.is-open .company__node { border-color: var(--band-hue, #e4dccf); }
+
+.company__role-head {
+  all: unset; box-sizing: border-box; cursor: pointer;
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 12px 0; border-radius: 10px;
+}
+.company__role-head:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; }
+.company__role-text { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.company__role-title { font-size: 1.02rem; font-weight: 600; line-height: 1.3; transition: color 0.3s ease; }
+.company__role-date { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.company__role.is-highlighted .company__role-title, .company__role[data-current] .company__role-title { color: #ff8a5c; }
+.company__chev { flex: none; color: var(--muted); transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.2s; }
+.company__role-head:hover .company__chev { color: var(--fg); }
+.company__role.is-open .company__chev { transform: rotate(180deg); }
+.company__role + .company__role .company__role-head { border-top: 1px solid color-mix(in srgb, var(--line) 55%, transparent); border-radius: 0; }
+
+.company__detail { padding: 4px 0 22px; animation: company-open 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes company-open { from { opacity: 0; transform: translateY(-6px); } }
+
+/* The card on the band bar's lit line picks up the band's colour, softly */
+.company:has(.company__role[data-current]) {
+  border-color: color-mix(in srgb, var(--band-hue, #e4dccf) 40%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--band-hue, #e4dccf) 12%, transparent), 0 0 28px color-mix(in srgb, var(--band-hue, #e4dccf) 8%, transparent), var(--glass-shadow-base);
+}
+
+@media (max-width: 560px) {
+  .company { padding: 16px 16px 6px; }
+  .company__logo { height: 26px; max-width: 64px; }
+  .company__role { padding-left: 22px; }
+  .company__role-title { font-size: 0.96rem; }
+}
+@media (prefers-reduced-motion: reduce) { .company__detail { animation: none; } .company__chev, .company__node { transition: none; } }
+.company .company__role { margin-bottom: 0; padding-left: 26px; }
+@media (max-width: 560px) { .company .company__role { padding-left: 22px; } }

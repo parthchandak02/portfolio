@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import TimelineCard from './TimelineCard';
+import CardDetail from './CardDetail';
+import CompanyCard from './CompanyCard';
 import LabShowcase from './LabShowcase';
 import CardTile, { isTile } from './CardTile';
 import TileGrid from './TileGrid';
@@ -69,23 +70,31 @@ const Timeline = ({
     return () => document.removeEventListener('keydown', onKey);
   }, [openTile]);
   const closeTile = () => setOpenTile(null);
-  const detailFor = (item) => () => renderCard(item, { defaultExpanded: true, onCollapse: closeTile, className: 'timeline__card timeline-card--drawer' });
+  const detailFor = (item) => () => <CardDetail item={item} subprojects={childrenOf[item.title]} />;
   const segments = useMemo(() => {
     const out = [];
+    const seen = new Set();
     sortedData.forEach((item, index) => {
       if (item.category === 'lab') {
         if (index === firstLabIndex) out.push({ kind: 'lab', index });
         return;
       }
+      // Jobs and degrees: every role at one organisation shares one card, placed where its newest role falls
+      if (!isTile(item)) {
+        const key = `${item.category}|${item.company || item.title}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        const roles = sortedData
+          .map((it, i) => ({ item: it, index: i }))
+          .filter(({ item: it }) => !isTile(it) && `${it.category}|${it.company || it.title}` === key);
+        out.push({ kind: 'company', key, roles });
+        return;
+      }
       const prev = out[out.length - 1];
       // Runs follow the bands, so a keynote sitting among press pieces joins their grid
       const band = bandIndex(item);
-      if (isTile(item)) {
-        if (prev && prev.kind === 'tiles' && prev.band === band) prev.items.push({ item, index });
-        else out.push({ kind: 'tiles', band, items: [{ item, index }] });
-      } else {
-        out.push({ kind: 'card', item, index });
-      }
+      if (prev && prev.kind === 'tiles' && prev.band === band) prev.items.push({ item, index });
+      else out.push({ kind: 'tiles', band, items: [{ item, index }] });
     });
     return out;
   }, [sortedData, firstLabIndex]);
@@ -108,27 +117,6 @@ const Timeline = ({
     id: sortedData.findIndex((d) => d.category === item.category) === index ? item.category?.toLowerCase() : undefined
   });
 
-  const renderCard = (item, extra = {}) => (
-    <TimelineCard
-      title={item.title}
-      company={item.company}
-      companyLogo={item.companyLogo}
-      projectImage={item.projectImage}
-      date={item.date}
-      category={item.category}
-      description={item.description}
-      location={item.location}
-      volume={item.volume}
-      url={item.url}
-      video={item.video}
-      skills={item.skills || []}
-      subprojects={childrenOf[item.title]}
-      lightMode={lightMode}
-      className="timeline__card"
-      isTypewriterHighlighted={highlights.timelineCards.includes(item.title)}
-      {...extra}
-    />
-  );
 
   return (
     <div className={`timeline ${lightMode ? 'timeline--light' : 'timeline--dark'} ${className}`} {...props}>
@@ -197,10 +185,18 @@ const Timeline = ({
                   </div>
                 );
               }
-              const { item, index } = segment;
+              const { roles } = segment;
               return (
-                <div key={item.title} className="timeline__item" {...itemAttrs(item, index)}>
-                  {renderCard(item)}
+                <div key={segment.key} className="timeline__company" style={{ '--band-hue': bandForSection(roles[0].item.category)?.hue }}>
+                  <CompanyCard
+                    lightMode={lightMode}
+                    childrenOf={childrenOf}
+                    roles={roles.map(({ item, index }) => ({
+                      item,
+                      attrs: itemAttrs(item, index),
+                      highlighted: highlights.timelineCards.includes(item.title)
+                    }))}
+                  />
                 </div>
               );
             })
