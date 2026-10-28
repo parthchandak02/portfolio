@@ -14,10 +14,10 @@ const TEXT_TILE_CATEGORIES = new Set(['research']);
 export const isTile = (item) => Boolean(tileImageFor(item)) || TEXT_TILE_CATEGORIES.has(item.category);
 
 /**
- * A record card shown as a glass tile, like the Lab's. Hover or focus lifts the fog to show what it is;
- * clicking opens the full card in its place.
+ * A card shown as a glass tile, like the Lab's. Hover or focus lifts the fog to show what it is; clicking opens
+ * its details in a row under it (see TileGrid), and clicking again closes them.
  */
-const CardTile = ({ item, highlighted = false, onOpen }) => {
+const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
   const image = tileImageFor(item);
   const venue = item.volume ? item.volume.split(',')[0] : item.company;
   const band = bandForSection(item.category);
@@ -25,10 +25,11 @@ const CardTile = ({ item, highlighted = false, onOpen }) => {
   return (
     <button
       type="button"
-      className={`lab-tile lab-tile--card${image ? '' : ' lab-tile--text'}${highlighted ? ' is-highlighted' : ''}`}
+      className={`lab-tile lab-tile--card${image ? '' : ' lab-tile--text'}${highlighted ? ' is-highlighted' : ''}${open ? ' is-open' : ''}`}
       style={band ? { '--hue': band.hue } : undefined}
       onClick={onOpen}
-      aria-label={`${item.title}, ${item.date}. Open the full card`}
+      aria-expanded={open}
+      aria-label={`${item.title}, ${item.date}. ${open ? 'Close' : 'Show'} the details`}
     >
       {image && <img className="lab-tile__img" src={image} alt="" loading="lazy" />}
       {item.video && <span className="lab-tile__badge" aria-hidden="true"><Play size={12} fill="currentColor" /></span>}
@@ -44,7 +45,7 @@ const CardTile = ({ item, highlighted = false, onOpen }) => {
         <span className="lab-tile__name">{item.title}</span>
         <span className="lab-tile__desc">{item.description}</span>
         <span className="lab-tile__open">
-          {item.video ? 'Watch' : 'Open'} <Maximize2 size={13} />
+          {open ? 'Close' : item.video ? 'Watch' : 'Details'} <Maximize2 size={13} />
         </span>
       </span>
     </button>

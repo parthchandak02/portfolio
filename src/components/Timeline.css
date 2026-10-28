@@ -136,7 +136,39 @@
 .timeline__selected .lab--light .lab-tile__img { opacity: 1; }
 .timeline__selected .lab--light .lab-tile__fog { background: linear-gradient(to top, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.6) 28%, rgba(255, 255, 255, 0) 52%); }
 .timeline__tiles .timeline__item { margin-bottom: 0; }
-.timeline__tiles .timeline__item--open { grid-column: 1 / -1; }
+
+/* An opened tile keeps its place, outlined in its band's colour; its details open in a row under it */
+.timeline__tiles .timeline__item.is-open .lab-tile { border-color: color-mix(in srgb, var(--band-hue) 75%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--band-hue) 40%, transparent), 0 0 24px color-mix(in srgb, var(--band-hue) 22%, transparent); }
+.tile-drawer { grid-column: 1 / -1; position: relative; overflow: hidden; margin-top: 4px; }
+.tile-drawer__inner {
+  position: relative; margin-top: 7px; border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--band-hue, #ff6b35) 45%, transparent);
+  background: color-mix(in srgb, var(--band-hue, #ff6b35) 7%, var(--glass-bg-base));
+  -webkit-backdrop-filter: var(--glass-blur-subtle); backdrop-filter: var(--glass-blur-subtle);
+}
+/* the notch that points up at the opened tile */
+.tile-drawer::before {
+  content: ""; position: absolute; top: 2px; left: var(--notch); z-index: 1;
+  width: 12px; height: 12px; transform: translateX(-50%) rotate(45deg);
+  border-left: 1px solid color-mix(in srgb, var(--band-hue, #ff6b35) 45%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--band-hue, #ff6b35) 45%, transparent);
+  background: var(--drawer-notch, #0d0b0a);
+  transition: left 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.timeline--light .tile-drawer::before { --drawer-notch: #f7f4f1; }
+.tile-drawer__close {
+  position: absolute; top: 14px; right: 14px; z-index: 2;
+  display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px;
+  border: 0; background: transparent; color: inherit; opacity: 0.7; cursor: pointer;
+}
+.tile-drawer__close:hover { opacity: 1; background: rgba(127, 127, 127, 0.16); }
+.tile-drawer__close:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; opacity: 1; }
+.timeline--dark .tile-drawer__close { color: #fff; }
+.timeline--light .tile-drawer__close { color: #141418; }
+/* The details are the card's own content, without a second card around them */
+.tile-drawer .timeline-card--drawer { background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.tile-drawer .timeline-card--drawer .timeline-card__toggle { display: none; }
+.tile-drawer .timeline-card--drawer .timeline-card__header { cursor: default; padding-right: 44px; }
 
 /* Timeline dots removed for cleaner design */
 

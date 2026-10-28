@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import TimelineCard from './TimelineCard';
 import LabShowcase from './LabShowcase';
 import CardTile, { isTile } from './CardTile';
+import TileGrid from './TileGrid';
 import { useTypewriterHighlight } from '../contexts/TypewriterHighlightContext';
 import { categoryOrder, timelineDataByCategory } from '../data/timelineData';
 import { FEATURED } from '../data/featured';
@@ -55,26 +56,16 @@ const Timeline = ({
 
   // Cards with a picture or a video, and research papers, show as glass tiles, a run of them sharing one grid.
   // Other text-only cards stay wide.
+  // An opened tile stays as it is and its details open in a row under it (see TileGrid); Escape closes them
   const [openTile, setOpenTile] = useState(null);
-  // An opened tile becomes a full card in its place. If that place is up under the top bar, the card is
-  // brought down into view so its title and close control aren't hidden; Escape turns it back into a tile.
   useEffect(() => {
     if (!openTile) return undefined;
-    const frame = requestAnimationFrame(() => {
-      const card = document.querySelector('.timeline__item--open');
-      const scroller = document.querySelector('.main-content-scroll');
-      if (!card || !scroller) return;
-      const clear = scroller.getBoundingClientRect().top + 120; // below the bar and its veil
-      const top = card.getBoundingClientRect().top;
-      if (top < clear) scroller.scrollBy({ top: top - clear, behavior: 'smooth' });
-    });
     const onKey = (e) => { if (e.key === 'Escape') setOpenTile(null); };
     document.addEventListener('keydown', onKey);
-    return () => {
-      cancelAnimationFrame(frame);
-      document.removeEventListener('keydown', onKey);
-    };
+    return () => document.removeEventListener('keydown', onKey);
   }, [openTile]);
+  const closeTile = () => setOpenTile(null);
+  const detailFor = (item) => () => renderCard(item, { defaultExpanded: true, onCollapse: closeTile, className: 'timeline__card timeline-card--drawer' });
   const segments = useMemo(() => {
     const out = [];
     sortedData.forEach((item, index) => {
@@ -152,25 +143,22 @@ const Timeline = ({
               Selected work
             </h2>
             <div className={`timeline__tiles lab ${lightMode ? 'lab--light' : 'lab--dark'}`}>
-              <div className="lab__grid">
-                {featured.map(({ item, tile }) => {
-                  const key = `selected:${item.title}`;
-                  return (
-                    <div
-                      key={key}
-                      className={`timeline__item${openTile === key ? ' timeline__item--open' : ''}`}
-                      style={{ '--band-hue': bandForSection(item.category)?.hue || '#ff6b35' }}
-                      data-current={currentTitle === item.title && !openTile ? 'true' : undefined}
-                      data-category="selected"
-                      data-title={item.title}
-                    >
-                      {openTile === key
-                        ? renderCard(item, { defaultExpanded: true, onCollapse: () => setOpenTile(null) })
-                        : <CardTile item={tile} highlighted={highlights.timelineCards.includes(item.title)} onOpen={() => setOpenTile(key)} />}
-                    </div>
-                  );
-                })}
-              </div>
+              <TileGrid
+                openKey={openTile}
+                onOpen={setOpenTile}
+                onClose={closeTile}
+                entries={featured.map(({ item, tile }) => ({
+                  key: `selected:${item.title}`,
+                  attrs: {
+                    style: { '--band-hue': bandForSection(item.category)?.hue || '#ff6b35' },
+                    'data-current': currentTitle === item.title && !openTile ? 'true' : undefined,
+                    'data-category': 'selected',
+                    'data-title': item.title
+                  },
+                  tile: (toggle, open) => <CardTile item={tile} open={open} highlighted={highlights.timelineCards.includes(item.title)} onOpen={toggle} />,
+                  detail: detailFor(item)
+                }))}
+              />
             </div>
           </section>
         )}
@@ -189,25 +177,19 @@ const Timeline = ({
               if (segment.kind === 'tiles') {
                 return (
                   <div key={`tiles-${segment.items[0].item.title}`} className={`timeline__tiles lab ${lightMode ? 'lab--light' : 'lab--dark'}`}>
-                    <div className="lab__grid">
-                      {segment.items.map(({ item, index }) => (
-                        <div
-                          key={item.title}
-                          className={`timeline__item${openTile === item.title ? ' timeline__item--open' : ''}`}
-                          {...itemAttrs(item, index)}
-                        >
-                          {openTile === item.title
-                            ? renderCard(item, { defaultExpanded: true, onCollapse: () => setOpenTile(null) })
-                            : (
-                              <CardTile
-                                item={item}
-                                highlighted={highlights.timelineCards.includes(item.title)}
-                                onOpen={() => setOpenTile(item.title)}
-                              />
-                            )}
-                        </div>
-                      ))}
-                    </div>
+                    <TileGrid
+                      openKey={openTile}
+                      onOpen={setOpenTile}
+                      onClose={closeTile}
+                      entries={segment.items.map(({ item, index }) => ({
+                        key: item.title,
+                        attrs: itemAttrs(item, index),
+                        tile: (toggle, open) => (
+                          <CardTile item={item} open={open} highlighted={highlights.timelineCards.includes(item.title)} onOpen={toggle} />
+                        ),
+                        detail: detailFor(item)
+                      }))}
+                    />
                   </div>
                 );
               }
