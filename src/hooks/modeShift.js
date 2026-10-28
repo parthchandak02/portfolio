@@ -54,6 +54,7 @@ export const switchMode = (toLight, apply) => {
   const cy = box.top + box.height / 2 - CENTRE.y * ZOOM;
   const far = Math.max(...[[0, 0], [window.innerWidth, 0], [0, window.innerHeight], [window.innerWidth, window.innerHeight]].map(([x, y]) => Math.hypot(x - cx, y - cy))) + 40;
   Object.assign(modeShift, { kind, t0: performance.now(), maxR: far / ZOOM, core: 0, spawns: [] });
+  performance.mark('shift:start', { detail: kind }); // for the ?perf frame log
   window.dispatchEvent(new Event('modeshift'));
 
   const root = document.documentElement;
@@ -63,9 +64,11 @@ export const switchMode = (toLight, apply) => {
   const els = ui();
   const out = els.map((el) => el.animate({ opacity: [1, 0] }, { duration: f.out * 1000, easing: 'ease-in', fill: 'forwards' }));
   Promise.all(out.map((a) => a.finished)).catch(() => {}).then(() => {
+    performance.mark('shift:page-changed');
     apply();
     const wait = Math.max(0, f.back * 1000 - (performance.now() - modeShift.t0));
     setTimeout(() => {
+      performance.mark('shift:page-back');
       root.classList.remove('is-shifting');
       els.forEach((el, i) => {
         out[i].cancel();
@@ -76,4 +79,4 @@ export const switchMode = (toLight, apply) => {
 };
 
 // The scene calls this when its half is done
-export const endShift = () => { modeShift.kind = null; modeShift.t0 = null; };
+export const endShift = () => { performance.mark('shift:end'); modeShift.kind = null; modeShift.t0 = null; };

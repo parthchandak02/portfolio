@@ -175,6 +175,11 @@ export default function App() {
   };
   useEffect(() => paintMode(lightMode), [lightMode]);
 
+  // ?perf turns on a frame recorder for checking the site on a real device (see hooks/perfLog)
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).has('perf')) import('./hooks/perfLog').then((m) => m.startPerfLog());
+  }, []);
+
   // The prism shatters into bubbles, or the bubbles collapse into the prism (see hooks/modeShift). The page
   // changes while it is faded out, rendered in slices so the scene keeps its frames.
   const flipMode = () => switchMode(!lightMode, () => {
