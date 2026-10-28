@@ -70,7 +70,7 @@ const fragmentShader = `
     float a = clamp(fres * 1.1 + 0.025 + 0.12 * max(max(film.r, film.g), film.b) * (0.15 + fres) + 0.12 * uGlow + 0.55 * rim, 0.0, 0.92);
     // The scene is composited in linear light and converted for the screen at the end, so the colour is
     // given in linear terms; written as is, it came out washed out
-    gl_FragColor = vec4(pow(refl, vec3(2.2)), a);
+    gl_FragColor = vec4(pow(max(refl, 0.0), vec3(2.2)), a);
   }`;
 
 // The droplets a burst sheds from its retreating rim
@@ -90,13 +90,13 @@ const dropFrag = `
     vec2 c = gl_PointCoord - 0.5; float r = length(c);
     if (r > 0.5 || vLife <= 0.0) discard;
     // a tiny bead: a darker edge and a bright glint
-    float bead = smoothstep(0.5, 0.32, r);
-    vec3 col = mix(vColor * 0.75, vec3(1.0), smoothstep(0.22, 0.0, length(c - vec2(-0.12, 0.12))));
+    float bead = 1.0 - smoothstep(0.32, 0.5, r);
+    vec3 col = mix(vColor * 0.75, vec3(1.0), 1.0 - smoothstep(0.0, 0.22, length(c - vec2(-0.12, 0.12))));
     // switching to dark, the page goes dark outside a closing circle, and there a droplet glows instead
     float dark = uWDark * smoothstep(uWR - 0.03, uWR + 0.03, length(vW - uWC));
     col = mix(col, mix(vColor, vec3(1.0), 0.6) * 1.6, dark);
     float a = mix(bead * 0.85, exp(-r * r * 18.0), dark);
-    gl_FragColor = vec4(pow(col, vec3(2.2)), a * vLife);
+    gl_FragColor = vec4(pow(max(col, 0.0), vec3(2.2)), a * vLife);
   }`;
 
 const SMALL = 9; // bubbles rising past the big one

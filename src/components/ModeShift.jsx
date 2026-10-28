@@ -13,7 +13,7 @@ const SPARKS = 900;
 // Every shader here finds the page's colour at its own point with the same circle
 const WIPE = `
   uniform vec2 uWC; uniform float uWR; uniform float uWIn; uniform float uWOut;
-  float lightAt(vec2 p) { return mix(uWOut, uWIn, smoothstep(uWR + 0.03, uWR - 0.03, length(p - uWC))); }`;
+  float lightAt(vec2 p) { return mix(uWOut, uWIn, 1.0 - smoothstep(uWR - 0.03, uWR + 0.03, length(p - uWC))); }`;
 
 const bgVert = `uniform vec2 uView; varying vec2 vP;
   void main() { vP = position.xy * 0.5 * uView; gl_Position = vec4(position.xy, 0.9999, 1.0); }`;
@@ -22,10 +22,10 @@ const bgFrag = `${WIPE} uniform float uRing; uniform float uTime; uniform vec2 u
     vec2 p = vP + uCam;
     vec3 c = vec3(lightAt(p));
     // the sweep's edge carries a faint spectrum: the light changing hands
-    float d = length(p - uWC); float ring = uRing * exp(-pow((d - uWR) / 0.3, 2.0));
-    vec3 rb = 0.5 + 0.5 * cos(6.2831 * (vec3(0.0, 0.33, 0.67) + atan(p.y - uWC.y, p.x - uWC.x) / 3.1416 + uTime * 0.25));
+    float d = length(p - uWC); float e = (d - uWR) / 0.3; float ring = uRing * exp(-e * e);
+    vec3 rb = 0.5 + 0.5 * cos(6.2831 * (vec3(0.0, 0.33, 0.67) + atan(p.y - uWC.y, p.x - uWC.x + 1e-5) / 3.1416 + uTime * 0.25));
     c = mix(c, rb, ring * 0.4);
-    gl_FragColor = vec4(pow(c, vec3(2.2)), 1.0);
+    gl_FragColor = vec4(pow(clamp(c, 0.0, 1.0), vec3(2.2)), 1.0);
   }`;
 
 const shardVert = `
@@ -60,7 +60,7 @@ const shardFrag = `${WIPE}
     vec3 body = mix(vec3(0.05, 0.06, 0.08) + vec3(0.18, 0.2, 0.26) * (1.0 - facing), vec3(0.88, 0.9, 0.95) - vec3(0.12) * (1.0 - facing), L);
     vec3 rim = mix(mix(vec3(0.9, 0.95, 1.0), irid, 0.3) * 1.6, mix(vec3(0.42, 0.46, 0.56), irid * 0.7, 0.35), L);
     vec3 col = mix(body, rim, edge);
-    gl_FragColor = vec4(pow(col, vec3(2.2)), max(mix(0.78, 0.32, L) * uBody, edge * mix(1.0, 0.85, L)) * vFade);
+    gl_FragColor = vec4(pow(max(col, 0.0), vec3(2.2)), max(mix(0.78, 0.32, L) * uBody, edge * mix(1.0, 0.85, L)) * vFade);
   }`;
 
 const sparkVert = `attribute float aLife; attribute float aSize; attribute vec3 aColor; uniform float uDpr;
@@ -71,10 +71,10 @@ const sparkFrag = `${WIPE} varying float vLife; varying vec3 vColor; varying vec
   void main() { vec2 c = gl_PointCoord - 0.5; float r = length(c); if (r > 0.5 || vLife <= 0.0) discard;
     // a glowing spark on black, a coloured bead on white
     float L = lightAt(vW);
-    vec3 bead = mix(vColor * 0.75, vec3(1.0), smoothstep(0.22, 0.0, length(c - vec2(-0.12, 0.12))));
+    vec3 bead = mix(vColor * 0.75, vec3(1.0), 1.0 - smoothstep(0.0, 0.22, length(c - vec2(-0.12, 0.12))));
     vec3 col = mix(mix(vColor, vec3(1.0), 0.45) * 1.6, bead, L);
-    float a = mix(exp(-r * r * 18.0), smoothstep(0.5, 0.32, r) * 0.85, L) * vLife;
-    gl_FragColor = vec4(pow(col, vec3(2.2)), a); }`;
+    float a = mix(exp(-r * r * 18.0), (1.0 - smoothstep(0.32, 0.5, r)) * 0.85, L) * vLife;
+    gl_FragColor = vec4(pow(max(col, 0.0), vec3(2.2)), a); }`;
 
 const glowFrag = `uniform float uO; varying vec2 vU;
   void main() { vec2 p = (vU - 0.5) * 2.0;
@@ -197,6 +197,7 @@ export const ModeShift = ({ kind = null, onDone }) => {
     state.current = { broke: false, done: false };
     sparks.life.fill(0);
     shardMaterial.uniforms.uT.value = -1; shardMaterial.uniforms.uEdge.value = 0; shardMaterial.uniforms.uBody.value = 0;
+    bg.uniforms.uRing.value = 0;
     if (kind !== 'shatter' || !shardMesh.current) return;
     const { g, info } = shardGeometry();
     shardMesh.current.geometry.dispose();
@@ -211,7 +212,7 @@ export const ModeShift = ({ kind = null, onDone }) => {
       const at = shardAt(sh, when - SHATTER.BREAK); const vel = shardVel(sh, when - SHATTER.BREAK);
       return { when, x: at[0], y: at[1], vx: vel[0], vy: vel[1] };
     });
-  }, [kind, sparks, shardMaterial]);
+  }, [kind, sparks, shardMaterial, bg]);
   const colour = useMemo(() => new THREE.Color(), []);
 
   useFrame((_, delta) => {

@@ -124,19 +124,19 @@ const RainbowMaterial = shaderMaterial(
       vec3 finalColor = area * co * l * brightness * emissiveIntensity * (1.0 + flash);
 
       // Light the band of the item being read and let the rest of the spectrum fall back
-      float near = exp(-pow((w - focus) / 26.0, 2.0));
+      float nf = (w - focus) / 26.0; float near = exp(-nf * nf);
       finalColor *= mix(1.0, 0.15 + 1.75 * near, focusAmount);
 
       // A band of light that runs out from the prism along one colour, or the whole spectrum when pulseWave is 0
-      float ring = exp(-pow((uv.y - pulseR) / 0.05, 2.0));
-      float pulseBand = pulseWave > 0.0 ? exp(-pow((w - pulseWave) / 24.0, 2.0)) : 1.0;
+      float rr = (uv.y - pulseR) / 0.05; float ring = exp(-rr * rr);
+      float pulseBand = pulseWave > 0.0 ? exp(-((w - pulseWave) / 24.0) * ((w - pulseWave) / 24.0)) : 1.0;
       finalColor *= 1.0 + pulseAmt * ring * pulseBand * 2.0;
       
       if (lightMode) {
         // On white, light cannot be added, so the colour is laid over the page and fades with its brightness.
         // A smooth fade, where a cutoff used to leave the fan's edges jagged.
         float luminance = dot(finalColor, vec3(0.299, 0.587, 0.114));
-        gl_FragColor = vec4(pow(finalColor, vec3(0.8)) * 1.2, smoothstep(0.02, 0.3, luminance));
+        gl_FragColor = vec4(pow(max(finalColor, 0.0), vec3(0.8)) * 1.2, smoothstep(0.02, 0.3, luminance));
       } else {
         gl_FragColor = vec4(finalColor, 1.0);
       }
