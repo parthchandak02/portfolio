@@ -27,9 +27,9 @@
 }
 .ctile--photo .ctile__year { text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); opacity: 0.8; }
 .ctile__year--beside { right: 46px; top: 16px; }
-.ctile--info .ctile__top { padding-right: 52px; }
+.ctile .ctile__top { padding-right: 52px; }
 
-/* Photo tile: the picture fills it, shaded at the foot so the title reads; the logo sits in a chip */
+/* Photo tile: the picture fills it, shaded at the foot so the title reads, its edges melting into the glass */
 .ctile--photo { color: #fff; }
 .ctile--photo .ctile__img { transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .ctile--photo::before {
@@ -37,13 +37,13 @@
   background: linear-gradient(to top, rgba(0, 0, 0, 0.86) 0%, rgba(0, 0, 0, 0.42) 42%, rgba(0, 0, 0, 0) 70%);
 }
 .ctile--photo .ctile__name { text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5); }
-.ctile__chip {
-  position: absolute; top: 10px; left: 10px;
-  display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px;
-  background: rgba(0, 0, 0, 0.45);
-  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+.ctile--photo .ctile__img {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+  mask-composite: intersect;
 }
-.ctile__chip img { width: 22px; height: 22px; object-fit: contain; }
+.ctile--photo .ctile__logo { filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.45)); }
 .ctile__play {
   position: absolute; top: 10px; right: 10px;
   display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
@@ -51,8 +51,9 @@
 }
 @media (hover: hover) { .ctile--photo:hover .ctile__img { transform: scale(1.04); } }
 
-/* Info tile: the logo and who it's from up top; any picture is a soft ghost behind */
-.ctile--info .ctile__img { opacity: 0.18; filter: blur(5px) saturate(1.1); transform: scale(1.08); }
+/* Info tile: any picture is a soft ghost behind, which gives way once opened, for the details show it */
+.ctile--info .ctile__img { opacity: 0.18; filter: blur(5px) saturate(1.1); transform: scale(1.08); transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1); }
+.ctile--info.is-open .ctile__img { opacity: 0; }
 .ctile--info .ctile__name { -webkit-line-clamp: 3; }
 .ctile__top { display: flex; align-items: center; gap: 11px; padding: 13px 14px 0; min-width: 0; }
 .ctile__logo { height: 40px; width: auto; max-width: 128px; object-fit: contain; flex: none; opacity: 0.9; }
@@ -61,7 +62,9 @@
   color: var(--hue, #ff9a3d); line-height: 1.35;
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-width: 0;
 }
-.lab--light .ctile--info .ctile__logo { filter: invert(1) brightness(0.8); }
+.lab--light .ctile--info .ctile__logo,
+.lab--light .ctile--veiled:not(.is-open):not(:focus-visible) .ctile__logo { filter: invert(1) brightness(0.8); }
+@media (hover: hover) { .lab--light .ctile--veiled:hover .ctile__logo { filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.45)); } }
 .lab--light .ctile--info .ctile__venue { color: color-mix(in srgb, var(--hue, #ff9a3d) 62%, #000); }
 
 /* Phones: square tiles, two across, with room for one more line of title */

@@ -32,11 +32,14 @@ const F = 12; // the inside curve where the tab meets the details
 // edge when it's fully joined, down to the details when it isn't, so a tab can drain or fill. Until the details
 // reach past the gap under the row, the opened tile's tab alone runs down.
 const outline = (tabs, yb, b, W, gap) => {
+  if (!tabs.length) return 'M0 0';
   if (b < yb + 1) {
     const { x0, x1, top } = tabs[tabs.length - 1];
     const yB = Math.max(yb - gap, b);
-    return [`M${x0} ${top + R}`, `Q${x0} ${top} ${x0 + R} ${top}`, `L${x1 - R} ${top}`, `Q${x1} ${top} ${x1} ${top + R}`,
-      `L${x1} ${yB - R}`, `Q${x1} ${yB} ${x1 - R} ${yB}`, `L${x0 + R} ${yB}`, `Q${x0} ${yB} ${x0} ${yB - R}`, 'Z'].join(' ');
+    const q = Math.min(R, (yB - top) / 2);
+    if (q < 0.5) return 'M0 0';
+    return [`M${x0} ${top + q}`, `Q${x0} ${top} ${x0 + q} ${top}`, `L${x1 - q} ${top}`, `Q${x1} ${top} ${x1} ${top + q}`,
+      `L${x1} ${yB - q}`, `Q${x1} ${yB} ${x1 - q} ${yB}`, `L${x0 + q} ${yB}`, `Q${x0} ${yB} ${x0} ${yB - q}`, 'Z'].join(' ');
   }
   const r = Math.min(RB, (b - yb) / 2);
   const risen = tabs.filter((t) => yb - t.top > 0.5).sort((m, n) => m.x0 - n.x0);
@@ -62,7 +65,7 @@ const outline = (tabs, yb, b, W, gap) => {
  * The glass of one opened tile and its details as a single shape, like a folder tab: it follows the tile and
  * the details row as they flow (see Molten), and fades as it closes. When another tile in the row opens, the
  * glass drains out of the old tile back into the details as it rises into the new one, and the details keep
- * their place, only flowing to fit what's new. A tile the glass has risen into gives up its own glass
+ * their place, only flowing to fit what's new. A tile the glass has wholly risen into gives up its own glass
  * (data-joined).
  */
 const TabGlass = ({ grid, row, tile, gap, open }) => {
@@ -81,7 +84,9 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
       const yb = y0 + el.offsetHeight + gap;
       const tabs = Object.entries(joins.current).map(([i, j]) => {
         const t = tileEl(i);
-        if (t) t.toggleAttribute('data-joined', open && j > 0.5);
+        // A tile keeps its own glass until the tab has wholly risen into it, and takes it back the moment the tab
+        // starts to leave, so the tab's edge, moving under it, is only ever seen blurred through that glass
+        if (t) t.toggleAttribute('data-joined', open && Number(i) === tile && j > 0.98);
         return t && { x0: t.offsetLeft, x1: t.offsetLeft + t.offsetWidth, top: yb - j * (yb - y0), j };
       }).filter(Boolean).sort((m, n) => m.j - n.j);
       const d = g.querySelector(`.tile-drawer[data-row="${row}"]`);
@@ -89,21 +94,22 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
       shape.current.style.clipPath = `path("${path}")`;
       edge.current.setAttribute('d', path);
     };
-    // The glass drains from every other tile as it rises into this one
+    // The glass drains from every other tile as it rises into this one; closing, it drains from this one too, back
+    // down into the details as they melt away
     const start = { ...joins.current };
     const fresh = Object.keys(start).length === 0;
     if (!(tile in start)) start[tile] = 0;
     let run;
     let live = true;
     const step = (v) => {
-      Object.keys(start).forEach((i) => { joins.current[i] = start[i] + ((Number(i) === tile ? 1 : 0) - start[i]) * v; });
+      Object.keys(start).forEach((i) => { joins.current[i] = start[i] + ((open && Number(i) === tile ? 1 : 0) - start[i]) * v; });
       draw();
     };
     if (fresh || reducedMotion()) {
       step(1);
     } else {
-      run = animate(0, 1, { duration: OPEN_MS / 1000, ease: GLASS_EASE_ARRAY, onUpdate: step });
-      run.then(() => { if (!live) return; Object.keys(joins.current).forEach((i) => { if (Number(i) !== tile) { delete joins.current[i]; tileEl(i)?.removeAttribute('data-joined'); } }); draw(); });
+      run = animate(0, 1, { duration: (open ? OPEN_MS : CLOSE_MS) / 1000, ease: open ? GLASS_EASE_ARRAY : [0.4, 0, 0.2, 1], onUpdate: step });
+      run.then(() => { if (!live || !open) return; Object.keys(joins.current).forEach((i) => { if (Number(i) !== tile) { delete joins.current[i]; tileEl(i)?.removeAttribute('data-joined'); } }); draw(); });
     }
     draw();
     const ro = new ResizeObserver(draw);

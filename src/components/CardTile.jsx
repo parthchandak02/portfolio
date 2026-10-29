@@ -30,9 +30,9 @@ const metaOf = (item) => {
 const isTopic = (logo) => /\/topic-[^/]+$/.test(logo || '');
 
 /**
- * A card as a tile, in one of two styles that share one size and layout. A photo tile leads with its picture,
- * with the logo as a small chip; an info tile leads with the logo and who it's from, with any picture as a soft
- * ghost behind. Cards with a picture get a photo tile unless they ask for `tile: 'info'`. Clicking opens the
+ * A card as a tile, in one of two styles that share one size and layout, both headed by the logo and who it's
+ * from. A photo tile leads with its picture; an info tile leaves any picture a soft ghost behind, which gives
+ * way once it opens, for the details show it. Cards with a picture get a photo tile unless they ask for `tile: 'info'`. Clicking opens the
  * details in a row under the tile (see TileGrid).
  */
 const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
@@ -43,7 +43,7 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
   const year = yearOf(item);
   const band = bandForSection(item.category);
   const logo = typeof item.companyLogo === 'string' && !isTopic(item.companyLogo) ? item.companyLogo : null;
-  // Info tiles show the logo large, so they use the copy with its empty margins cut off (public/logos/trim)
+  // Every tile shows its logo the same size, from the copy with its empty margins cut off (public/logos/trim)
   const bigLogo = logo && /^\/logos\/[^/]+\.png$/.test(logo) ? logo.replace('/logos/', '/logos/trim/') : logo;
   // Photos rest frosted over, like the Lab's tiles, and come into focus on hover or when opened
   const veiled = photo;
@@ -58,17 +58,11 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
       aria-label={`${item.title}, ${item.date}. ${open ? 'Close' : 'Show'} the details`}
     >
       {image && <img className="ctile__img" src={image} alt="" loading="lazy" />}
-      {photo ? (
-        <>
-          {logo && !WORDMARKS.some((w) => logo.endsWith(`/${w}`)) && <span className="ctile__chip" aria-hidden="true"><img src={logo} alt="" /></span>}
-          {item.video && <span className="ctile__play" aria-hidden="true"><Play size={12} fill="currentColor" /></span>}
-        </>
-      ) : (
-        <span className="ctile__top" aria-hidden="true">
-          {logo && <img className="ctile__logo" src={bigLogo} alt="" />}
-          {venue && !WORDMARKS.some((w) => logo?.endsWith(`/${w}`)) && <span className="ctile__venue">{venue}</span>}
-        </span>
-      )}
+      <span className="ctile__top" aria-hidden="true">
+        {logo && <img className="ctile__logo" src={bigLogo} alt="" />}
+        {venue && !WORDMARKS.some((w) => logo?.endsWith(`/${w}`)) && <span className="ctile__venue">{venue}</span>}
+      </span>
+      {item.video && photo && <span className="ctile__play" aria-hidden="true"><Play size={12} fill="currentColor" /></span>}
       {year && <span className={`ctile__year${item.video && photo ? ' ctile__year--beside' : ''}`} aria-hidden="true">{year}</span>}
       <span className="ctile__text">
         <span className="ctile__name">{item.title}</span>
