@@ -12,7 +12,7 @@
   font-size: 0.92rem; font-weight: 600; line-height: 1.28;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.ctile__meta { font-size: 0.72rem; opacity: 0.72; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ctile__meta { font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.72rem; opacity: 0.72; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Photo tile: the picture fills it, shaded at the foot so the title reads; the logo sits in a chip */
 .ctile--photo { color: #fff; }
@@ -42,7 +42,7 @@
 .ctile__top { display: flex; align-items: center; gap: 9px; padding: 13px 14px 0; min-width: 0; }
 .ctile__logo { height: 26px; width: auto; max-width: 64px; object-fit: contain; flex: none; opacity: 0.9; }
 .ctile__venue {
-  font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  font-family: var(--font-family-label); font-weight: 600; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--hue, #ff9a3d);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }

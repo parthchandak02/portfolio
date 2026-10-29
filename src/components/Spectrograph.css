@@ -100,7 +100,7 @@
 /* Each lane's band name, in the margin to its left. The picked band's name lights up. */
 .spectro__label {
   position: absolute; left: 0; display: flex; align-items: center; pointer-events: none;
-  font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+  font-family: var(--font-family-label); font-weight: 600; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
   color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); opacity: 0.72;
 }
 .spectro__label.is-on { opacity: 1; }
@@ -164,10 +164,10 @@
 .spectro__readout.is-idle { background: none; border-color: transparent; text-align: center; justify-items: center; grid-template-rows: 1fr; }
 .spectro__readout.is-idle .spectro__meta { opacity: 0.7; }
 .spectro--collapsed .spectro__readout.is-idle .spectro__meta { visibility: hidden; } /* keep the space so selecting a line does not shift the page */
-.spectro__kicker { font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); font-weight: 700; }
+.spectro__kicker { font-family: var(--font-family-label); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); font-weight: 700; }
 .spectro__title { font-size: 0.95rem; font-weight: 700; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; align-self: center; }
 .spectro__metatext { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.spectro__meta { font-size: 0.78rem; color: var(--mute); display: flex; align-items: center; gap: 4px 12px; min-width: 0; }
+.spectro__meta { font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.78rem; color: var(--mute); display: flex; align-items: center; gap: 4px 12px; min-width: 0; }
 .spectro__link { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 2px; color: #ff6b35; font-weight: 600; text-decoration: none; }
 .spectro--light .spectro__link { color: #c2410c; }
 .spectro__link:hover { text-decoration: underline; }

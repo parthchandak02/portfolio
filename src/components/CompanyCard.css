@@ -13,9 +13,9 @@
 
 .company__head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 6px; }
 .company__who { display: grid; gap: 3px; min-width: 0; }
-.company__name { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--band-hue, #e4dccf); }
+.company__name { font-family: var(--font-family-label); font-weight: 600; font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--band-hue, #e4dccf); }
 .company--light .company__name { color: rgba(20, 20, 24, 0.75); }
-.company__where { font-size: 0.8rem; color: var(--muted); }
+.company__where { font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.8rem; color: var(--muted); }
 .company__logo { height: 34px; width: auto; max-width: 84px; object-fit: contain; flex: none; opacity: 0.92; }
 .company--light .company__logo { filter: invert(1) brightness(0.8); }
 
@@ -46,7 +46,7 @@
 .company__role-head:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; }
 .company__role-text { display: grid; gap: 2px; flex: 1; min-width: 0; }
 .company__role-title { font-size: 1.02rem; font-weight: 600; line-height: 1.3; transition: color 0.3s ease; }
-.company__role-date { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.company__role-date { font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.8rem; color: var(--muted); }
 .company__role.is-highlighted .company__role-title, .company__role[data-current] .company__role-title { color: #ff8a5c; }
 .company__chev { flex: none; color: var(--muted); transition: transform 0.64s cubic-bezier(0.32, 0.72, 0, 1), color 0.2s; }
 .company__role-head:hover .company__chev { color: var(--fg); }

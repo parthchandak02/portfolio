@@ -18,7 +18,7 @@
 
 .cdetail__eyebrow {
   display: flex; align-items: center; gap: 10px; min-width: 0;
-  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  font-family: var(--font-family-label); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--band-hue, #ff9a3d);
 }
 .cdetail__eyebrow span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -27,7 +27,7 @@
 .timeline--light .cdetail__eyebrow { color: color-mix(in srgb, var(--band-hue, #ff9a3d) 62%, #000); }
 .cdetail__title { margin: 0; font-size: 1.3rem; font-weight: 600; line-height: 1.25; letter-spacing: -0.005em; text-wrap: balance; }
 
-.cdetail__meta { margin: 0; display: flex; flex-wrap: wrap; gap: 2px 0; font-size: 0.82rem; color: var(--muted); }
+.cdetail__meta { font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; margin: 0; display: flex; flex-wrap: wrap; gap: 2px 0; font-size: 0.82rem; color: var(--muted); }
 .cdetail__meta span + span::before { content: "·"; margin: 0 8px; opacity: 0.7; }
 .cdetail__desc { margin: 0; font-size: 0.95rem; line-height: 1.65; color: var(--fg); opacity: 0.86; max-width: 66ch; text-wrap: pretty; }
 
@@ -92,7 +92,7 @@
 .cdetail__sub { display: grid; gap: 10px; align-content: start; min-width: 0; }
 .cdetail__sub-text { display: grid; gap: 2px; }
 .cdetail__sub-title { font-weight: 600; font-size: 0.92rem; }
-.cdetail__sub-date { font-size: 0.76rem; color: var(--muted); }
+.cdetail__sub-date { font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.76rem; color: var(--muted); }
 .cdetail__sub-text p { margin: 6px 0 0; font-size: 0.85rem; line-height: 1.55; color: var(--fg); opacity: 0.8; }
 
 @media (prefers-reduced-motion: reduce) { .cdetail__play, .cdetail__link { transition: none; } }

@@ -123,7 +123,7 @@
 .timeline__selected { margin-bottom: 56px; }
 .timeline__selected-title {
   display: flex; align-items: center; gap: 10px; margin: 0 0 16px;
-  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  font-family: var(--font-family-label); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
 }
 .timeline--dark .timeline__selected-title { color: rgba(255, 255, 255, 0.82); }
 .timeline--light .timeline__selected-title { color: rgba(20, 20, 24, 0.78); }
