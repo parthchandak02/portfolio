@@ -6,9 +6,9 @@ import './Molten.css';
  * Glass that forms as it opens (see hooks/glassMotion). Opening, the space flows open to the content's height
  * while the content condenses out of a blur and a soft sheen runs down the glass; when `contentKey` changes
  * the glass flows to the new height and the new content condenses in its place; closing melts it back to
- * nothing before it leaves the page.
+ * nothing before it leaves the page, then calls `onClosed`.
  */
-const Molten = ({ open, contentKey, className = '', style, children, ...rest }) => {
+const Molten = ({ open, contentKey, className = '', style, children, onClosed, ...rest }) => {
   const outer = useRef(null);
   const inner = useRef(null);
   const sheen = useRef(null);
@@ -66,11 +66,11 @@ const Molten = ({ open, contentKey, className = '', style, children, ...rest }) 
     const from = o.getBoundingClientRect().height;
     flowing.current?.cancel();
     height.current = 0;
-    if (reducedMotion()) { setMounted(false); return undefined; }
+    if (reducedMotion()) { setMounted(false); onClosed?.(); return undefined; }
     inner.current?.animate(CONDENSE.slice().reverse(), { duration: CLOSE_MS, easing: GLASS_CLOSE_EASE, fill: 'forwards' });
     const a = o.animate([{ height: `${from}px`, opacity: 1 }, { height: '0px', opacity: 0 }], { duration: CLOSE_MS, easing: GLASS_CLOSE_EASE, fill: 'forwards' });
     closing.current = a;
-    a.onfinish = () => { if (closing.current === a) setMounted(false); };
+    a.onfinish = () => { if (closing.current === a) { setMounted(false); onClosed?.(); } };
     return undefined;
   }, [open, mounted]);
 
