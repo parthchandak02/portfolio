@@ -28,68 +28,96 @@ const R = 16; // a tile's corners
 const RB = 20; // the details' corners
 const F = 12; // the inside curve where the tab meets the details
 
-// One outline around a tile (x0..x1, y0..y1) and the details under it, which run down to `b`. Until the details
-// reach past the gap under the tile, the tab alone runs down; after, the glass spreads across the row.
-const outline = ({ x0, x1, y0, y1 }, b, W, gap) => {
-  const top = [`M${x0} ${y0 + R}`, `Q${x0} ${y0} ${x0 + R} ${y0}`, `L${x1 - R} ${y0}`, `Q${x1} ${y0} ${x1} ${y0 + R}`];
-  const yb = y1 + gap;
+// One outline around the details under a row, which run from just under its tiles (yb) down to `b`, and the
+// tabs that join it to the row's tiles. A tab is a tile's span (x0..x1) risen to `top`: up to the tile's top
+// edge when it's fully joined, down to the details when it isn't, so a tab can drain or fill. Until the details
+// reach past the gap under the row, the opened tile's tab alone runs down.
+const outline = (tabs, yb, b, W, gap) => {
   if (b < yb + 1) {
-    const yB = Math.max(y1, b);
-    return [...top, `L${x1} ${yB - R}`, `Q${x1} ${yB} ${x1 - R} ${yB}`, `L${x0 + R} ${yB}`, `Q${x0} ${yB} ${x0} ${yB - R}`, 'Z'].join(' ');
+    const { x0, x1, top } = tabs[tabs.length - 1];
+    const yB = Math.max(yb - gap, b);
+    return [`M${x0} ${top + R}`, `Q${x0} ${top} ${x0 + R} ${top}`, `L${x1 - R} ${top}`, `Q${x1} ${top} ${x1} ${top + R}`,
+      `L${x1} ${yB - R}`, `Q${x1} ${yB} ${x1 - R} ${yB}`, `L${x0 + R} ${yB}`, `Q${x0} ${yB} ${x0} ${yB - R}`, 'Z'].join(' ');
   }
   const r = Math.min(RB, (b - yb) / 2);
-  const f = Math.min(F, b - yb);
-  const p = top;
-  if (x1 < W - 1) p.push(`L${x1} ${yb - f}`, `Q${x1} ${yb} ${x1 + f} ${yb}`, `L${W - r} ${yb}`, `Q${W} ${yb} ${W} ${yb + r}`);
-  p.push(`L${W} ${b - r}`, `Q${W} ${b} ${W - r} ${b}`, `L${r} ${b}`, `Q0 ${b} 0 ${b - r}`);
-  if (x0 > 1) p.push(`L0 ${yb + r}`, `Q0 ${yb} ${r} ${yb}`, `L${x0 - f} ${yb}`, `Q${x0} ${yb} ${x0} ${yb - f}`);
-  p.push('Z');
+  const risen = tabs.filter((t) => yb - t.top > 0.5).sort((m, n) => m.x0 - n.x0);
+  const p = [`M0 ${b - r}`];
+  if (!(risen[0]?.x0 < 1)) p.push(`L0 ${yb + r}`, `Q0 ${yb} ${r} ${yb}`);
+  risen.forEach((t, i) => {
+    const h = yb - t.top;
+    const rt = Math.min(R, h / 2, (t.x1 - t.x0) / 2);
+    // The inside curves where it meets the details, kept clear of a neighbouring tab's
+    const room = (x) => (x == null ? F : x / 2);
+    const fl = Math.min(F, h, room(i > 0 ? t.x0 - risen[i - 1].x1 : null));
+    const fr = Math.min(F, h, room(i < risen.length - 1 ? risen[i + 1].x0 - t.x1 : null));
+    if (t.x0 >= 1) p.push(`L${t.x0 - fl} ${yb}`, `Q${t.x0} ${yb} ${t.x0} ${yb - fl}`);
+    p.push(`L${t.x0} ${t.top + rt}`, `Q${t.x0} ${t.top} ${t.x0 + rt} ${t.top}`, `L${t.x1 - rt} ${t.top}`, `Q${t.x1} ${t.top} ${t.x1} ${t.top + rt}`);
+    if (t.x1 <= W - 1) p.push(`L${t.x1} ${yb - fr}`, `Q${t.x1} ${yb} ${t.x1 + fr} ${yb}`);
+  });
+  if (!(risen[risen.length - 1]?.x1 > W - 1)) p.push(`L${W - r} ${yb}`, `Q${W} ${yb} ${W} ${yb + r}`);
+  p.push(`L${W} ${b - r}`, `Q${W} ${b} ${W - r} ${b}`, `L${r} ${b}`, `Q0 ${b} 0 ${b - r}`, 'Z');
   return p.join(' ');
 };
 
 /**
  * The glass of one opened tile and its details as a single shape, like a folder tab: it follows the tile and
- * the details row as they flow (see Molten), slides across when another tile in the row opens, and fades
- * as it closes.
+ * the details row as they flow (see Molten), and fades as it closes. When another tile in the row opens, the
+ * glass drains out of the old tile back into the details as it rises into the new one, and the details keep
+ * their place, only flowing to fit what's new. A tile the glass has risen into gives up its own glass
+ * (data-joined).
  */
 const TabGlass = ({ grid, row, tile, gap, open }) => {
   const shape = useRef(null);
   const edge = useRef(null);
-  const from = useRef(null); // the tab as drawn when it last started moving
-  const now = useRef(null); // the tab as drawn now
-  const t = useRef(1); // how far it has moved, 0..1
+  const joins = useRef({}); // how far the glass has risen into each tile, 0..1
 
   useLayoutEffect(() => {
     const g = grid.current;
     if (!g) return undefined;
+    const tileEl = (i) => g.querySelector(`[data-tile="${i}"]`);
     const draw = () => {
-      const el = g.querySelector(`[data-tile="${tile}"]`);
+      const el = tileEl(tile);
       if (!el || !shape.current) return;
-      const to = { x0: el.offsetLeft, x1: el.offsetLeft + el.offsetWidth, y0: el.offsetTop, y1: el.offsetTop + el.offsetHeight };
-      const a = from.current || to;
-      const k = t.current;
-      const tab = { x0: a.x0 + (to.x0 - a.x0) * k, x1: a.x1 + (to.x1 - a.x1) * k, y0: a.y0 + (to.y0 - a.y0) * k, y1: a.y1 + (to.y1 - a.y1) * k };
-      now.current = tab;
+      const y0 = el.offsetTop;
+      const yb = y0 + el.offsetHeight + gap;
+      const tabs = Object.entries(joins.current).map(([i, j]) => {
+        const t = tileEl(i);
+        if (t) t.toggleAttribute('data-joined', open && j > 0.5);
+        return t && { x0: t.offsetLeft, x1: t.offsetLeft + t.offsetWidth, top: yb - j * (yb - y0), j };
+      }).filter(Boolean).sort((m, n) => m.j - n.j);
       const d = g.querySelector(`.tile-drawer[data-row="${row}"]`);
-      const b = d ? d.offsetTop + d.offsetHeight : tab.y1;
-      const path = outline(tab, b, g.clientWidth, gap);
+      const path = outline(tabs, yb, d ? d.offsetTop + d.offsetHeight : yb - gap, g.clientWidth, gap);
       shape.current.style.clipPath = `path("${path}")`;
       edge.current.setAttribute('d', path);
     };
-    // Another tile in the row: slide the tab over from where it is
-    let slide;
-    if (now.current && !reducedMotion()) {
-      from.current = now.current;
-      t.current = 0;
-      slide = animate(0, 1, { duration: OPEN_MS / 1000, ease: GLASS_EASE_ARRAY, onUpdate: (v) => { t.current = v; draw(); } });
+    // The glass drains from every other tile as it rises into this one
+    const start = { ...joins.current };
+    const fresh = Object.keys(start).length === 0;
+    if (!(tile in start)) start[tile] = 0;
+    let run;
+    let live = true;
+    const step = (v) => {
+      Object.keys(start).forEach((i) => { joins.current[i] = start[i] + ((Number(i) === tile ? 1 : 0) - start[i]) * v; });
+      draw();
+    };
+    if (fresh || reducedMotion()) {
+      step(1);
     } else {
-      t.current = 1;
+      run = animate(0, 1, { duration: OPEN_MS / 1000, ease: GLASS_EASE_ARRAY, onUpdate: step });
+      run.then(() => { if (!live) return; Object.keys(joins.current).forEach((i) => { if (Number(i) !== tile) { delete joins.current[i]; tileEl(i)?.removeAttribute('data-joined'); } }); draw(); });
     }
     draw();
     const ro = new ResizeObserver(draw);
     ro.observe(g);
-    return () => { ro.disconnect(); slide?.stop(); };
-  }, [grid, row, tile, gap]);
+    return () => { live = false; ro.disconnect(); run?.stop(); };
+  }, [grid, row, tile, gap, open]);
+
+  // Leaving the page, every tile it joined has its own glass back
+  useLayoutEffect(() => () => {
+    grid.current?.querySelectorAll('[data-joined]').forEach((el) => {
+      if (el.closest('.tile-grid') === grid.current && Number(el.dataset.tile) in joins.current) el.removeAttribute('data-joined');
+    });
+  }, [grid]);
 
   // Frost in as it opens, out as it closes
   useLayoutEffect(() => {
@@ -113,8 +141,9 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
 /**
  * A grid of tiles whose opened tile stays put and becomes the tab of one piece of glass: its details form in a
  * full-width row under the tile's row (see Molten), and the glass runs down from the tile and spreads across
- * under it (see TabGlass). Opening another tile in the same row slides the tab over and condenses the new
- * details in place; in another row, the old glass melts away as the new one forms.
+ * under it (see TabGlass). Opening another tile in the same row drains the glass out of the old tile as it
+ * rises into the new one, and the details stay open, the new condensing in place of the old; in another row,
+ * the old glass melts away as the new one forms.
  *
  * entries: [{ key, attrs, tile, detail }]: attrs go on the tile's wrapper, tile renders the tile, detail renders
  * what opens under it.
