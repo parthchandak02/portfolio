@@ -25,7 +25,7 @@ const person = {
 };
 
 // The record as plain HTML, band by band in the same order as the page, for crawlers, link previews
-// and the moment before the app loads. The app replaces it on load.
+// and visitors without JavaScript; others see the loading screen (#boot) instead. The app replaces it on load.
 const record = spectrumBands
   .map((band) => ({
     name: band.name,
@@ -68,8 +68,40 @@ const record = spectrumBands
       href="https://fonts.googleapis.com/css2?family=Bitcount+Grid+Single&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Instrument+Sans:wght@400..700&family=Manrope:wght@400..700&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap"
     />
     <title>{title}</title>
+    <script is:inline>
+      // A first visit opens on the prism alone, so the loading screen leaves the cursor out
+      try {
+        if (localStorage.getItem('pc-has-visited') !== '1' && !location.hash) document.documentElement.classList.add('boot-play');
+      } catch (e) {}
+    </script>
   </head>
   <body class="dark-mode">
+    <!-- Until the site has loaded: the cursor where the typing begins, and the light coming in to the prism -->
+    <div id="boot" aria-hidden="true">
+      <span class="boot__beam"></span>
+      <span class="boot__cursor">|</span>
+    </div>
+    <noscript><style>#boot { display: none; } .record { position: static; width: auto; height: auto; min-height: 100vh; padding: 48px 20px; overflow: visible; clip-path: none; white-space: normal; }</style></noscript>
+    <script is:inline>
+      (() => {
+        const boot = document.getElementById('boot');
+        // The site's own cursor takes over from this one as soon as it shows
+        const watch = () => {
+          if (document.querySelector('.typed-cursor')) boot.classList.add('boot--typing');
+          else if (boot.isConnected) requestAnimationFrame(watch);
+        };
+        requestAnimationFrame(watch);
+        let gone = false;
+        const done = () => {
+          if (gone) return;
+          gone = true;
+          boot.classList.add('boot--done');
+          setTimeout(() => boot.remove(), 900);
+        };
+        window.addEventListener('scene-ready', done, { once: true });
+        setTimeout(done, 8000);
+      })();
+    </script>
     <div id="root">
       <App client:only="react">
         <main slot="fallback" class="record">
@@ -105,14 +137,55 @@ const record = spectrumBands
 </html>
 
 <style is:global>
+  #boot {
+    position: fixed; inset: 0; z-index: 5; pointer-events: none;
+    background: #000;
+    transition: opacity 0.8s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  #boot.boot--done { opacity: 0; }
+  /* The beam the prism splits, sliding in from the left to where the prism catches it */
+  .boot__beam {
+    position: absolute; left: 0; top: 50%; height: 1.5px; margin-top: -0.75px;
+    width: calc(50% - 62px);
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 8%, rgba(255, 255, 255, 0.14) 40%, rgba(255, 255, 255, 0.55));
+    transform-origin: left center;
+    animation: boot-beam 1.1s cubic-bezier(0.32, 0.72, 0, 1) 0.15s both;
+  }
+  .boot__beam::after {
+    content: ""; position: absolute; right: -4px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.9), 0 0 50px 18px rgba(255, 255, 255, 0.08);
+    animation: boot-glint 1.1s ease-out 0.15s both;
+  }
+  @keyframes boot-beam { from { transform: scaleX(0); opacity: 0; } 30% { opacity: 1; } to { transform: scaleX(1); opacity: 1; } }
+  @keyframes boot-glint { 0%, 70% { opacity: 0; } to { opacity: 1; } }
+  /* The typing's cursor, the same size and place as the site's own before it types (UITypewriter.css) */
+  .boot__cursor {
+    position: absolute; left: 0; right: 0; top: 245px;
+    text-align: center; color: #fff;
+    font: 600 clamp(1.4rem, 6vw, 2rem) / 1.25 'Plus Jakarta Sans', -apple-system, system-ui, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+    animation: boot-blink 0.7s infinite;
+  }
+  @media (min-width: 481px) { .boot__cursor { top: 191px; font-size: clamp(1.6rem, 5vw, 2.2rem); } }
+  @media (min-width: 769px) { .boot__cursor { top: calc(26px + 20.5vw); font-size: 4.48vw; } }
+  @media (min-width: 1024px) { .boot__cursor { top: 164px; font-size: 3.2rem; } }
+  @media (min-width: 1440px) { .boot__cursor { top: 190px; font-size: 3.8rem; } }
+  @media (max-height: 600px) { .boot__cursor { top: 95px; font-size: clamp(1.4rem, 4vw, 1.8rem); } }
+  @keyframes boot-blink { 50% { opacity: 0; } }
+  .boot-play .boot__cursor, #boot.boot--typing .boot__cursor { display: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .boot__beam, .boot__beam::after, .boot__cursor { animation: none; }
+  }
+  /* The plain page stays for crawlers, link previews and screen readers, out of sight */
   .record {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
     font-family: system-ui, sans-serif;
     max-width: 640px;
     margin: 0 auto;
-    padding: 48px 20px;
     color: #eee;
     background: #000;
-    min-height: 100vh;
     line-height: 1.55;
   }
   .record h1 {

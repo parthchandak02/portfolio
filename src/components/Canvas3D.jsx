@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { Canvas, useLoader, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer, LUT } from '@react-three/postprocessing';
 import { LUTCubeLoader } from 'postprocessing';
 import Scene from './Scene';
@@ -20,6 +20,16 @@ import { QUALITY } from '../hooks/quality';
 // off-screen buffer, not to the screen, so the warm-up aims at a buffer of the same kind, or the shaders it
 // made would not match. It also keys on the number of lights, so it runs twice: with the dark scene's lights,
 // and without them (light mode, and a switch once the prism has gone).
+// Once the scene has drawn a couple of frames, the page's loading screen (see pages/index.astro) gives way to it
+const Ready = () => {
+  const frames = useRef(0);
+  useFrame(() => {
+    frames.current += 1;
+    if (frames.current === 3) window.dispatchEvent(new Event('scene-ready'));
+  });
+  return null;
+};
+
 const Warmup = () => {
   const { gl, scene, camera } = useThree();
   useEffect(() => {
@@ -146,6 +156,7 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, focusHue =
       <Scene active={dark} lightMode={false} viewportPosition={viewportPosition} isLocked={isLocked} focusWave={focusWave} shift={shift} />
       <ModeShift kind={shift} onDone={finish} />
       <Warmup />
+      <Ready />
       <SwarmLight lightMode={lightMode} />
       <Finish lut={texture} />
     </Canvas>
