@@ -10,8 +10,9 @@ export const CLOSE_MS = 380;
 
 export const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// The content's frames: a soft, slightly smaller blur that settles into focus
+// The content's frames: a light blur, a touch smaller, that settles into focus (kept light, so the text never
+// smears and the browser can keep up)
 export const CONDENSE = [
-  { opacity: 0, filter: 'blur(14px)', transform: 'translateY(-6px) scale(0.985)' },
+  { opacity: 0, filter: 'blur(6px)', transform: 'translateY(-4px) scale(0.99)' },
   { opacity: 1, filter: 'blur(0px)', transform: 'none' }
 ];

@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { CLOSE_MS, CONDENSE, GLASS_CLOSE_EASE, GLASS_EASE, OPEN_MS, reducedMotion } from '../hooks/glassMotion';
+import { glassSound } from '../hooks/glassSound';
 import './Molten.css';
 
 /**
@@ -47,6 +48,7 @@ const Molten = ({ open, contentKey, className = '', style, children, onClosed, .
     closing.current?.cancel();
     closing.current = null;
     const from = height.current;
+    glassSound(from ? 'switch' : 'open');
     flowing.current?.cancel();
     flow(fit(), from);
     if (reducedMotion()) return;
@@ -82,6 +84,7 @@ const Molten = ({ open, contentKey, className = '', style, children, onClosed, .
     const o = outer.current;
     if (open || !mounted || !o) return undefined;
     const from = o.getBoundingClientRect().height;
+    glassSound('close');
     flowing.current?.cancel();
     height.current = 0;
     if (reducedMotion()) { setMounted(false); onClosed?.(); return undefined; }

@@ -1,7 +1,7 @@
 import { Fragment, useLayoutEffect, useRef, useState } from 'react';
 import { animate } from 'motion';
 import Molten from './Molten';
-import { CLOSE_MS, GLASS_CLOSE_EASE, GLASS_EASE_ARRAY, OPEN_MS, reducedMotion } from '../hooks/glassMotion';
+import { CLOSE_MS, GLASS_CLOSE_EASE, OPEN_MS, reducedMotion } from '../hooks/glassMotion';
 
 // How many columns a grid is laid out in right now (its columns follow the width), and the gap between its rows
 const useLayout = (ref) => {
@@ -25,53 +25,57 @@ const useLayout = (ref) => {
 
 const R = 16; // a tile's corners
 const RB = 20; // the details' corners
-const F = 12; // the inside curve where the tab meets the details
-
-// One outline around the details under a row, which run from just under its tiles (yb) down to `b`, and the
-// tabs that join it to the row's tiles. A tab is a tile's span (x0..x1) risen to `top`: up to the tile's top
-// edge when it's fully joined, down to the details when it isn't, so a tab can drain or fill. Until the details
-// reach past the gap under the row, the opened tile's tab alone runs down.
-const outline = (tabs, yb, b, W, gap) => {
-  if (!tabs.length) return 'M0 0';
-  if (b < yb + 1) {
-    const { x0, x1, top } = tabs[tabs.length - 1];
-    const yB = Math.max(yb - gap, b);
-    const q = Math.min(R, (yB - top) / 2);
-    if (q < 0.5) return 'M0 0';
-    return [`M${x0} ${top + q}`, `Q${x0} ${top} ${x0 + q} ${top}`, `L${x1 - q} ${top}`, `Q${x1} ${top} ${x1} ${top + q}`,
-      `L${x1} ${yB - q}`, `Q${x1} ${yB} ${x1 - q} ${yB}`, `L${x0 + q} ${yB}`, `Q${x0} ${yB} ${x0} ${yB - q}`, 'Z'].join(' ');
-  }
-  const r = Math.min(RB, (b - yb) / 2);
-  const risen = tabs.filter((t) => yb - t.top > 0.5).sort((m, n) => m.x0 - n.x0);
-  const p = [`M0 ${b - r}`];
-  if (!(risen[0]?.x0 < 1)) p.push(`L0 ${yb + r}`, `Q0 ${yb} ${r} ${yb}`);
-  risen.forEach((t, i) => {
-    const h = yb - t.top;
-    const rt = Math.min(R, h / 2, (t.x1 - t.x0) / 2);
-    // The inside curves where it meets the details, kept clear of a neighbouring tab's
-    const room = (x) => (x == null ? F : x / 2);
-    const fl = Math.min(F, h, room(i > 0 ? t.x0 - risen[i - 1].x1 : null));
-    const fr = Math.min(F, h, room(i < risen.length - 1 ? risen[i + 1].x0 - t.x1 : null));
-    if (t.x0 >= 1) p.push(`L${t.x0 - fl} ${yb}`, `Q${t.x0} ${yb} ${t.x0} ${yb - fl}`);
-    p.push(`L${t.x0} ${t.top + rt}`, `Q${t.x0} ${t.top} ${t.x0 + rt} ${t.top}`, `L${t.x1 - rt} ${t.top}`, `Q${t.x1} ${t.top} ${t.x1} ${t.top + rt}`);
-    if (t.x1 <= W - 1) p.push(`L${t.x1} ${yb - fr}`, `Q${t.x1} ${yb} ${t.x1 + fr} ${yb}`);
-  });
-  if (!(risen[risen.length - 1]?.x1 > W - 1)) p.push(`L${W - r} ${yb}`, `Q${W} ${yb} ${W} ${yb + r}`);
-  p.push(`L${W} ${b - r}`, `Q${W} ${b} ${W - r} ${b}`, `L${r} ${b}`, `Q0 ${b} 0 ${b - r}`, 'Z');
-  return p.join(' ');
-};
+const F = 12; // the inside curve where the neck meets the details
 
 /**
- * The glass of one opened tile and its details as a single shape, like a folder tab: it follows the tile and
- * the details row as they flow (see Molten), and fades as it closes. When another tile in the row opens, the
- * glass drains out of the old tile back into the details as it rises into the new one, and the details keep
- * their place, only flowing to fit what's new. A tile the glass has wholly risen into gives up its own glass
- * (data-joined).
+ * The glass under a row: the details, from just under the row's tiles (yb) down to `b`, and a neck (n.x0..n.x1)
+ * that joins them up to the foot of the opened tile. Until the details reach past the gap under the row, the
+ * neck alone runs down. Returns the shape to clip the glass to, and its edge, which leaves out the neck's top,
+ * where the glass runs on into the tile. Every y is drawn from `oy`, where the glass's box starts.
+ */
+const outline = (n, foot, yb, b, W, oy) => {
+  const Y = (y) => y - oy;
+  if (b <= foot + 0.5) return null;
+  if (b < yb + 1) {
+    const q = Math.min(R, (b - foot) / 2, (n.x1 - n.x0) / 2);
+    const rest = `L${n.x1} ${Y(b - q)} Q${n.x1} ${Y(b)} ${n.x1 - q} ${Y(b)} L${n.x0 + q} ${Y(b)} Q${n.x0} ${Y(b)} ${n.x0} ${Y(b - q)} L${n.x0} ${Y(foot)}`;
+    return { clip: `M${n.x0} ${Y(foot)} L${n.x1} ${Y(foot)} ${rest} Z`, edge: `M${n.x1} ${Y(foot)} ${rest}` };
+  }
+  const r = Math.min(RB, (b - yb) / 2);
+  const h = yb - foot;
+  const p = [];
+  // Down the neck's right side and out along the top of the details, unless the neck is flush with the edge
+  if (n.x1 > W - 1) p.push(`L${W} ${Y(b - r)}`);
+  else {
+    const room = W - n.x1;
+    const fr = Math.min(F, h, room / 2);
+    const rr = Math.min(r, room - fr);
+    p.push(`L${n.x1} ${Y(yb - fr)}`, `Q${n.x1} ${Y(yb)} ${n.x1 + fr} ${Y(yb)}`, `L${W - rr} ${Y(yb)}`, `Q${W} ${Y(yb)} ${W} ${Y(yb + rr)}`, `L${W} ${Y(b - r)}`);
+  }
+  p.push(`Q${W} ${Y(b)} ${W - r} ${Y(b)}`, `L${r} ${Y(b)}`, `Q0 ${Y(b)} 0 ${Y(b - r)}`);
+  if (n.x0 < 1) p.push(`L0 ${Y(foot)}`);
+  else {
+    const fl = Math.min(F, h, n.x0 / 2);
+    const rl = Math.min(r, n.x0 - fl);
+    p.push(`L0 ${Y(yb + rl)}`, `Q0 ${Y(yb)} ${rl} ${Y(yb)}`, `L${n.x0 - fl} ${Y(yb)}`, `Q${n.x0} ${Y(yb)} ${n.x0} ${Y(yb - fl)}`, `L${n.x0} ${Y(foot)}`);
+  }
+  const rest = p.join(' ');
+  return { clip: `M${n.x0} ${Y(foot)} L${n.x1} ${Y(foot)} ${rest} Z`, edge: `M${n.x1} ${Y(foot)} ${rest}` };
+};
+
+const easeOut = (t) => 1 - (1 - t) ** 3;
+
+/**
+ * The glass of the opened tile's details, joined to the tile by a neck of the same glass, like a folder tab: the
+ * tile keeps its own glass and opens at its foot into the neck (data-joined), so it reads as one piece. It follows
+ * the tile and the details as they flow (see Molten), and fades as it closes. When another tile in the row opens,
+ * the neck flows along under the row to it, its leading side first, like a drop of liquid, while the details keep
+ * their place. Its box covers only the neck and the details, so the blur behind it stays small.
  */
 const TabGlass = ({ grid, row, tile, gap, open }) => {
   const shape = useRef(null);
   const edge = useRef(null);
-  const joins = useRef({}); // how far the glass has risen into each tile, 0..1
+  const neck = useRef(null); // where the neck is now, x0..x1
 
   useLayoutEffect(() => {
     const g = grid.current;
@@ -79,48 +83,55 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
     const tileEl = (i) => g.querySelector(`[data-tile="${i}"]`);
     const draw = () => {
       const el = tileEl(tile);
-      if (!el || !shape.current) return;
-      const y0 = el.offsetTop;
-      const yb = y0 + el.offsetHeight + gap;
-      const tabs = Object.entries(joins.current).map(([i, j]) => {
-        const t = tileEl(i);
-        // A tile keeps its own glass until the tab has wholly risen into it, and takes it back the moment the tab
-        // starts to leave, so the tab's edge, moving under it, is only ever seen blurred through that glass
-        if (t) t.toggleAttribute('data-joined', open && Number(i) === tile && j > 0.98);
-        return t && { x0: t.offsetLeft, x1: t.offsetLeft + t.offsetWidth, top: yb - j * (yb - y0), j };
-      }).filter(Boolean).sort((m, n) => m.j - n.j);
+      const n = neck.current;
+      if (!el || !n || !shape.current) return;
+      const foot = el.offsetTop + el.offsetHeight;
+      // The tile the neck sits mostly under opens at its foot into it
+      g.querySelectorAll('[data-tile]').forEach((t) => {
+        if (t.offsetTop !== el.offsetTop) return;
+        const over = Math.min(n.x1, t.offsetLeft + t.offsetWidth) - Math.max(n.x0, t.offsetLeft);
+        t.toggleAttribute('data-joined', open && over > t.offsetWidth / 2);
+      });
       const d = g.querySelector(`.tile-drawer[data-row="${row}"]`);
-      const path = outline(tabs, yb, d ? d.offsetTop + d.offsetHeight : yb - gap, g.clientWidth, gap);
-      shape.current.style.clipPath = `path("${path}")`;
-      edge.current.setAttribute('d', path);
+      const b = d ? d.offsetTop + d.offsetHeight : foot;
+      const out = outline(n, foot, foot + gap, b, g.clientWidth, foot);
+      const box = { top: `${foot}px`, height: `${Math.max(0, b - foot)}px` };
+      Object.assign(shape.current.style, box, { clipPath: out ? `path("${out.clip}")` : 'path("M0 0")' });
+      Object.assign(edge.current.ownerSVGElement.style, box);
+      edge.current.setAttribute('d', out ? out.edge : '');
     };
-    // The glass drains from every other tile as it rises into this one; closing, it drains from this one too, back
-    // down into the details as they melt away
-    const start = { ...joins.current };
-    const fresh = Object.keys(start).length === 0;
-    if (!(tile in start)) start[tile] = 0;
+    const el = tileEl(tile);
+    const to = el && { x0: el.offsetLeft, x1: el.offsetLeft + el.offsetWidth };
+    const from = neck.current;
     let run;
-    let live = true;
-    const step = (v) => {
-      Object.keys(start).forEach((i) => { joins.current[i] = start[i] + ((open && Number(i) === tile ? 1 : 0) - start[i]) * v; });
-      draw();
-    };
-    if (fresh || reducedMotion()) {
-      step(1);
+    if (!to) return undefined;
+    if (!from || !open || reducedMotion() || (from.x0 === to.x0 && from.x1 === to.x1)) {
+      neck.current = to;
     } else {
-      run = animate(0, 1, { duration: (open ? OPEN_MS : CLOSE_MS) / 1000, ease: open ? GLASS_EASE_ARRAY : [0.4, 0, 0.2, 1], onUpdate: step });
-      run.then(() => { if (!live || !open) return; Object.keys(joins.current).forEach((i) => { if (Number(i) !== tile) { delete joins.current[i]; tileEl(i)?.removeAttribute('data-joined'); } }); draw(); });
+      // The side it's flowing towards leads, the other follows on a little behind, then it settles to the tile
+      const right = to.x0 > from.x0;
+      run = animate(0, 1, {
+        duration: OPEN_MS / 1000,
+        ease: 'linear',
+        onUpdate: (v) => {
+          const lead = easeOut(Math.min(1, v / 0.75));
+          const trail = easeOut(Math.max(0, (v - 0.12) / 0.88));
+          const [p0, p1] = right ? [trail, lead] : [lead, trail];
+          neck.current = { x0: from.x0 + (to.x0 - from.x0) * p0, x1: from.x1 + (to.x1 - from.x1) * p1 };
+          draw();
+        },
+      });
     }
     draw();
     const ro = new ResizeObserver(draw);
     ro.observe(g);
-    return () => { live = false; ro.disconnect(); run?.stop(); };
+    return () => { ro.disconnect(); run?.stop(); };
   }, [grid, row, tile, gap, open]);
 
-  // Leaving the page, every tile it joined has its own glass back
+  // Leaving the page, every tile it joined has its own glass whole again
   useLayoutEffect(() => () => {
     grid.current?.querySelectorAll('[data-joined]').forEach((el) => {
-      if (el.closest('.tile-grid') === grid.current && Number(el.dataset.tile) in joins.current) el.removeAttribute('data-joined');
+      if (el.closest('.tile-grid') === grid.current) el.removeAttribute('data-joined');
     });
   }, [grid]);
 
@@ -146,9 +157,9 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
 /**
  * A grid of tiles whose opened tile stays put and becomes the tab of one piece of glass: its details form in a
  * full-width row under the tile's row (see Molten), and the glass runs down from the tile and spreads across
- * under it (see TabGlass). Opening another tile in the same row drains the glass out of the old tile as it
- * rises into the new one, and the details stay open, the new condensing in place of the old; in another row,
- * the old glass melts away as the new one forms.
+ * under it (see TabGlass). Opening another tile in the same row flows the glass along under the row to it, and
+ * the details stay open, the new condensing in place of the old; in another row, the old glass melts away as
+ * the new one forms.
  *
  * entries: [{ key, attrs, tile, detail }]: attrs go on the tile's wrapper, tile renders the tile, detail renders
  * what opens under it.
