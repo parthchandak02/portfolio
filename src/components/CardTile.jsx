@@ -38,6 +38,8 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
   const year = yearOf(item);
   const band = bandForSection(item.category);
   const logo = typeof item.companyLogo === 'string' ? item.companyLogo : null;
+  // Info tiles show the logo large, so they use the copy with its empty margins cut off (public/logos/trim)
+  const bigLogo = logo && /^\/logos\/[^/]+\.png$/.test(logo) ? logo.replace('/logos/', '/logos/trim/') : logo;
   // Recognition's photos (press, talks, awards) rest frosted over, and come into focus on hover or when opened
   const veiled = photo && band?.key === 'recognition';
 
@@ -58,7 +60,7 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
         </>
       ) : (
         <span className="ctile__top" aria-hidden="true">
-          {logo && <img className="ctile__logo" src={logo} alt="" />}
+          {logo && <img className="ctile__logo" src={bigLogo} alt="" />}
           {venue && <span className="ctile__venue">{venue}</span>}
         </span>
       )}

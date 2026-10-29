@@ -54,8 +54,8 @@
 /* Info tile: the logo and who it's from up top; any picture is a soft ghost behind */
 .ctile--info .ctile__img { opacity: 0.18; filter: blur(5px) saturate(1.1); transform: scale(1.08); }
 .ctile--info .ctile__name { -webkit-line-clamp: 3; }
-.ctile__top { display: flex; align-items: center; gap: 9px; padding: 13px 14px 0; min-width: 0; }
-.ctile__logo { height: 26px; width: auto; max-width: 64px; object-fit: contain; flex: none; opacity: 0.9; }
+.ctile__top { display: flex; align-items: center; gap: 11px; padding: 13px 14px 0; min-width: 0; }
+.ctile__logo { height: 40px; width: auto; max-width: 128px; object-fit: contain; flex: none; opacity: 0.9; }
 .ctile__venue {
   font-family: var(--font-family-label); font-weight: 600; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--hue, #ff9a3d);
@@ -72,7 +72,7 @@
   .ctile__text { padding: 0 12px 11px; }
   .ctile__name { font-size: 0.86rem; -webkit-line-clamp: 3; }
   .ctile--info .ctile__name { -webkit-line-clamp: 4; }
-  .ctile__logo { height: 22px; max-width: 52px; }
+  .ctile__logo { height: 28px; max-width: 88px; }
 }
 @media (prefers-reduced-motion: reduce) { .ctile__img, .ctile__meta { transition: none; } }
 
