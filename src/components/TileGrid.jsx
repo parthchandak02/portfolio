@@ -1,6 +1,5 @@
 import { Fragment, useLayoutEffect, useRef, useState } from 'react';
 import { animate } from 'motion';
-import { X } from 'lucide-react';
 import Molten from './Molten';
 import { CLOSE_MS, GLASS_CLOSE_EASE, GLASS_EASE_ARRAY, OPEN_MS, reducedMotion } from '../hooks/glassMotion';
 
@@ -219,9 +218,6 @@ const TileGrid = ({ entries, openKey, onOpen, onClose }) => {
               >
                 <div className="tile-drawer__inner" ref={(el) => { drawers.current[r] = el; }}>
                   {entry.detail()}
-                  <button type="button" className="tile-drawer__close" onClick={onClose} aria-label="Close the details">
-                    <X size={16} />
-                  </button>
                 </div>
               </Molten>
             )}

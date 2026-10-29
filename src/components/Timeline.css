@@ -162,17 +162,6 @@
 .tile-drawer__inner { position: relative; padding: calc(var(--gap, 12px) + 26px) 28px 28px; }
 /* The shape carries the glass, so the row's own band of light would show past its edges */
 .tile-drawer .molten__sheen { display: none; }
-.tile-drawer__close {
-  position: absolute; top: calc(var(--gap, 12px) + 14px); right: 16px; z-index: 2;
-  display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
-  border: 1px solid transparent; background: transparent; color: inherit; opacity: 0.7; cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
-}
-.tile-drawer__close:hover { opacity: 1; background: rgba(127, 127, 127, 0.16); }
-.tile-drawer__close:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; opacity: 1; }
-.timeline--dark .tile-drawer__close { color: #fff; }
-.timeline--light .tile-drawer__close { color: #141418; }
-.tile-drawer .cdetail__text { padding-right: 36px; }
 @media (max-width: 560px) { .tile-drawer__inner { padding: calc(var(--gap, 10px) + 20px) 18px 22px; } }
 
 

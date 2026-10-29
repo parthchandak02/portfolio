@@ -20,11 +20,14 @@ const venueOf = (item) => (item.volume ? item.volume.split(',')[0] : item.compan
 const yearOf = (item) => (/present/i.test(item.date) ? 'Now' : (item.date.match(/\d{4}/g) || []).pop() || '');
 // Logos that spell out the organisation's name, so the name isn't written again beside them
 const WORDMARKS = ['springer-nature-logo.png', 'ieee-logo.png', 'sigma-xi-logo.png', 'buildon-logo.png'];
+// The date and place under the title, leaving out a date that's only the year already in the corner
 const metaOf = (item) => {
   const venue = venueOf(item);
   const rest = item.volume ? item.volume.split(',').slice(1).join(',').trim() : item.location;
-  return [item.date, rest && rest !== venue ? rest : null].filter(Boolean).join(' · ');
+  return [item.date.trim() === yearOf(item) ? null : item.date, rest && rest !== venue ? rest : null].filter(Boolean).join(' · ');
 };
+// Stock topic icons stand in for a venue without a logo of its own; a tile names the venue alone instead
+const isTopic = (logo) => /\/topic-[^/]+$/.test(logo || '');
 
 /**
  * A card as a tile, in one of two styles that share one size and layout. A photo tile leads with its picture,
@@ -39,7 +42,7 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
   const meta = metaOf(item);
   const year = yearOf(item);
   const band = bandForSection(item.category);
-  const logo = typeof item.companyLogo === 'string' ? item.companyLogo : null;
+  const logo = typeof item.companyLogo === 'string' && !isTopic(item.companyLogo) ? item.companyLogo : null;
   // Info tiles show the logo large, so they use the copy with its empty margins cut off (public/logos/trim)
   const bigLogo = logo && /^\/logos\/[^/]+\.png$/.test(logo) ? logo.replace('/logos/', '/logos/trim/') : logo;
   // Photos rest frosted over, like the Lab's tiles, and come into focus on hover or when opened
@@ -57,7 +60,7 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
       {image && <img className="ctile__img" src={image} alt="" loading="lazy" />}
       {photo ? (
         <>
-          {logo && <span className="ctile__chip" aria-hidden="true"><img src={logo} alt="" /></span>}
+          {logo && !WORDMARKS.some((w) => logo.endsWith(`/${w}`)) && <span className="ctile__chip" aria-hidden="true"><img src={logo} alt="" /></span>}
           {item.video && <span className="ctile__play" aria-hidden="true"><Play size={12} fill="currentColor" /></span>}
         </>
       ) : (
