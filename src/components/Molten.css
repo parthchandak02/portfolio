@@ -8,3 +8,5 @@
   mix-blend-mode: screen;
 }
 .timeline--light .molten__sheen { background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.5) 48%, transparent 62%); mix-blend-mode: normal; }
+/* The content that was there, melting away over the new as it condenses in */
+.molten__ghost { position: absolute; top: 0; left: 0; right: 0; pointer-events: none; }

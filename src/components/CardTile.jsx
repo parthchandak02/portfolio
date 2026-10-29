@@ -18,6 +18,8 @@ export const isTile = (item) => layoutOf(item.category) === 'tiles';
 const venueOf = (item) => (item.volume ? item.volume.split(',')[0] : item.company) || '';
 // The year a tile shows in its corner: when it ended, or Now
 const yearOf = (item) => (/present/i.test(item.date) ? 'Now' : (item.date.match(/\d{4}/g) || []).pop() || '');
+// Logos that spell out the organisation's name, so the name isn't written again beside them
+const WORDMARKS = ['springer-nature-logo.png', 'ieee-logo.png', 'sigma-xi-logo.png', 'buildon-logo.png'];
 const metaOf = (item) => {
   const venue = venueOf(item);
   const rest = item.volume ? item.volume.split(',').slice(1).join(',').trim() : item.location;
@@ -40,8 +42,8 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
   const logo = typeof item.companyLogo === 'string' ? item.companyLogo : null;
   // Info tiles show the logo large, so they use the copy with its empty margins cut off (public/logos/trim)
   const bigLogo = logo && /^\/logos\/[^/]+\.png$/.test(logo) ? logo.replace('/logos/', '/logos/trim/') : logo;
-  // Recognition's photos (press, talks, awards) rest frosted over, and come into focus on hover or when opened
-  const veiled = photo && band?.key === 'recognition';
+  // Photos rest frosted over, like the Lab's tiles, and come into focus on hover or when opened
+  const veiled = photo;
 
   return (
     <button
@@ -61,7 +63,7 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
       ) : (
         <span className="ctile__top" aria-hidden="true">
           {logo && <img className="ctile__logo" src={bigLogo} alt="" />}
-          {venue && <span className="ctile__venue">{venue}</span>}
+          {venue && !WORDMARKS.some((w) => logo?.endsWith(`/${w}`)) && <span className="ctile__venue">{venue}</span>}
         </span>
       )}
       {year && <span className={`ctile__year${item.video && photo ? ' ctile__year--beside' : ''}`} aria-hidden="true">{year}</span>}

@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Fragment, useLayoutEffect, useRef, useState } from 'react';
 import { animate } from 'motion';
 import { X } from 'lucide-react';
 import Molten from './Molten';
@@ -138,12 +138,27 @@ const TileGrid = ({ entries, openKey, onOpen, onClose }) => {
     settle((n) => n + 1);
   };
 
-  // Bring the opened details into view once they have formed, without moving the tile off the screen
+  // While one tile's glass melts away and another's forms, the opened tile holds still on the screen, however
+  // the rows around it move; then its details come into view, without moving the tile off the screen
   const drawers = useRef({});
-  useEffect(() => {
-    if (at < 0) return undefined;
-    const t = setTimeout(() => drawers.current[row]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 420);
-    return () => clearTimeout(t);
+  useLayoutEffect(() => {
+    const el = at >= 0 && grid.current?.querySelector(`[data-tile="${at}"]`);
+    if (!el) return undefined;
+    const scroller = el.closest('.main-content-scroll') || document.scrollingElement;
+    // Where the tile sits in the scrolled content, so the reader's own scrolling is left alone
+    const at0 = () => el.getBoundingClientRect().top + scroller.scrollTop;
+    let top = at0();
+    const end = performance.now() + Math.max(OPEN_MS, CLOSE_MS) + 80;
+    const hold = () => {
+      const drift = at0() - top;
+      if (Math.abs(drift) > 0.5) { scroller.scrollBy({ top: drift, behavior: 'instant' }); top += drift; }
+    };
+    // Corrected as the content changes size, after layout and before it paints, so the tile never visibly moves
+    const ro = new ResizeObserver(() => { if (performance.now() < end) hold(); });
+    [...scroller.children].forEach((c) => ro.observe(c));
+    const t = setTimeout(() => drawers.current[row]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), Math.max(OPEN_MS, CLOSE_MS) + 120);
+    const stop = setTimeout(() => ro.disconnect(), end - performance.now());
+    return () => { ro.disconnect(); clearTimeout(t); clearTimeout(stop); };
   }, [at, row]);
 
   const rows = Object.entries(shown.current).filter(([, i]) => entries[i]);

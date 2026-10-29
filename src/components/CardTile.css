@@ -68,7 +68,8 @@
 @media (max-width: 560px) {
   .timeline__tiles .lab__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .ctile { aspect-ratio: 1; }
-  .ctile__top { padding: 11px 12px 0; }
+  .ctile__top { padding: 11px 12px 0; flex-wrap: wrap; row-gap: 6px; } /* a name too long to sit beside the logo goes under it */
+  .ctile__venue { max-width: 100%; }
   .ctile__text { padding: 0 12px 11px; }
   .ctile__name { font-size: 0.86rem; -webkit-line-clamp: 3; }
   .ctile--info .ctile__name { -webkit-line-clamp: 4; }
@@ -79,13 +80,32 @@
 /* The tile whose card the typewriter names */
 .ctile.is-highlighted { border-color: rgba(255, 107, 53, 0.7); box-shadow: 0 0 0 1px rgba(255, 107, 53, 0.35), 0 0 24px rgba(255, 107, 53, 0.18); }
 
-/* A veiled photo tile (Recognition): the picture rests behind frosted glass, and comes into focus as the glass
-   clears on hover, keyboard focus, or once opened */
+/* A veiled photo tile: at rest it's the same frosted glass as every card, its picture only a soft ghost behind,
+   like the Lab's tiles; the glass clears and the picture comes into focus on hover, keyboard focus, or once
+   opened */
 .ctile--veiled .ctile__img {
-  filter: blur(14px) saturate(1.15) brightness(0.8);
-  transform: scale(1.12);
-  transition: filter 0.64s cubic-bezier(0.32, 0.72, 0, 1), transform 0.64s cubic-bezier(0.32, 0.72, 0, 1);
+  opacity: 0.22; filter: blur(10px) saturate(1.2); transform: scale(1.1);
+  transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1), filter 0.64s cubic-bezier(0.32, 0.72, 0, 1), transform 0.64s cubic-bezier(0.32, 0.72, 0, 1);
 }
-.ctile--veiled.is-open .ctile__img, .ctile--veiled:focus-visible .ctile__img { filter: none; transform: scale(1.02); }
-@media (hover: hover) { .ctile--veiled:hover .ctile__img { filter: none; transform: scale(1.02); } }
-@media (prefers-reduced-motion: reduce) { .ctile--veiled .ctile__img { transition: none; } }
+.ctile--veiled::before { opacity: 0.45; transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1); }
+.ctile--veiled .ctile__name, .ctile--veiled .ctile__year { transition: color 0.45s ease, text-shadow 0.45s ease; }
+.ctile--veiled.is-open .ctile__img, .ctile--veiled:focus-visible .ctile__img { opacity: 1; filter: none; transform: scale(1.02); }
+.ctile--veiled.is-open::before, .ctile--veiled:focus-visible::before { opacity: 1; }
+@media (hover: hover) {
+  .ctile--veiled:hover .ctile__img { opacity: 1; filter: none; transform: scale(1.02); }
+  .ctile--veiled:hover::before { opacity: 1; }
+}
+/* Light glass: dark text while frosted, white once the picture shows */
+.lab--light .ctile--veiled.is-open, .lab--light .ctile--veiled:focus-visible { color: #fff; }
+.lab--light .ctile--veiled:not(.is-open):not(:focus-visible) { color: rgba(20, 20, 24, 0.92); }
+.lab--light .ctile--veiled:not(.is-open):not(:focus-visible)::before { opacity: 0; }
+.lab--light .ctile--veiled:not(.is-open):not(:focus-visible) :is(.ctile__name, .ctile__year) { text-shadow: none; }
+@media (hover: hover) {
+  .lab--light .ctile--veiled:hover { color: #fff; }
+  .lab--light .ctile--veiled:hover::before { opacity: 1; }
+  .lab--light .ctile--veiled:hover :is(.ctile__name, .ctile__year) { text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5); }
+}
+@media (prefers-reduced-motion: reduce) { .ctile--veiled .ctile__img, .ctile--veiled::before { transition: none; } }
+
+/* Opened, the tile is the tab that heads its details: its whole title shows */
+.ctile.is-open .ctile__name { -webkit-line-clamp: 5; }

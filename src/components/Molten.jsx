@@ -5,7 +5,7 @@ import './Molten.css';
 /**
  * Glass that forms as it opens (see hooks/glassMotion). Opening, the space flows open to the content's height
  * while the content condenses out of a blur and a soft sheen runs down the glass; when `contentKey` changes
- * the glass flows to the new height and the new content condenses in its place; closing melts it back to
+ * the glass flows to the new height while the old content melts away and the new condenses in its place; closing melts it back to
  * nothing before it leaves the page, then calls `onClosed`.
  */
 const Molten = ({ open, contentKey, className = '', style, children, onClosed, ...rest }) => {
@@ -14,6 +14,10 @@ const Molten = ({ open, contentKey, className = '', style, children, onClosed, .
   const sheen = useRef(null);
   const [mounted, setMounted] = useState(open);
   const lastChildren = useRef(children);
+  // What showed before the content last changed, melting away over the new content
+  const ghostEl = useRef(null);
+  const [ghost, setGhost] = useState(null);
+  const shownKey = useRef(contentKey);
   const height = useRef(0); // the height it last settled at; 0 while closed
   const closing = useRef(null);
   const flowing = useRef(null);
@@ -29,7 +33,10 @@ const Molten = ({ open, contentKey, className = '', style, children, onClosed, .
   };
   // The height the glass needs for its content: the content plus its own border (sizes are border-box)
   const fit = () => inner.current.offsetHeight + (outer.current.offsetHeight - outer.current.clientHeight);
-  if (open) lastChildren.current = children;
+  if (open && mounted && contentKey !== shownKey.current) {
+    setGhost({ key: shownKey.current, children: lastChildren.current });
+  }
+  if (open) { lastChildren.current = children; shownKey.current = contentKey; }
 
   if (open && !mounted) setMounted(true);
 
@@ -46,6 +53,17 @@ const Molten = ({ open, contentKey, className = '', style, children, onClosed, .
     inner.current?.animate(CONDENSE, { duration: OPEN_MS + 80, delay: from ? 40 : 90, easing: GLASS_EASE, fill: 'backwards' });
     if (!from) sheen.current?.animate([{ transform: 'translateY(-100%)', opacity: 0.9 }, { transform: 'translateY(100%)', opacity: 0 }], { duration: OPEN_MS + 260, easing: GLASS_EASE });
   }, [open, mounted, contentKey]);
+
+  // The old content melts away where it was, as the new condenses in
+  useLayoutEffect(() => {
+    const g = ghostEl.current;
+    if (!ghost || !g) return undefined;
+    g.inert = true;
+    if (reducedMotion()) { setGhost(null); return undefined; }
+    const a = g.animate(CONDENSE.slice().reverse(), { duration: CLOSE_MS, easing: GLASS_CLOSE_EASE, fill: 'forwards' });
+    a.onfinish = () => setGhost((cur) => (cur === ghost ? null : cur));
+    return () => a.cancel();
+  }, [ghost]);
 
   // Content that changes size once open (a picture loading, a video starting) flows the glass with it
   useLayoutEffect(() => {
@@ -78,6 +96,7 @@ const Molten = ({ open, contentKey, className = '', style, children, onClosed, .
   return (
     <div ref={outer} className={`molten ${className}`} style={style} {...rest}>
       <div ref={inner} className="molten__inner">{open ? children : lastChildren.current}</div>
+      {ghost && <div key={ghost.key} ref={ghostEl} className="molten__ghost" aria-hidden="true">{ghost.children}</div>}
       <span ref={sheen} className="molten__sheen" aria-hidden="true" />
     </div>
   );

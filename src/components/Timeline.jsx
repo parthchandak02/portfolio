@@ -70,7 +70,7 @@ const Timeline = ({
     return () => document.removeEventListener('keydown', onKey);
   }, [openTile]);
   const closeTile = () => setOpenTile(null);
-  const detailFor = (item) => () => <CardDetail item={item} subprojects={childrenOf[item.title]} />;
+  const detailFor = (item) => () => <CardDetail item={item} subprojects={childrenOf[item.title]} tab />;
   const segments = useMemo(() => {
     const out = [];
     const seen = new Set();

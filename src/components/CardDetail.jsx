@@ -16,8 +16,9 @@ const urlText = (url) => {
 const still = (video) => `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
 
 // A picture that dissolves into the glass: its edges fade out, over a soft glow of its own colours. A video is
-// its still with a play button until clicked, so no third-party code loads up front.
-const Media = ({ item, compact = false }) => {
+// its still with a play button until clicked, so no third-party code loads up front; `chip` shows just a small
+// play button instead, where the still is already on show (a tile's tab).
+const Media = ({ item, compact = false, chip = false }) => {
   const [playing, setPlaying] = useState(false);
   const src = item.projectImage || (item.video && still(item.video));
   if (!src) return null;
@@ -31,6 +32,13 @@ const Media = ({ item, compact = false }) => {
           allowFullScreen
         />
       </div>
+    );
+  }
+  if (chip) {
+    return (
+      <button type="button" className="cdetail__link cdetail__watch" onClick={(e) => { e.stopPropagation(); setPlaying(true); }}>
+        <Play size={12} fill="currentColor" aria-hidden="true" /> Watch the video
+      </button>
     );
   }
   const picture = (
@@ -68,14 +76,19 @@ const Tags = ({ skills }) => (
 /**
  * What a card says once opened, the same wherever it opens: under a tile (TileGrid) or under a role in a
  * company's card (CompanyCard). `head` adds the organisation and title, for places that don't already show them.
+ * `tab`: under a tile's tab, which already shows the picture, organisation, title and date, so the details carry
+ * on from it with only what's new.
  */
-const CardDetail = ({ item, subprojects = [], head = true }) => {
+const CardDetail = ({ item, subprojects = [], head: withHead = true, tab = false }) => {
+  const head = withHead && !tab;
   const venue = item.volume ? item.volume.split(',')[0] : item.company;
   const volumeRest = item.volume ? item.volume.split(',').slice(1).join(',').trim() : null;
   const place = item.location && item.location !== venue ? item.location : null;
-  const meta = [head ? item.date : null, place, volumeRest].filter(Boolean);
+  const meta = tab ? [] : [head ? item.date : null, place, volumeRest].filter(Boolean);
   const logo = typeof item.companyLogo === 'string' ? item.companyLogo : null;
-  const media = Boolean(item.projectImage || item.video);
+  // A tab already shows the card's picture, unless it's an info tile, where the picture is only a faint ghost
+  const pictured = tab && item.tile !== 'info';
+  const media = !pictured && Boolean(item.projectImage || item.video);
 
   return (
     <div className={`cdetail${media ? ' cdetail--media' : ''}`}>
@@ -92,6 +105,7 @@ const CardDetail = ({ item, subprojects = [], head = true }) => {
           <p className="cdetail__meta">{meta.map((m, i) => <span key={i}>{m}</span>)}</p>
         )}
         {item.description && <p className="cdetail__desc">{item.description}</p>}
+        {pictured && item.video && <Media item={item} chip />}
         {item.url && (
           <a className="cdetail__link" href={item.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
             {urlText(item.url)} <ExternalLink size={13} aria-hidden="true" />
