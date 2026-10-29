@@ -19,39 +19,38 @@
 .company__logo { height: 34px; width: auto; max-width: 84px; object-fit: contain; flex: none; opacity: 0.92; }
 .company--light .company__logo { filter: invert(1) brightness(0.8); }
 
-/* The roles: a hairline down the left, a node per role; the current role's node glows */
-.company__roles { list-style: none; margin: 6px 0 0; padding: 0; position: relative; }
-.company--many .company__roles::before {
-  content: ""; position: absolute; left: 5px; top: 22px; bottom: 26px; width: 1px;
-  background: linear-gradient(to bottom, var(--line), var(--line) 85%, transparent);
-}
-.company__role { position: relative; margin: 0; padding-left: 26px; }
-.company__node {
-  position: absolute; left: 0; top: 21px; width: 11px; height: 11px; border-radius: 50%;
-  background: var(--bg-node, #0b0b0e); border: 1.5px solid var(--line);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-.company--light .company__node { --bg-node: #f6f4f1; }
-.company__role.is-current .company__node {
-  border-color: var(--band-hue, #e4dccf); background: var(--band-hue, #e4dccf);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--band-hue, #e4dccf) 18%, transparent), 0 0 14px color-mix(in srgb, var(--band-hue, #e4dccf) 45%, transparent);
-}
-.company__role[data-current] .company__node, .company__role.is-open .company__node { border-color: var(--band-hue, #e4dccf); }
-
+/* The roles: behind each, the glass fills in for its stretch of the company's years (see CompanyCard). The
+   current role's fill takes the band's colour and fades out, as it hasn't ended. Dates come in on hover. */
+.company__roles { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
+.company__role { position: relative; margin: 0; }
 .company__role-head {
-  all: unset; box-sizing: border-box; cursor: pointer;
-  display: flex; align-items: center; gap: 12px; width: 100%;
-  padding: 12px 0; border-radius: 10px;
+  all: unset; box-sizing: border-box; cursor: pointer; position: relative; isolation: isolate; overflow: hidden;
+  display: flex; align-items: center; gap: 12px; width: calc(100% + 24px); margin: 0 -12px;
+  padding: 14px 12px; border-radius: 12px;
 }
 .company__role-head:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; }
-.company__role-text { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.company__fill {
+  position: absolute; top: 0; bottom: 0; z-index: -1; border-radius: 10px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--fg) 8%, transparent), color-mix(in srgb, var(--fg) 3%, transparent));
+  transition: background 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.company__role.is-current .company__fill { background: linear-gradient(90deg, color-mix(in srgb, var(--band-hue, #f0875a) 24%, transparent), transparent); }
+.company__role-head:hover .company__fill, .company__role.is-open .company__fill, .company__role-head:focus-visible .company__fill {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--band-hue, #f0875a) 28%, transparent), color-mix(in srgb, var(--band-hue, #f0875a) 8%, transparent));
+}
+.company__role-text { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 2px 16px; flex: 1; min-width: 0; }
 .company__role-title { font-size: 1.02rem; font-weight: 600; line-height: 1.3; transition: color 0.3s ease; }
-.company__role-date { font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.8rem; color: var(--muted); }
-.company__role.is-highlighted .company__role-title, .company__role[data-current] .company__role-title { color: #ff8a5c; }
+.company__role-date {
+  font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.8rem; color: var(--muted);
+  opacity: 0; filter: blur(6px); transform: translateY(-3px);
+  transition: opacity 0.45s cubic-bezier(0.32, 0.72, 0, 1), filter 0.45s cubic-bezier(0.32, 0.72, 0, 1), transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.company__role-head:hover .company__role-date, .company__role-head:focus-visible .company__role-date, .company__role.is-open .company__role-date { opacity: 1; filter: none; transform: none; }
+.company__role.is-current .company__role-title, .company__role.is-highlighted .company__role-title, .company__role[data-current] .company__role-title { color: #ff8a5c; }
+.company--light .company__role.is-current .company__role-title, .company--light .company__role[data-current] .company__role-title { color: #d0602e; }
 .company__chev { flex: none; color: var(--muted); transition: transform 0.64s cubic-bezier(0.32, 0.72, 0, 1), color 0.2s; }
 .company__role-head:hover .company__chev { color: var(--fg); }
 .company__role.is-open .company__chev { transform: rotate(180deg); }
-.company__role + .company__role .company__role-head { border-top: 1px solid color-mix(in srgb, var(--line) 55%, transparent); border-radius: 0; }
 
 .company__detail-body { padding: 4px 0 22px; }
 
@@ -64,9 +63,7 @@
 @media (max-width: 560px) {
   .company { padding: 16px 16px 6px; }
   .company__logo { height: 26px; max-width: 64px; }
-  .company__role { padding-left: 22px; }
   .company__role-title { font-size: 0.96rem; }
 }
-@media (prefers-reduced-motion: reduce) { .company__chev, .company__node { transition: none; } }
-.company .company__role { margin-bottom: 0; padding-left: 26px; }
-@media (max-width: 560px) { .company .company__role { padding-left: 22px; } }
+@media (prefers-reduced-motion: reduce) { .company__chev, .company__fill, .company__role-date { transition: none; } }
+.company .company__role { margin-bottom: 0; padding-left: 0; }

@@ -22,8 +22,9 @@ const lengthOf = (from, to) => {
 const ends = (date = '') => { const [a, b] = date.split(' - '); return [a, b || a]; };
 
 /**
- * One organisation in the timeline, with each role held there on a line inside it, newest first, so a run of
- * roles at one company reads as one continuous stretch. Each role is its own .timeline__item (the strip,
+ * One organisation in the timeline, with its roles inside it, newest first, so a run of roles at one company
+ * reads as one continuous stretch. Behind each role, the glass fills in for the part of the company's years it
+ * covers; its dates come in on hover or once opened. Each role is its own .timeline__item (the strip,
  * the band bar and the typewriter find it by title) and opens to its details.
  *
  * roles: [{ item, attrs, highlighted }], newest first; childrenOf: projects done in a role, by its title
@@ -42,15 +43,22 @@ const CompanyCard = ({ roles, childrenOf = {}, lightMode = false }) => {
   const place = first.location !== company ? first.location : null;
   const from = ends(roles[roles.length - 1].item.date)[0];
   const to = ends(first.date)[1];
-  const span = roles.length > 1 ? `${from} – ${to}` : null;
   const total = roles.length > 1 ? lengthOf(from, to) : null;
+  // Where a role sits across the company's years, as a share of the card's width
+  const start = monthOf(from); const stop = monthOf(to);
+  const reach = (date) => {
+    const [a, b] = ends(date).map(monthOf);
+    if (roles.length === 1 || a == null || b == null || start == null || !(stop > start)) return { left: '0%', width: '100%' };
+    const left = Math.min(94, ((a - start) / (stop - start + 1)) * 100);
+    return { left: `${left}%`, width: `${Math.max(6, ((b - a + 1) / (stop - start + 1)) * 100)}%` };
+  };
 
   return (
     <div className={`company glass glass-strong ${lightMode ? 'company--light' : 'company--dark'}${roles.length > 1 ? ' company--many' : ''}`}>
       <header className="company__head">
         <div className="company__who">
           {company && <span className="company__name">{company}</span>}
-          <span className="company__where">{[place, span, total].filter(Boolean).join(' · ')}</span>
+          <span className="company__where">{[place, total].filter(Boolean).join(' · ')}</span>
         </div>
         {logo && <img className="company__logo" src={logo} alt={company ? `${company} logo` : ''} />}
       </header>
@@ -67,8 +75,8 @@ const CompanyCard = ({ roles, childrenOf = {}, lightMode = false }) => {
               {...attrs}
               className={`timeline__item company__role${isOpen ? ' is-open' : ''}${current ? ' is-current' : ''}${highlighted ? ' is-highlighted' : ''}`}
             >
-              <span className="company__node" aria-hidden="true" />
               <button type="button" className="company__role-head" onClick={() => toggle(item.title)} aria-expanded={isOpen}>
+                <span className="company__fill" style={reach(item.date)} aria-hidden="true" />
                 <span className="company__role-text">
                   <span className="company__role-title">{item.title}</span>
                   <span className="company__role-date">{[item.date.replace(' - ', ' – '), length].filter(Boolean).join(' · ')}</span>

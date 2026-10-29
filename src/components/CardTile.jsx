@@ -16,6 +16,8 @@ export const isTile = (item) => layoutOf(item.category) === 'tiles';
 
 // Who it's from (the journal for a paper, else the organisation), and the line under the title
 const venueOf = (item) => (item.volume ? item.volume.split(',')[0] : item.company) || '';
+// The year a tile shows in its corner: when it ended, or Now
+const yearOf = (item) => (/present/i.test(item.date) ? 'Now' : (item.date.match(/\d{4}/g) || []).pop() || '');
 const metaOf = (item) => {
   const venue = venueOf(item);
   const rest = item.volume ? item.volume.split(',').slice(1).join(',').trim() : item.location;
@@ -33,6 +35,7 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
   const photo = Boolean(image) && item.tile !== 'info';
   const venue = venueOf(item);
   const meta = metaOf(item);
+  const year = yearOf(item);
   const band = bandForSection(item.category);
   const logo = typeof item.companyLogo === 'string' ? item.companyLogo : null;
   // Recognition's photos (press, talks, awards) rest frosted over, and come into focus on hover or when opened
@@ -59,6 +62,7 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
           {venue && <span className="ctile__venue">{venue}</span>}
         </span>
       )}
+      {year && <span className={`ctile__year${item.video && photo ? ' ctile__year--beside' : ''}`} aria-hidden="true">{year}</span>}
       <span className="ctile__text">
         <span className="ctile__name">{item.title}</span>
         {meta && <span className="ctile__meta">{meta}</span>}

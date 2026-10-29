@@ -12,7 +12,22 @@
   font-size: 0.92rem; font-weight: 600; line-height: 1.28;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.ctile__meta { font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.72rem; opacity: 0.72; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ctile__meta {
+  font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  /* The date and place come in on hover, keyboard focus or once opened; the corner year stands in for them */
+  opacity: 0; filter: blur(6px); transform: translateY(-3px);
+  transition: opacity 0.45s cubic-bezier(0.32, 0.72, 0, 1), filter 0.45s cubic-bezier(0.32, 0.72, 0, 1), transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.ctile:focus-visible .ctile__meta, .ctile.is-open .ctile__meta { opacity: 0.72; filter: none; transform: none; }
+@media (hover: hover) { .ctile:hover .ctile__meta { opacity: 0.72; filter: none; transform: none; } }
+.ctile__year {
+  position: absolute; top: 14px; right: 14px; z-index: 1;
+  font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
+  opacity: 0.55;
+}
+.ctile--photo .ctile__year { text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); opacity: 0.8; }
+.ctile__year--beside { right: 46px; top: 16px; }
+.ctile--info .ctile__top { padding-right: 52px; }
 
 /* Photo tile: the picture fills it, shaded at the foot so the title reads; the logo sits in a chip */
 .ctile--photo { color: #fff; }
@@ -59,7 +74,7 @@
   .ctile--info .ctile__name { -webkit-line-clamp: 4; }
   .ctile__logo { height: 22px; max-width: 52px; }
 }
-@media (prefers-reduced-motion: reduce) { .ctile__img { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .ctile__img, .ctile__meta { transition: none; } }
 
 /* The tile whose card the typewriter names */
 .ctile.is-highlighted { border-color: rgba(255, 107, 53, 0.7); box-shadow: 0 0 0 1px rgba(255, 107, 53, 0.35), 0 0 24px rgba(255, 107, 53, 0.18); }
