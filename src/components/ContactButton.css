@@ -1,4 +1,4 @@
-/* The contact button, fixed to the bottom-right corner. Its glass is the card: the script springs it open. */
+/* The contact button, fixed to the bottom-right corner. Its glass is the card: the script flows it open. */
 .contact {
   --fab: 48px;
   position: fixed; z-index: 60;

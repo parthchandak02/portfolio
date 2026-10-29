@@ -1,0 +1,10 @@
+/* Glass that forms as it opens (see Molten.jsx): the space clips its content while it flows open, and a soft
+   band of light runs down the glass once as it forms */
+.molten { position: relative; overflow: hidden; }
+.molten__inner { will-change: auto; }
+.molten__sheen {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.07) 45%, rgba(255, 255, 255, 0.12) 50%, transparent 62%);
+  mix-blend-mode: screen;
+}
+.timeline--light .molten__sheen { background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.5) 48%, transparent 62%); mix-blend-mode: normal; }

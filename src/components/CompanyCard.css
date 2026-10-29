@@ -48,13 +48,12 @@
 .company__role-title { font-size: 1.02rem; font-weight: 600; line-height: 1.3; transition: color 0.3s ease; }
 .company__role-date { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .company__role.is-highlighted .company__role-title, .company__role[data-current] .company__role-title { color: #ff8a5c; }
-.company__chev { flex: none; color: var(--muted); transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.2s; }
+.company__chev { flex: none; color: var(--muted); transition: transform 0.64s cubic-bezier(0.32, 0.72, 0, 1), color 0.2s; }
 .company__role-head:hover .company__chev { color: var(--fg); }
 .company__role.is-open .company__chev { transform: rotate(180deg); }
 .company__role + .company__role .company__role-head { border-top: 1px solid color-mix(in srgb, var(--line) 55%, transparent); border-radius: 0; }
 
-.company__detail { padding: 4px 0 22px; animation: company-open 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
-@keyframes company-open { from { opacity: 0; transform: translateY(-6px); } }
+.company__detail-body { padding: 4px 0 22px; }
 
 /* The card on the band bar's lit line picks up the band's colour, softly */
 .company:has(.company__role[data-current]) {
@@ -68,6 +67,6 @@
   .company__role { padding-left: 22px; }
   .company__role-title { font-size: 0.96rem; }
 }
-@media (prefers-reduced-motion: reduce) { .company__detail { animation: none; } .company__chev, .company__node { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .company__chev, .company__node { transition: none; } }
 .company .company__role { margin-bottom: 0; padding-left: 26px; }
 @media (max-width: 560px) { .company .company__role { padding-left: 22px; } }

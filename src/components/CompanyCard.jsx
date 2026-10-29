@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import CardDetail from './CardDetail';
+import Molten from './Molten';
 import './CompanyCard.css';
 
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
@@ -74,9 +75,11 @@ const CompanyCard = ({ roles, childrenOf = {}, lightMode = false }) => {
                 </span>
                 <ChevronDown className="company__chev" size={18} aria-hidden="true" />
               </button>
-              <div className="company__detail" hidden={!isOpen}>
-                {isOpen && <CardDetail item={{ ...item, location: item.location === place ? null : item.location }} head={false} subprojects={childrenOf[item.title]} />}
-              </div>
+              <Molten open={isOpen} className="company__detail">
+                <div className="company__detail-body">
+                  <CardDetail item={{ ...item, location: item.location === place ? null : item.location }} head={false} subprojects={childrenOf[item.title]} />
+                </div>
+              </Molten>
             </li>
           );
         })}

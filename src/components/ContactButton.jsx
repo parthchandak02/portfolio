@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { animate, stagger } from 'motion';
 import { Calendar, FileText, Github, Linkedin, Mail, MessageCircle, X } from 'lucide-react';
 import { glowPrism } from '../hooks/prismGlow';
+import { CLOSE_MS, GLASS_EASE_ARRAY, OPEN_MS, reducedMotion } from '../hooks/glassMotion';
 import './ContactButton.css';
 
 const LINKS = [
@@ -15,15 +16,16 @@ const LINKS = [
 const CARD_W = 240; // px, or the window less its gutters on narrow phones
 const GUTTER = 16;
 const RADIUS = 20; // the open card's corners; closed, the corners are half the button so it is a circle
-const OPEN = { type: 'spring', bounce: 0.2, visualDuration: 0.5 };
-const CLOSE = { type: 'spring', bounce: 0.08, visualDuration: 0.36 };
+// The glass motion every card shares (hooks/glassMotion): no spring, the glass flows open and settles
+const OPEN = { duration: OPEN_MS / 1000, ease: GLASS_EASE_ARRAY };
+const CLOSE = { duration: CLOSE_MS / 1000, ease: [0.4, 0, 0.2, 1] };
 
-const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const prefersReducedMotion = reducedMotion;
 
 /**
  * One glass button in the bottom-right corner, always on screen. Opening it does not bring in a second
- * panel: the button's own glass grows into the card on a spring, like a phone's Dynamic Island, and the
- * links settle in one after another. Closing springs the same glass back into the circle.
+ * panel: the button's own glass flows out into the card, like a phone's Dynamic Island, and the links
+ * condense out of a blur one after another. Closing flows the same glass back into the circle.
  */
 const ContactButton = ({ lightMode = false, away = false }) => {
   const [open, setOpen] = useState(false);
@@ -58,12 +60,12 @@ const ContactButton = ({ lightMode = false, away = false }) => {
     if (to) {
       runningRef.current.push(
         animate(shell, target, OPEN),
-        animate(items, { opacity: [0, 1], y: [10, 0] }, { delay: stagger(0.045, { startDelay: 0.12 }), type: 'spring', bounce: 0.15, visualDuration: 0.4 })
+        animate(items, { opacity: [0, 1], y: [6, 0], filter: ['blur(10px)', 'blur(0px)'] }, { delay: stagger(0.05, { startDelay: 0.14 }), duration: 0.56, ease: GLASS_EASE_ARRAY })
       );
     } else {
       // The glass closes over the links as they fade, the open played backwards
       const shrink = animate(shell, target, CLOSE);
-      runningRef.current.push(animate(items, { opacity: 0, y: 6 }, { duration: 0.18 }), shrink);
+      runningRef.current.push(animate(items, { opacity: 0, y: 4, filter: 'blur(8px)' }, { duration: 0.2 }), shrink);
       // Back to the stylesheet's size once closed, so the button follows the layout again
       shrink.then(() => {
         if (shellRef.current?.classList.contains('is-open')) return;
