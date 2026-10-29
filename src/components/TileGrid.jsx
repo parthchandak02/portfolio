@@ -19,7 +19,7 @@ const useColumns = (ref) => {
 
 /**
  * A grid of tiles whose opened tile stays put: its details form as glass in a full-width row under the tile's
- * row (see Molten), the row's top edge lit under the tile. Opening another tile in the same row condenses the
+ * row (see Molten). Opening another tile in the same row condenses the
  * new details in place; in another row, the old details melt away as the new ones form.
  *
  * entries: [{ key, attrs, tile, detail }]: attrs go on the tile's wrapper, tile renders the tile, detail renders
@@ -59,7 +59,7 @@ const TileGrid = ({ entries, openKey, onOpen, onClose }) => {
                 open={r === row}
                 contentKey={entry.key}
                 className="tile-drawer"
-                style={{ '--notch': `${(((last % cols) + 0.5) / cols) * 100}%`, '--band-hue': entry.attrs.style?.['--band-hue'] }}
+                style={{ '--band-hue': entry.attrs.style?.['--band-hue'] }}
                 role="region"
                 aria-label="Details"
                 data-row={r}

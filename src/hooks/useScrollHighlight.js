@@ -112,6 +112,16 @@ const useScrollHighlight = (activeFilter) => {
       onLine = crossing[Math.min(crossing.length - 1, Math.floor(progress * crossing.length))].item;
     }
 
+    // Reading an opened tile's details, under its row: the tile they belong to stays the one you are on
+    if (!onLine) {
+      const drawer = Array.from(document.querySelectorAll('.tile-drawer')).find((d) => {
+        const r = d.getBoundingClientRect();
+        return r.top <= readingLine && r.bottom >= readingLine;
+      });
+      const owner = drawer?.parentElement?.querySelector('.timeline__item.is-open[data-category]');
+      if (owner) onLine = owner;
+    }
+
     if (onLine) {
       centermostCategory = onLine.getAttribute('data-category') || 'all';
       centermostTitle = onLine.getAttribute('data-title');
@@ -122,10 +132,11 @@ const useScrollHighlight = (activeFilter) => {
       centermostTitle = timelineRect(readingLine) ? null : edge.getAttribute('data-title');
     }
 
-    // Selected work is a single row on a wide screen, so the reading line passes it while its tiles are still
-    // in full view. While they are, the bar keeps saying Selected work rather than naming the card below.
+    // Selected work is a single row on a wide screen, so the reading line passes it while its tiles are still in
+    // full view. While they are, and the line is in the gap below them, the bar keeps saying Selected work; once a
+    // card reaches the line, the bar names that card.
     const selected = document.getElementById('selected');
-    if (selected && centermostCategory !== 'selected') {
+    if (selected && centermostCategory !== 'selected' && !onLine) {
       const r = selected.getBoundingClientRect();
       if (r.top < readingLine && r.bottom > containerRect.top + BAR_CLEARANCE + 60) {
         centermostCategory = 'selected';

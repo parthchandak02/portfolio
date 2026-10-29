@@ -36,7 +36,7 @@
 }
 @media (hover: hover) { .ctile--photo:hover .ctile__img { transform: scale(1.04); } }
 
-/* Info tile: the logo and who it's from up top, in the band's colour; any picture is a soft ghost behind */
+/* Info tile: the logo and who it's from up top; any picture is a soft ghost behind */
 .ctile--info .ctile__img { opacity: 0.18; filter: blur(5px) saturate(1.1); transform: scale(1.08); }
 .ctile--info .ctile__name { -webkit-line-clamp: 3; }
 .ctile__top { display: flex; align-items: center; gap: 9px; padding: 13px 14px 0; min-width: 0; }
@@ -45,10 +45,6 @@
   font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--hue, #ff9a3d);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.ctile--info::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
-  background: var(--hue, #ff9a3d); opacity: 0.6;
 }
 .lab--light .ctile--info .ctile__logo { filter: invert(1) brightness(0.8); }
 .lab--light .ctile--info .ctile__venue { color: color-mix(in srgb, var(--hue, #ff9a3d) 62%, #000); }

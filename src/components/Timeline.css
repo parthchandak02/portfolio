@@ -132,30 +132,20 @@
 @media (max-width: 900px) { .timeline__selected .lab__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .timeline__tiles .timeline__item { margin-bottom: 0; }
 
-/* An opened tile keeps its place, outlined in its band's colour; its details open in a row under it */
-.timeline__tiles .timeline__item.is-open .lab-tile { border-color: color-mix(in srgb, var(--band-hue) 75%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--band-hue) 40%, transparent), 0 0 24px color-mix(in srgb, var(--band-hue) 22%, transparent); }
-/* Frosted glass, tinted faintly with the band's colour, that flows open under the tile (see Molten); where it
-   meets the opened tile, its top edge lights up */
+/* An opened tile keeps its place, its glass edge a little brighter; its details open in a row under it */
+.timeline__tiles .timeline__item.is-open .lab-tile { border-color: rgba(255, 255, 255, 0.32); }
+.timeline--light .timeline__tiles .timeline__item.is-open .lab-tile { border-color: rgba(20, 20, 24, 0.28); }
+/* Plain frosted glass that flows open under the tile (see Molten): the scene behind gives it its colour */
 .tile-drawer {
   grid-column: 1 / -1; position: relative; isolation: isolate;
   border-radius: 20px;
-  background:
-    radial-gradient(60% 120px at var(--notch) 0%, color-mix(in srgb, var(--band-hue, #ff6b35) 16%, transparent), transparent 70%),
-    linear-gradient(180deg, color-mix(in srgb, var(--band-hue, #ff6b35) 6%, transparent), transparent 55%),
-    var(--glass-bg-base);
+  background: var(--glass-bg-base);
   border: 1px solid var(--glass-border-hover);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 24px 60px rgba(0, 0, 0, 0.28);
   -webkit-backdrop-filter: var(--glass-blur-strong); backdrop-filter: var(--glass-blur-strong);
 }
 .tile-drawer__inner { position: relative; padding: 26px 28px 28px; }
-.tile-drawer::before {
-  content: ""; position: absolute; top: 0; left: var(--notch); z-index: 1;
-  width: min(240px, 40%); height: 1px; transform: translateX(-50%);
-  background: linear-gradient(90deg, transparent, var(--band-hue, #ff6b35), transparent);
-}
-.timeline--light .tile-drawer { background:
-    radial-gradient(60% 120px at var(--notch) 0%, color-mix(in srgb, var(--band-hue, #ff6b35) 14%, transparent), transparent 70%),
-    rgba(255, 255, 255, 0.55);
+.timeline--light .tile-drawer { background: rgba(255, 255, 255, 0.55);
   border-color: rgba(20, 20, 24, 0.08); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.08); }
 .tile-drawer__close {
   position: absolute; top: 16px; right: 16px; z-index: 2;
@@ -169,8 +159,7 @@
 .timeline--light .tile-drawer__close { color: #141418; }
 .tile-drawer .cdetail__text { padding-right: 36px; }
 @media (max-width: 560px) { .tile-drawer__inner { padding: 20px 18px 22px; } }
-/* The line of light glides along the top edge when another tile in the row is opened */
-.tile-drawer::before { transition: left 0.64s cubic-bezier(0.32, 0.72, 0, 1); }
+
 
 /* Timeline dots removed for cleaner design */
 
