@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Application of user-centered design principles in IoT system development for agricultural automation and smart farming solutions.
+User-centered design for IoT in smart farming.

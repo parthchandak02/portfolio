@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Materials science research on cadmium telluride crystal growth and characterization for semiconductor applications.
+Growing and characterizing cadmium telluride crystals for semiconductors.

@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Inventor
 typewriterPrefix: I am an
 ---
-Named inventor on a published patent application for context-aware audio prioritization in autonomous vehicles, covering how in-cabin audio behavior can be tested and tuned in realistic prototypes.
+Named inventor on context-aware audio prioritization for autonomous vehicle cabins.

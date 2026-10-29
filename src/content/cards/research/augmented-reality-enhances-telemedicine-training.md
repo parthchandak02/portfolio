@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Research on AR applications in telemedicine training, demonstrating improved learning outcomes and practical skill development.
+How AR improves telemedicine training.

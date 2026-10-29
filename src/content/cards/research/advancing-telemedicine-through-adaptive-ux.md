@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Investigation of adaptive user experience design principles in telemedicine platforms, focusing on accessibility and user engagement.
+Adaptive UX for more accessible telemedicine platforms.

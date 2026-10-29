@@ -10,4 +10,4 @@ skills:
 typewriterTitle: Programmer
 typewriterPrefix: I am a
 ---
-AI-powered literature review assistant that streamlines academic research workflows. Leverages large language models to automate paper analysis, extract key insights, and synthesize research findings across multiple documents.
+Literature review assistant that reads papers, pulls out key findings and synthesizes them across documents.

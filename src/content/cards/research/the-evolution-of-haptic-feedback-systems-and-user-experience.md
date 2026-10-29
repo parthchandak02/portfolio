@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Comprehensive analysis of haptic feedback evolution and its impact on user experience design in modern interactive systems.
+How haptic feedback has evolved and shaped interaction design.

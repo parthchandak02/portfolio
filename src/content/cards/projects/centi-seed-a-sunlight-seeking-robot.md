@@ -14,4 +14,4 @@ skills:
 typewriterTitle: Maker
 typewriterPrefix: I am a
 ---
-Built Centi-seed with team Caffeine Cycle: a walking robot that seeks out sunlight for the plants growing on its back. Its laser-cut acrylic legs and servos came from the Fall 2017 IEEE Hardware Hackathon; at Crimson Code the team gave it webcam vision with Python, OpenCV and Arduino, and won first place.
+A walking robot that carries plants and seeks out sunlight. Team Caffeine Cycle gave it OpenCV webcam vision at Crimson Code and won first place.

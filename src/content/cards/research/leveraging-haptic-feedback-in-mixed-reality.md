@@ -13,4 +13,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Investigation of haptic feedback systems in mixed reality environments and their impact on user experience and task performance.
+How haptic feedback in mixed reality affects experience and performance.

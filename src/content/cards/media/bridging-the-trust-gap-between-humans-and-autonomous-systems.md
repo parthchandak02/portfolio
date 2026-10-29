@@ -10,4 +10,4 @@ skills:
   - Electric Vehicles
   - Design
 ---
-Analysis of trust-building strategies in human-autonomous system interactions, drawing from automotive industry experience.
+Building trust between people and autonomous systems, drawing on work in the auto industry.

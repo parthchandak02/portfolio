@@ -12,4 +12,4 @@ skills:
 typewriterTitle: Programmer
 typewriterPrefix: I am a
 ---
-Served as Team Technical Lead and Liaison. Developed innovative damping ratio analysis tool using advanced mathematical techniques for piloted aircraft systems, contributing to aerospace engineering research.
+Technical lead and liaison; built a tool to analyze damping ratios of piloted aircraft systems.

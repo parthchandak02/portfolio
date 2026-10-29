@@ -12,4 +12,4 @@ skills:
 typewriterTitle: Team Leader
 typewriterPrefix: I am a
 ---
-Grew the team from 6 to 12+ members (up 100%) and organized 3+ community service and team-building events. Lead 3+ cross-team initiatives to strengthen cohesion within and across teams, and manage its mentorship programs.
+Doubled the team to 12+ members, and lead its mentorship programs and cross-team initiatives.

@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Systematic exploration of ethical frameworks and governance challenges in AI health assistants, focusing on user experience and regulatory compliance.
+Ethics, governance and usability of AI virtual health assistants.

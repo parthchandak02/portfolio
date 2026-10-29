@@ -9,4 +9,4 @@ skills:
   - Data Analysis
   - Automation
 ---
-Featured article discussing innovative approaches to user-centered design in modern manufacturing systems and Industry 4.0 applications.
+User-centered design for modern manufacturing systems.

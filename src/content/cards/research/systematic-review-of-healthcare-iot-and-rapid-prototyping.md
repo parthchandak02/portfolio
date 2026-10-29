@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Comprehensive review of IoT applications in healthcare with focus on rapid prototyping methodologies for medical device development.
+A review of healthcare IoT and rapid prototyping for medical devices.

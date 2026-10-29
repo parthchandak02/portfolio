@@ -9,4 +9,4 @@ skills:
   - Prototyping
   - Technology
 ---
-Profile piece highlighting the intersection of engineering, user experience design, and robotics in autonomous vehicle development.
+Profile on bringing engineering, UX and robotics together in autonomous vehicles.

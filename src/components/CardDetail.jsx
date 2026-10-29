@@ -54,9 +54,10 @@ const Media = ({ item, compact = false }) => {
   );
 };
 
+// At most three tags, so the details stay quick to read (the rest still feed the greeting's typewriter)
 const Tags = ({ skills }) => (
   <ul className="cdetail__tags">
-    {skills.map((s) => {
+    {skills.slice(0, 3).map((s) => {
       const name = typeof s === 'string' ? s : s.name;
       const Icon = typeof s === 'string' ? iconMap[s] : s.component;
       return <li key={name} className="cdetail__tag">{Icon && <Icon size={13} aria-hidden="true" />}{name}</li>;

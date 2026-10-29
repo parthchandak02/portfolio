@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Research on bio-inspired materials that respond to light, with applications in smart materials and autonomous systems.
+Light-responsive, bio-inspired materials for smart and autonomous systems.

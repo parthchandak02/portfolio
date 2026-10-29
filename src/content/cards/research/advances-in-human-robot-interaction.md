@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Comprehensive study of human-robot interaction principles and their application in developing intuitive robotic interfaces.
+Principles of human-robot interaction for more intuitive robots.

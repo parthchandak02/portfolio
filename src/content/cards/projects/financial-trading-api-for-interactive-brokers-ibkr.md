@@ -9,4 +9,4 @@ skills:
 typewriterTitle: Programmer
 typewriterPrefix: I am a
 ---
-Comprehensive REST API for Interactive Brokers platform enabling automated trading, portfolio management, and real-time market data integration.
+REST API for automated trading, portfolio management and live market data.

@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Technical analysis of electric bicycle innovations, focusing on battery technology, motor efficiency, and sustainable transportation solutions.
+Batteries, motor efficiency and sustainability in electric bicycles.

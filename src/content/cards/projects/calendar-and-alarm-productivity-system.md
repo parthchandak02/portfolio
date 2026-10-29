@@ -10,4 +10,4 @@ skills:
 typewriterTitle: Programmer
 typewriterPrefix: I am a
 ---
-Advanced productivity system combining intelligent calendar management with context-aware alarm systems for optimized time management and task completion.
+Calendar management paired with context-aware alarms.

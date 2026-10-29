@@ -9,4 +9,4 @@ skills:
   - CAD
   - Process Optimization
 ---
-Achieved a minimum 10% higher production rate with LEAN manufacturing and CAD/CAM prototyping for hard-wall shelters.
+Raised production by 10%+ with LEAN manufacturing and CAD/CAM prototyping for hard-wall shelters.

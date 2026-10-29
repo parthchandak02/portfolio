@@ -6,4 +6,4 @@ location: ICETAIA Conference
 skills:
   - Presentation
 ---
-Keynote presentation on innovative rapid prototyping methodologies and fidelity frameworks for modern product development, sharing insights from autonomous vehicle development.
+Keynote on rapid prototyping and choosing the right fidelity, drawn from autonomous vehicle work.

@@ -8,4 +8,4 @@ url: https://tiny.cc/crimsoncode2018
 date: March 2018
 location: Pullman, WA
 ---
-First place (Tier 1) with team Caffeine Cycle for Centi-seed's vision: webcam and OpenCV software that steers the walking robot toward sunlight. The robot itself was built at the Fall 2017 IEEE Hardware Hackathon.
+First place with team Caffeine Cycle, for webcam vision that steers the Centi-seed robot toward sunlight.

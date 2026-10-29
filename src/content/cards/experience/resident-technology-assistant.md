@@ -10,4 +10,4 @@ skills:
   - Advisor
   - Creativity
 ---
-Assisted students with technical issues, created technology awareness.
+Helped residents with technical issues.

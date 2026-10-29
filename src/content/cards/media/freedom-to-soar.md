@@ -11,4 +11,4 @@ skills:
   - Robotics
   - Innovation
 ---
-University feature highlighting academic achievements and entrepreneurial spirit during undergraduate engineering studies.
+WSU feature on academic and entrepreneurial work as an undergraduate.

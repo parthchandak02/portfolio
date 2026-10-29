@@ -9,4 +9,4 @@ skills:
   - IoT
   - 3D Printing
 ---
-In-depth coverage of rapid prototyping techniques for complex engineering systems, from concept to testing phases.
+Rapid prototyping of complex systems, from concept to testing.

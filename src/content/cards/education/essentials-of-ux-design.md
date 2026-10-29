@@ -13,4 +13,4 @@ skills:
 typewriterTitle: Creative Technologist
 typewriterPrefix: I am a
 ---
-Comprehensive course in user experience design principles, methodologies, and practical application in product development. Achieved exceptional academic performance.
+User experience principles and methods for product development.

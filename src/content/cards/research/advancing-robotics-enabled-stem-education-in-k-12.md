@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Research on integrating robotics platforms into K-12 STEM education to enhance learning outcomes and student engagement.
+Using robotics in K-12 classrooms to improve STEM learning.

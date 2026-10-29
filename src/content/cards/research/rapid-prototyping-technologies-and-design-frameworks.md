@@ -12,4 +12,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Comprehensive study of rapid prototyping methodologies and their application in modern design frameworks across multiple industries.
+Rapid prototyping methods and design frameworks across industries.

@@ -11,4 +11,4 @@ skills:
   - Travel
   - School Building
 ---
-Raised $55,000 to build a school in Nepal, directly impacting 210+ students (including 108 girls) in a community of 2,250 farmers. Led fundraising strategy and participated in construction trek.
+Raised $55K for a school serving 210+ students in a farming community, and joined the build.

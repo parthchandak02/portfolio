@@ -16,4 +16,4 @@ skills:
 typewriterTitle: Prototyper
 typewriterPrefix: I am a
 ---
-Riders set a theme in the app and find their robotaxi by a personalized light and sound sequence. Helped prototype the lights and audio, and built the tooling that let designers try different color variations.
+Riders find their robotaxi by a personal light and sound sequence. Helped prototype it and built the tools designers used to try colors.

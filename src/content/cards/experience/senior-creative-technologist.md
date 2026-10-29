@@ -14,4 +14,4 @@ skills:
 typewriterTitle: Creative Technologist
 typewriterPrefix: I am a
 ---
-Build the prototyping systems that let designers and researchers try ideas in the robotaxi cabin, from lights and sound to displays and controls, and test them in realistic conditions.
+Build the prototyping systems designers and researchers use to try robotaxi cabin ideas in realistic conditions.

@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Mechanical Engineer
 typewriterPrefix: I am a
 ---
-Designed and assembled standardization system for accelerated crystal rotation technique (ACRT) furnace for SURCA research. Contributed to advanced materials science research.
+Designed and built a standardization system for an ACRT crystal-growth furnace.

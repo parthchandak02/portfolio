@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Development of rapid prototyping frameworks specifically designed for smart manufacturing tools and Industry 4.0 applications.
+Rapid prototyping frameworks for smart manufacturing tools.

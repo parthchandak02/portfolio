@@ -8,4 +8,4 @@ skills:
   - Advisor
   - Innovation
 ---
-Judged at Cal Hacks 13.0, about 2,000 hackers over a weekend in San Francisco. Standouts included Freshly, which tracks what is in your fridge from a photo of a grocery receipt, Digital Twin Biomedical, a 3D twin of a patient with live vitals so nurses can catch decline early, and PrintCommons, a 3D printing service that printed for nine other teams.
+Judged projects from about 2,000 hackers, from a receipt-reading fridge tracker to a live 3D patient twin.

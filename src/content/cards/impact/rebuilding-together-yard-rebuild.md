@@ -7,4 +7,4 @@ date: April 2023
 skills:
   - Community Service
 ---
-Redid an entire yard: removed the grass, laid down over 200 lbs of crushed gravel, installed rails, worked on the house interior and cleaned up the backyard.
+Rebuilt a whole yard with 200+ lbs of gravel and new rails, and helped inside the house.

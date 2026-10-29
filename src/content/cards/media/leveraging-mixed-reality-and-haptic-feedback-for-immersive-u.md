@@ -9,4 +9,4 @@ skills:
   - User Experience
   - Research
 ---
-Technical discussion of mixed reality applications and haptic feedback systems in creating immersive user experiences.
+Mixed reality and haptic feedback for immersive experiences.

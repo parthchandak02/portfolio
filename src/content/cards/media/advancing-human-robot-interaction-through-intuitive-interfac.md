@@ -9,4 +9,4 @@ skills:
   - Speech
   - Design
 ---
-Discussion of innovative interface design approaches for improving human-robot interaction in various applications.
+Interface design for more intuitive human-robot interaction.

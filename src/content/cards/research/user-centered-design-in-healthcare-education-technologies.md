@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Framework for implementing user-centered design principles in healthcare education technology development.
+User-centered design for healthcare education technology.

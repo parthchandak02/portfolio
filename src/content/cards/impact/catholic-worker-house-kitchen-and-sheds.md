@@ -7,4 +7,4 @@ date: October 2023
 skills:
   - Community Service
 ---
-Painted the kitchen, built shelves in the food and tool sheds, and refurbished the landscaping.
+Painted the kitchen, built shed shelves and refurbished the landscaping.

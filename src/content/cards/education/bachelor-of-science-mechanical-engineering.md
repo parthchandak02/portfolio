@@ -14,4 +14,4 @@ skills:
 typewriterTitle: Mechanical Engineer
 typewriterPrefix: I am a
 ---
-Graduated with GPA 3.7/4.0. Minors in Computer Science and Mathematics. Focused on robotics, automation, engineering design, and interdisciplinary technology integration.
+Focused on robotics, automation and engineering design.

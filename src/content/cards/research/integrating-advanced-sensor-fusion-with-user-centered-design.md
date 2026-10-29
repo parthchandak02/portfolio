@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Research on combining advanced sensor technologies with human-centered design principles in robotic system development.
+Combining sensor fusion with user-centered design in robotics.

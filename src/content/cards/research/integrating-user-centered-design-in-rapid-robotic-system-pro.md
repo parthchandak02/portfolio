@@ -12,4 +12,4 @@ skills:
 typewriterTitle: Researcher
 typewriterPrefix: I am a
 ---
-Framework for incorporating user-centered design principles in rapid prototyping of robotic systems, with emphasis on human-robot interaction.
+A framework for user-centered design in rapid robot prototyping.

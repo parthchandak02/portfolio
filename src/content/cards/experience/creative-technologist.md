@@ -15,4 +15,4 @@ skills:
 typewriterTitle: Creative Technologist
 typewriterPrefix: I am a
 ---
-Build prototyping systems that let designers and researchers try ideas in the robotaxi cabin, from lights and sound to displays and controls, without waiting on engineering. Connect design tools to vehicle hardware so new variations can be tested quickly and in realistic conditions.
+Built prototyping systems that let designers try robotaxi cabin ideas, from lights and sound to displays and controls, on real vehicle hardware.

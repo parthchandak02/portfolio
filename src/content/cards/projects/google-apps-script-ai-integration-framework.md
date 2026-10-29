@@ -11,4 +11,4 @@ skills:
 typewriterTitle: Programmer
 typewriterPrefix: I am a
 ---
-Framework for integrating AI capabilities into Google Workspace applications using Apps Script and Gemini API. Enables automated document processing, intelligent data analysis, and workflow optimization.
+Brings Gemini into Google Workspace through Apps Script, for document processing and data analysis.

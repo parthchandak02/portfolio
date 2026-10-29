@@ -12,4 +12,4 @@ skills:
   - CAD
   - Automation
 ---
-Built part-tracking scripts that improved traceability, and created tools and processes that improved manufacturing quality, testing, and material workflows for technicians. Manufactured vehicle hardware across product life cycles, from DFMEA to OQC.
+Built part-tracking and quality tools for vehicle hardware, from DFMEA to OQC.

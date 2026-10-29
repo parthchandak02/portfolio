@@ -15,4 +15,4 @@ skills:
 typewriterTitle: Prototyper
 typewriterPrefix: I am a
 ---
-Riders can stream their own audio over Bluetooth alongside Zoox's curated playlist. Helped designers test audio connections and prototyped ways to connect to the vehicle hardware.
+Riders stream their own audio over Bluetooth. Helped designers test audio connections to the vehicle.

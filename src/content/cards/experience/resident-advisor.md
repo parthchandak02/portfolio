@@ -9,4 +9,4 @@ skills:
   - Advisor
   - Creativity
 ---
-Enforced campus policies and organized events regarding technology in residence halls for 400+ residents.
+Ran events and upheld policies for 400+ residents.

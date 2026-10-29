@@ -7,4 +7,4 @@ date: April 2024
 skills:
   - Community Service
 ---
-Built a fence under the guidance of the Rebuilding Together team, installed a new microwave, added a handrail to the stairs down to the yard, cleared the area and mowed the grass.
+Built a fence and a stair handrail, installed a microwave and cleared the yard.
