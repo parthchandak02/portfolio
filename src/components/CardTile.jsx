@@ -35,11 +35,13 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
   const meta = metaOf(item);
   const band = bandForSection(item.category);
   const logo = typeof item.companyLogo === 'string' ? item.companyLogo : null;
+  // Recognition's photos (press, talks, awards) rest frosted over, and come into focus on hover or when opened
+  const veiled = photo && band?.key === 'recognition';
 
   return (
     <button
       type="button"
-      className={`lab-tile ctile ${photo ? 'ctile--photo' : 'ctile--info'}${highlighted ? ' is-highlighted' : ''}${open ? ' is-open' : ''}`}
+      className={`lab-tile ctile ${photo ? 'ctile--photo' : 'ctile--info'}${veiled ? ' ctile--veiled' : ''}${highlighted ? ' is-highlighted' : ''}${open ? ' is-open' : ''}`}
       style={band ? { '--hue': band.hue } : undefined}
       onClick={onOpen}
       aria-expanded={open}
