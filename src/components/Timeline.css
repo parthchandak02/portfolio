@@ -132,15 +132,17 @@
 @media (max-width: 900px) { .timeline__selected .lab__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .timeline__tiles .timeline__item { margin-bottom: 0; }
 
-/* An opened tile keeps its place and its own glass, and opens at its foot into a neck of the same glass that runs
-   on into its details (see TileGrid): once the neck sits under it (data-joined), its foot squares off and loses
-   its edge, and its glass matches the neck's exactly, so tile, neck and details read as one piece */
+/* An opened tile hands its glass over to one shape that runs from it down into its details (see TileGrid). The
+   shape is the very same glass, swapped in within one frame (no transition), so nothing changes but that the tile
+   now flows on below. Its picture squares off at the foot to meet it. */
 .tile-grid { position: relative; }
 .timeline__tiles .lab-tile {
-  transition: border-color 0.4s ease, border-radius 0.64s cubic-bezier(0.32, 0.72, 0, 1), clip-path 0.64s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: border-color 0.4s ease, box-shadow 0.5s ease, border-radius 0.64s cubic-bezier(0.32, 0.72, 0, 1), clip-path 0.64s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .timeline__tiles .timeline__item[data-joined] .lab-tile {
-  border-bottom-color: transparent;
+  transition: none;
+  background: transparent; border-color: transparent; box-shadow: none;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
   border-radius: 16px 16px 0 0; clip-path: inset(0 0 -1px 0 round 16px 16px 0 0);
 }
 /* Joined, a photo and its shade melt away towards the tile's foot, so nothing marks where the tile ends and the
@@ -155,20 +157,24 @@
 }
 .timeline__tiles .timeline__item[data-joined] .ctile--photo::before { -webkit-mask-position: 0 60%; mask-position: 0 60%; }
 .timeline__tiles .timeline__item[data-joined] .ctile--photo .ctile__img {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 14%, #000 40%, transparent 92%);
-  mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 14%, #000 40%, transparent 92%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 96%);
+  mask-image: linear-gradient(to bottom, #000 40%, transparent 96%);
 }
 .timeline__tiles .timeline__item[data-joined] .ctile--photo .ctile__name { text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7); }
 .lab--light .timeline__item[data-joined] .ctile--veiled.is-open { color: rgba(20, 20, 24, 0.92); }
 .lab--light .timeline__item[data-joined] .ctile--veiled.is-open :is(.ctile__name, .ctile__year) { text-shadow: 0 1px 10px rgba(255, 255, 255, 0.9); }
 .lab--light .timeline__item[data-joined] .ctile--veiled.is-open::before { opacity: 0; }
 
-/* The neck and details: the tiles' own glass, its edge their edge */
+/* The shape: the tiles' own glass, its edge their edge, tinted like them when its tile is the lit one */
 .tab-glass {
   position: absolute; left: 0; right: 0; top: 0; height: 0; pointer-events: none;
   background: var(--glass-bg-base);
+  transition: box-shadow 0.5s ease;
   -webkit-backdrop-filter: var(--glass-blur-subtle); backdrop-filter: var(--glass-blur-subtle);
   clip-path: path("M0 0");
+}
+.tile-grid:has(> .timeline__item[data-joined][data-current]) > .tab-glass {
+  box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--tab-hue, transparent) 12%, transparent);
 }
 .tab-glass__edge { position: absolute; left: 0; top: 0; width: 100%; height: 0; overflow: visible; pointer-events: none; }
 .tab-glass__edge path { fill: none; stroke: var(--glass-border-base); stroke-width: 1; }
@@ -257,12 +263,8 @@
     padding: 32px 16px;
   }
 }
-/* The card whose line is lit on the band bar: its edge picks up the band's colour, softly */
+/* The card whose line is lit on the band bar: its glass takes on a little of the band's colour, with no edge */
 .timeline__item[data-current] > .timeline-card,
 .timeline__item[data-current] > .lab-tile {
-  border-color: color-mix(in srgb, var(--band-hue) 55%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--band-hue) 18%, transparent),
-    0 0 28px color-mix(in srgb, var(--band-hue) 12%, transparent),
-    var(--glass-shadow-base);
+  box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--band-hue) 12%, transparent), var(--glass-shadow-base);
 }

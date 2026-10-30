@@ -54,10 +54,9 @@
 
 .company__detail-body { padding: 4px 0 22px; }
 
-/* The card on the band bar's lit line picks up the band's colour, softly */
+/* The card on the band bar's lit line takes on a little of the band's colour in its glass, with no edge */
 .company:has(.company__role[data-current]) {
-  border-color: color-mix(in srgb, var(--band-hue, #e4dccf) 40%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--band-hue, #e4dccf) 12%, transparent), 0 0 28px color-mix(in srgb, var(--band-hue, #e4dccf) 8%, transparent), var(--glass-shadow-base);
+  box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--band-hue, #e4dccf) 10%, transparent), var(--glass-shadow-base);
 }
 
 @media (max-width: 560px) {

@@ -67,13 +67,13 @@ const outline = (n, foot, yb, b, L, R, oy) => {
 const easeOut = (t) => 1 - (1 - t) ** 3;
 
 /**
- * The glass of the opened tile's details, joined to the tile by a neck of the same glass, like a folder tab: the
- * tile keeps its own glass and opens at its foot into the neck (data-joined), so it reads as one piece. It follows
+ * The glass of the opened tile and its details as one shape, joined by a neck, like a folder tab: once the neck is
+ * under the tile, the tile hands its own glass over to the shape (data-joined), so there is no join to see. It follows
  * the tile and the details as they flow (see Molten). Opening, it pours down out of the tile and spreads out
  * across the row; closing, it gathers back in and up into the tile, which only then rounds off its foot. When
  * another tile in the row opens,
  * the neck flows along under the row to it, its leading side first, like a drop of liquid, while the details keep
- * their place. Its box covers only the neck and the details, so the blur behind it stays small.
+ * their place. Its box covers only the row and the details, so the blur behind it stays small.
  */
 const TabGlass = ({ grid, row, tile, gap, open }) => {
   const shape = useRef(null);
@@ -90,22 +90,39 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
       const el = tileEl(tile);
       const n = neck.current;
       if (!el || !n || !shape.current) return;
-      const foot = el.offsetTop + el.offsetHeight;
-      // The tile the neck sits mostly under opens at its foot into it
+      const top = el.offsetTop;
+      const foot = top + el.offsetHeight;
+      // The tile the neck sits mostly under hands its glass to the shape: the two are the same glass, swapped in
+      // one frame, so the tile, the neck and the details are one piece with no join
+      let joined = null;
       g.querySelectorAll('[data-tile]').forEach((t) => {
-        if (t.offsetTop !== el.offsetTop) return;
+        if (t.offsetTop !== top) return;
         const over = Math.min(n.x1, t.offsetLeft + t.offsetWidth) - Math.max(n.x0, t.offsetLeft);
-        t.toggleAttribute('data-joined', spread.current > 0.02 && over > t.offsetWidth / 2);
+        const j = spread.current > 0.02 && over > t.offsetWidth / 2;
+        t.toggleAttribute('data-joined', j);
+        if (j) joined = t;
       });
       const d = g.querySelector(`.tile-drawer[data-row="${row}"]`);
       const b = d ? d.offsetTop + d.offsetHeight : foot;
       const W = g.clientWidth;
       const k = spread.current;
-      const out = outline(n, foot, foot + gap, b, n.x0 * (1 - k), n.x1 + (W - n.x1) * k, foot);
-      const box = { top: `${foot}px`, height: `${Math.max(0, b - foot)}px` };
-      Object.assign(shape.current.style, box, { clipPath: out ? `path("${out.clip}")` : 'path("M0 0")' });
+      const out = outline(n, foot, foot + gap, b, n.x0 * (1 - k), n.x1 + (W - n.x1) * k, top);
+      const clip = [];
+      const line = [];
+      if (joined) {
+        const x0 = joined.offsetLeft;
+        const x1 = x0 + joined.offsetWidth;
+        const f = foot - top;
+        const side = `L${x0} ${R} Q${x0} 0 ${x0 + R} 0 L${x1 - R} 0 Q${x1} 0 ${x1} ${R} L${x1} ${f}`;
+        clip.push(`M${x0} ${f + 1} ${side} L${x1} ${f + 1} Z`);
+        line.push(`M${x0} ${f} ${side}`);
+        shape.current.style.setProperty('--tab-hue', joined.style.getPropertyValue('--band-hue'));
+      }
+      if (out) { clip.push(out.clip); line.push(out.edge); }
+      const box = { top: `${top}px`, height: `${Math.max(0, Math.max(b, joined ? foot : top) - top)}px` };
+      Object.assign(shape.current.style, box, { clipPath: clip.length ? `path("${clip.join(' ')}")` : 'path("M0 0")' });
       Object.assign(edge.current.ownerSVGElement.style, box);
-      edge.current.setAttribute('d', out ? out.edge : '');
+      edge.current.setAttribute('d', line.join(' '));
     };
     redraw.current = draw;
     const el = tileEl(tile);
@@ -143,9 +160,8 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
     });
   }, [grid]);
 
-  // Pour out and spread as it opens, gather back in as it closes, frosting in and out at the start and the end
+  // Pour out and spread as it opens, gather back in and up into the tile as it closes
   useLayoutEffect(() => {
-    const els = [shape.current, edge.current?.ownerSVGElement];
     if (reducedMotion()) {
       spread.current = open ? 1 : 0;
       redraw.current?.();
@@ -157,11 +173,7 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
       onUpdate: (v) => { spread.current = v; redraw.current?.(); },
       onComplete: () => redraw.current?.(),
     });
-    const fades = els.map((el) => el?.animate(
-      open ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 1 }, { opacity: 1, offset: 0.6 }, { opacity: 0 }],
-      open ? { duration: 180, easing: 'ease-out', fill: 'backwards' } : { duration: CLOSE_MS, easing: 'ease-in', fill: 'forwards' }
-    ));
-    return () => { run.stop(); fades.forEach((a) => a?.cancel()); };
+    return () => run.stop();
   }, [open]);
 
   return (
