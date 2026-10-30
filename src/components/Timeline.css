@@ -162,7 +162,9 @@
 }
 .timeline__tiles .timeline__item[data-joined] .ctile--photo .ctile__name { text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7); }
 .lab--light .timeline__item[data-joined] .ctile--veiled.is-open { color: rgba(20, 20, 24, 0.92); }
-.lab--light .timeline__item[data-joined] .ctile--veiled.is-open :is(.ctile__name, .ctile__year) { text-shadow: 0 1px 10px rgba(255, 255, 255, 0.9); }
+.lab--light .timeline__item[data-joined] .ctile--veiled.is-open .ctile__name { text-shadow: 0 1px 10px rgba(255, 255, 255, 0.9); }
+/* The year sits on the photo, which still shows at the top */
+.lab--light .timeline__item[data-joined] .ctile--veiled.is-open .ctile__year { color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); }
 .lab--light .timeline__item[data-joined] .ctile--veiled.is-open::before { opacity: 0; }
 
 /* The shape: the tiles' own glass, its edge their edge, tinted like them when its tile is the lit one */
