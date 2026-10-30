@@ -43,9 +43,18 @@ const SOUNDS = {
   close: (c, t) => note(c, t, 587, { gain: 0.035, decay: 0.6, from: 1.12 }),
 };
 
+// The reader can turn them off (see SoundToggle), and the choice stays for their next visit
+const MUTED_KEY = 'pc-muted';
+let muted = (() => { try { return localStorage.getItem(MUTED_KEY) === '1'; } catch { return false; } })();
+export const isMuted = () => muted;
+export const setMuted = (m) => {
+  muted = m;
+  try { localStorage.setItem(MUTED_KEY, m ? '1' : '0'); } catch { /* kept for this visit only */ }
+};
+
 let pending = null;
 export const glassSound = (kind) => {
-  if (typeof window === 'undefined' || document.hidden) return;
+  if (typeof window === 'undefined' || document.hidden || muted) return;
   if (!navigator.userActivation?.hasBeenActive && navigator.userActivation) return;
   // Gather what happens in the same moment, then sound it once
   if (pending) { pending.add(kind); return; }

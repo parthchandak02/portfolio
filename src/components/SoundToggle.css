@@ -1,0 +1,26 @@
+/* Above the contact button, in line with it (see ContactButton.css) */
+.sound-toggle {
+  position: fixed; z-index: 60;
+  right: calc(20px + env(safe-area-inset-right, 0px));
+  bottom: calc(20px + 48px + 12px + env(safe-area-inset-bottom, 0px));
+  width: 48px; height: 48px; padding: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; pointer-events: auto; overflow: visible;
+  transition: opacity 0.35s ease, visibility 0.35s, color 0.3s ease;
+}
+.dark-mode .sound-toggle { color: rgba(255, 255, 255, 0.9); }
+.light-mode .sound-toggle { color: rgba(0, 0, 0, 0.8); }
+.sound-toggle.is-muted { opacity: 0.7; }
+.sound-toggle:focus-visible { outline: 2px solid #ff6b35; outline-offset: 3px; }
+@media (hover: hover) { .sound-toggle:hover > .ui-hint { opacity: 1; transform: translate(0, -50%); } }
+.sound-toggle:focus-visible > .ui-hint { opacity: 1; transform: translate(0, -50%); }
+/* It steps aside in the playground, and while the contact card is open over it */
+.sound-toggle.is-away, body:has(.contact__shell.is-open) .sound-toggle { opacity: 0; visibility: hidden; pointer-events: none; }
+@media (max-width: 768px) {
+  .sound-toggle {
+    width: 44px; height: 44px;
+    right: calc(16px + env(safe-area-inset-right, 0px));
+    bottom: calc(16px + 44px + 10px + env(safe-area-inset-bottom, 0px));
+  }
+  .sound-toggle svg { width: 16px; height: 16px; }
+}

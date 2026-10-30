@@ -8,6 +8,7 @@ import PlayModeToggle from './components/PlayModeToggle';
 import Timeline from './components/Timeline';
 import BandBar from './components/BandBar';
 import ContactButton from './components/ContactButton';
+import SoundToggle from './components/SoundToggle';
 import UITypewriter from './components/UITypewriter';
 import useLightMode from './hooks/useLightMode';
 import { switchMode } from './hooks/modeShift';
@@ -208,6 +209,7 @@ export default function App() {
         
         {/* One contact button, always on screen */}
         <ContactButton lightMode={lightMode} away={isPlayMode} />
+        <SoundToggle away={isPlayMode} />
 
         {/* UI Overlay Layer */}
         <div className={`layout__ui${handedOver ? ' layout__ui--reading' : ''}${atTop ? ' layout__ui--top' : ''}${isPlayMode ? ' layout__ui--play' : ''}`}>
