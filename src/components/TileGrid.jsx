@@ -215,14 +215,12 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
 /**
  * A grid of tiles whose opened tile stays put and becomes the tab of one piece of glass: its details form in a
  * full-width row under the tile's row (see Molten), and the glass runs down from the tile and spreads across
- * under it (see TabGlass). Opening another tile in the same row closes the old tile's neck as the new one's
- * opens, and the details stay open, the new condensing in place of the old; in another row, the old glass melts
- * away as the new one forms.
+ * under it (see TabGlass). Opening another tile closes the open one fully first (see Timeline), then opens it.
  *
  * entries: [{ key, attrs, tile, detail }]: attrs go on the tile's wrapper, tile renders the tile, detail renders
- * what opens under it.
+ * what opens under it. holdKey names a tile waiting to open while another closes: it holds still meanwhile.
  */
-const TileGrid = ({ entries, openKey, onOpen, onClose }) => {
+const TileGrid = ({ entries, openKey, holdKey = null, onOpen, onClose }) => {
   const grid = useRef(null);
   const { cols, gap } = useLayout(grid);
   const at = entries.findIndex((e) => e.key === openKey);
@@ -241,11 +239,12 @@ const TileGrid = ({ entries, openKey, onOpen, onClose }) => {
     settle((n) => n + 1);
   };
 
-  // While one tile's glass melts away and another's forms, the opened tile holds still on the screen, however
-  // the rows around it move; then its details come into view, without moving the tile off the screen
+  // While one tile's glass melts away and then another's forms, the tile that was clicked holds still on the
+  // screen, however the rows around it move; then its details come into view, without moving it off the screen
   const drawers = useRef({});
+  const held = at >= 0 ? at : entries.findIndex((e) => e.key === holdKey);
   useLayoutEffect(() => {
-    const el = at >= 0 && grid.current?.querySelector(`[data-tile="${at}"]`);
+    const el = held >= 0 && grid.current?.querySelector(`[data-tile="${held}"]`);
     if (!el) return undefined;
     const scroller = el.closest('.main-content-scroll') || document.scrollingElement;
     // Where the tile sits in the scrolled content, so the reader's own scrolling is left alone
@@ -259,10 +258,10 @@ const TileGrid = ({ entries, openKey, onOpen, onClose }) => {
     // Corrected as the content changes size, after layout and before it paints, so the tile never visibly moves
     const ro = new ResizeObserver(() => { if (performance.now() < end) hold(); });
     [...scroller.children].forEach((c) => ro.observe(c));
-    const t = setTimeout(() => drawers.current[row]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), Math.max(OPEN_MS, CLOSE_MS) + 120);
+    const t = at >= 0 && setTimeout(() => drawers.current[row]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), Math.max(OPEN_MS, CLOSE_MS) + 120);
     const stop = setTimeout(() => ro.disconnect(), end - performance.now());
     return () => { ro.disconnect(); clearTimeout(t); clearTimeout(stop); };
-  }, [at, row]);
+  }, [held, at, row]);
 
   const rows = Object.entries(shown.current).filter(([, i]) => entries[i]);
   return (

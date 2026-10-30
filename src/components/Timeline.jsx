@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import CardDetail from './CardDetail';
 import CompanyCard from './CompanyCard';
 import LabShowcase from './LabShowcase';
@@ -9,6 +9,7 @@ import { categoryOrder, timelineDataByCategory } from '../data/timelineData';
 import { FEATURED } from '../data/featured';
 import SelectedMark from './SelectedMark';
 import { bandForSection, spectrumBands, startOf, endOf } from '../data/spectrum';
+import { CLOSE_MS } from '../hooks/glassMotion';
 import './Timeline.css';
 
 const Timeline = ({ 
@@ -61,15 +62,33 @@ const Timeline = ({
   const firstLabIndex = sortedData.findIndex((item) => item.category === 'lab');
 
   // Everything but jobs and degrees shows as glass tiles, a band's run of them sharing one grid
-  // An opened tile stays as it is and its details open in a row under it (see TileGrid); Escape closes them
+  // An opened tile stays as it is and its details open in a row under it (see TileGrid); Escape closes them.
+  // Opening another while one is open first closes that one fully, then opens the next (nextTile waits meanwhile).
   const [openTile, setOpenTile] = useState(null);
+  const [nextTile, setNextTile] = useState(null);
+  const waiting = useRef(null);
+  const closeTile = () => {
+    clearTimeout(waiting.current);
+    setNextTile(null);
+    setOpenTile(null);
+  };
+  const openTileNext = (key) => {
+    clearTimeout(waiting.current);
+    if (openTile || nextTile) {
+      setOpenTile(null);
+      setNextTile(key);
+      waiting.current = setTimeout(() => { setNextTile(null); setOpenTile(key); }, openTile ? CLOSE_MS + 80 : CLOSE_MS);
+    } else {
+      setOpenTile(key);
+    }
+  };
+  useEffect(() => () => clearTimeout(waiting.current), []);
   useEffect(() => {
     if (!openTile) return undefined;
-    const onKey = (e) => { if (e.key === 'Escape') setOpenTile(null); };
+    const onKey = (e) => { if (e.key === 'Escape') closeTile(); };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [openTile]);
-  const closeTile = () => setOpenTile(null);
   const detailFor = (item) => () => <CardDetail item={item} subprojects={childrenOf[item.title]} tab />;
   const segments = useMemo(() => {
     const out = [];
@@ -137,7 +156,8 @@ const Timeline = ({
             <div className={`timeline__tiles lab ${lightMode ? 'lab--light' : 'lab--dark'}`}>
               <TileGrid
                 openKey={openTile}
-                onOpen={setOpenTile}
+                holdKey={nextTile}
+                onOpen={openTileNext}
                 onClose={closeTile}
                 entries={featured.map(({ item, tile }) => ({
                   key: `selected:${item.title}`,
@@ -171,7 +191,8 @@ const Timeline = ({
                   <div key={`tiles-${segment.items[0].item.title}`} className={`timeline__tiles lab ${lightMode ? 'lab--light' : 'lab--dark'}`}>
                     <TileGrid
                       openKey={openTile}
-                      onOpen={setOpenTile}
+                      holdKey={nextTile}
+                      onOpen={openTileNext}
                       onClose={closeTile}
                       entries={segment.items.map(({ item, index }) => ({
                         key: item.title,
