@@ -77,9 +77,9 @@ const Tags = ({ skills }) => (
  * What a card says once opened, the same wherever it opens: under a tile (TileGrid) or under a role in a
  * company's card (CompanyCard). `head` adds the organisation and title, for places that don't already show them.
  * `tab`: under a tile's tab, which already shows the picture, organisation, title and date, so the details carry
- * on from it with only what's new.
+ * on from it with only what's new. `picture`: a tab that doesn't show the card's picture, so the details do.
  */
-const CardDetail = ({ item, subprojects = [], head: withHead = true, tab = false }) => {
+const CardDetail = ({ item, subprojects = [], head: withHead = true, tab = false, picture = false }) => {
   const head = withHead && !tab;
   const venue = item.volume ? item.volume.split(',')[0] : item.company;
   const volumeRest = item.volume ? item.volume.split(',').slice(1).join(',').trim() : null;
@@ -87,7 +87,7 @@ const CardDetail = ({ item, subprojects = [], head: withHead = true, tab = false
   const meta = tab ? [] : [head ? item.date : null, place, volumeRest].filter(Boolean);
   const logo = typeof item.companyLogo === 'string' ? item.companyLogo : null;
   // A tab already shows the card's picture, unless it's an info tile, where the picture is only a faint ghost
-  const pictured = tab && item.tile !== 'info';
+  const pictured = tab && item.tile !== 'info' && !picture;
   const media = !pictured && Boolean(item.projectImage || item.video);
 
   return (

@@ -68,8 +68,10 @@ sends the strip's colours flying into the chevron as light.
 
 **3 · The portfolio**
 
-It opens with Selected work: jobwright, calarm, the audio prioritization patent and Centi-seed, each
-marked on the strip by a small diamond. Scrolling hands the strip over to a sticky band bar that tracks
+It opens with Selected work: Find My Zoox, Centi-seed, the audio prioritization patent and CALarm, each
+marked on the strip by a small diamond. These are large cards with one small thing happening inside each:
+a light that calls out, a 3D robot that follows your pointer, music that steps back for an alert, and a
+flip clock that rings. After them, the eight bands open up as links into the full portfolio. Scrolling hands the strip over to a sticky band bar that tracks
 which band and card you are on. Cards with a picture or video show as glass tiles, the rest as wide
 cards, newest first.
 
@@ -112,7 +114,7 @@ was touched, the hole races round it, and the retreating rim sheds droplets that
 
 <div align="center">
 
-<img src="docs/assets/readme/selected.jpg" width="720" alt="Selected work: a row of four glass tiles, jobwright, calarm, Audio prioritization patent and Centi-seed, under a sticky bar reading 'Selected work', above the first career card, with the prism's rainbow glowing through the glass">
+<img src="docs/assets/readme/selected.jpg" width="720" alt="Selected work: the first of four large glass cards, Find My Zoox, with the prism's rainbow behind it">
 
 <sub>Selected work, reached with <code>parthchandak.info/#selected</code>.</sub>
 
@@ -194,6 +196,8 @@ src/
     Rainbow.jsx, Flare.jsx  The light beam, the GLTF prism, the spectral rainbow and flare
     SwarmLight.jsx          The strip's swarm, drawn as light in the scene
     Spectrograph.jsx        The tick strip and its eight lanes
+    FeatureCards.jsx        Selected work's large cards and the lanes after them
+    centiSeedRobot.js       The 3D Centi-seed, on its own small canvas
     SelectedMark.jsx        The small diamond that marks selected work
     BandBar.jsx             Sticky band bar in the portfolio
     Timeline.jsx, TimelineCard.jsx, CardTile.jsx, LabShowcase.jsx

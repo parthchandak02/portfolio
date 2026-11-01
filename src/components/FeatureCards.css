@@ -1,0 +1,121 @@
+/* Selected work's large cards: the tiles' own glass at about a screen's height. Text is laid over whatever small
+   moment the card holds, and the rest of the card stays quiet, so the scene still shows through. */
+.fcard {
+  aspect-ratio: auto; display: flex; flex-direction: column; justify-content: flex-end; gap: 20px;
+  min-height: clamp(420px, 66vh, 580px); padding: clamp(22px, 4vw, 40px);
+  box-sizing: border-box; cursor: default;
+}
+.fcard__open {
+  position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; padding: 0; border: 0; border-radius: inherit;
+  background: none; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.fcard__open:focus-visible { outline: 2px solid #ff6b35; outline-offset: -3px; }
+
+.fcard__text { position: relative; z-index: 1; display: grid; gap: 8px; max-width: 34rem; pointer-events: none; }
+.fcard__kind { font-family: var(--font-family-label); font-weight: 600; font-size: 0.74rem; letter-spacing: 0.09em; text-transform: uppercase; opacity: 0.68; }
+.fcard__name { margin: 0; font-family: var(--font-family-primary); font-weight: 800; font-size: clamp(2.1rem, 6.4vw, 3.5rem); line-height: 1.04; letter-spacing: -0.02em; text-wrap: balance; }
+.fcard__line { margin: 0; font-size: clamp(0.95rem, 2.2vw, 1.06rem); line-height: 1.5; opacity: 0.8; text-wrap: pretty; }
+
+/* Text reads over the rainbow behind the glass: a soft shade from the text's own side, with no edge to it */
+.fcard::after { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1); }
+/* Opened, the shade goes, so nothing marks where the card ends and its details begin */
+.timeline__item[data-joined] .fcard::after { opacity: 0; }
+.fcard:not(.fcard--robot):not(.fcard--audio)::after { background: linear-gradient(to top, var(--fcard-shade), transparent 62%); }
+.fcard--robot::after, .fcard--audio::after { background: linear-gradient(to bottom, var(--fcard-shade), transparent 56%); }
+.lab--dark .fcard { --fcard-shade: rgba(0, 0, 0, 0.5); }
+.lab--light .fcard { --fcard-shade: rgba(255, 255, 255, 0.62); }
+.lab--dark .fcard__text { text-shadow: 0 1px 14px rgba(0, 0, 0, 0.6); }
+.lab--light .fcard__text { text-shadow: 0 1px 12px rgba(255, 255, 255, 0.8); }
+
+/* Controls sit above the card's own button */
+.fcard__swatch, .fcard__action { position: relative; z-index: 3; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.fcard__swatch:focus-visible, .fcard__action:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; }
+
+/* Find My Zoox: a soft light in the glass itself, from the top of the card */
+.fcard__glow {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(70% 62% at 58% 0%, color-mix(in srgb, var(--light) 62%, transparent), transparent 76%),
+    linear-gradient(color-mix(in srgb, var(--light) 9%, transparent), transparent 70%);
+  transition: background 0.5s ease;
+}
+.fcard__swatches { position: absolute; top: clamp(22px, 4vw, 40px); right: clamp(22px, 4vw, 40px); z-index: 3; display: flex; gap: 10px; }
+.fcard__swatch {
+  width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; background: var(--swatch);
+  box-shadow: 0 0 0 0 transparent; transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.fcard__swatch::after { content: ''; position: absolute; inset: -9px; border-radius: 50%; } /* a larger target for fingers */
+.fcard__swatch:hover { transform: scale(1.1); }
+.fcard__swatch[aria-pressed="true"] { box-shadow: 0 0 0 3px color-mix(in srgb, var(--swatch) 32%, transparent); }
+
+/* Centi-seed: text up top, the floor at the bottom */
+.fcard--robot { justify-content: flex-start; }
+.fcard__robot { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 0.5s ease; }
+.fcard__robot[data-ready] { opacity: 1; }
+
+/* The audio patent */
+.fcard--audio { justify-content: space-between; }
+.fcard__audio { position: relative; z-index: 3; display: grid; gap: 14px; flex: 1; grid-template-rows: minmax(120px, 1fr) auto; pointer-events: none; }
+.fcard__wave { width: 100%; height: 100%; min-height: 0; display: block; }
+.fcard__audio-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.fcard__level { font-family: var(--font-family-numeric); font-size: 0.8rem; opacity: 0.72; }
+.fcard__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.fcard__action {
+  min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; pointer-events: auto;
+  font-family: var(--font-family-label); font-weight: 600; font-size: 0.82rem; color: inherit;
+  background: rgba(255, 255, 255, 0.1); transition: background 0.2s ease;
+}
+.fcard__action:hover { background: rgba(255, 255, 255, 0.18); }
+.lab--light .fcard__action { background: rgba(20, 20, 24, 0.08); }
+.lab--light .fcard__action:hover { background: rgba(20, 20, 24, 0.15); }
+
+/* CALarm: the app's own flip clock, near-black in both modes, as on a phone. It opens out of a small pill. */
+.fcard__clock {
+  position: absolute; top: clamp(22px, 4vw, 40px); right: clamp(22px, 4vw, 40px); z-index: 1;
+  display: flex; align-items: center; gap: 8px; padding: 14px;
+  border-radius: 20px; background: #0e0e11; color: #ff736b;
+  font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums;
+  transform-origin: 100% 0;
+  transition: transform 0.7s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.7s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.4s ease;
+}
+.fcard__clock i { font-style: normal; font-size: clamp(1.6rem, 4.6vw, 2.4rem); }
+.fcard__flip {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  width: clamp(44px, 10vw, 64px); height: clamp(60px, 13vw, 86px); border-radius: 8px; background: #2a2a2e;
+  font-size: clamp(2rem, 6.4vw, 3.3rem);
+}
+.fcard__flip::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #0e0e11; }
+.fcard__clock.is-pill { transform: scale(0.26); border-radius: 60px; }
+@keyframes fcard-ring { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 115, 107, 0); } 30% { box-shadow: 0 0 42px 6px rgba(255, 115, 107, 0.42); } }
+.fcard__clock.is-ring { animation: fcard-ring 1.3s ease-in-out; }
+
+/* After the last card, the bands of the strip open up: each lane draws in, then its lines rise, as at the top */
+.fdoor { display: grid; gap: 2px; margin-top: 44px; scroll-margin-top: 90px; }
+.fdoor--dark { color: rgba(255, 255, 255, 0.92); --rule: rgba(255, 255, 255, 0.14); --ink: 0; }
+.fdoor--light { color: rgba(20, 20, 24, 0.92); --rule: rgba(0, 0, 0, 0.16); --ink: 0.38; }
+.fdoor__title { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-family: var(--font-family-label); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.82; }
+.fdoor__lane { display: grid; grid-template-columns: 104px minmax(0, 1fr); align-items: center; height: 42px; color: inherit; text-decoration: none; border-radius: 8px; }
+.fdoor__lane:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; }
+.fdoor__name {
+  font-family: var(--font-family-label); font-weight: 600; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); opacity: 0.8; transition: opacity 0.2s ease;
+}
+.fdoor__track { position: relative; height: 26px; }
+.fdoor__track::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--rule); transform-origin: left center; }
+.fdoor__track i { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; border-radius: 2px; background: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); opacity: 0.9; }
+.fdoor__lane:hover .fdoor__name { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .fdoor:not(.is-on) .fdoor__track::before { transform: scaleX(0); }
+  .fdoor:not(.is-on) .fdoor__track i, .fdoor:not(.is-on) .fdoor__name { opacity: 0; }
+  .fdoor.is-on .fdoor__track::before { transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--lane) * 55ms); }
+  .fdoor.is-on .fdoor__name { transition: opacity 0.5s ease calc(var(--lane) * 55ms); }
+  .fdoor.is-on .fdoor__track i { animation: fdoor-tick 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(160ms + var(--lane) * 55ms + var(--j) * 2ms); }
+}
+@keyframes fdoor-tick { from { scale: 1 0; opacity: 0; } to { scale: 1 1; opacity: 0.9; } }
+
+@media (max-width: 560px) {
+  .fcard { min-height: min(74vh, 560px); }
+  .fdoor__lane { grid-template-columns: 84px minmax(0, 1fr); }
+  .fcard__action { flex: 1; }
+  .fcard__actions { width: 100%; }
+}

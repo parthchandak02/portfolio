@@ -3,6 +3,7 @@ import CardDetail from './CardDetail';
 import CompanyCard from './CompanyCard';
 import LabShowcase from './LabShowcase';
 import CardTile, { isTile } from './CardTile';
+import FeatureCard, { PortfolioDoor } from './FeatureCards';
 import TileGrid from './TileGrid';
 import { useTypewriterHighlight } from '../contexts/TypewriterHighlightContext';
 import { categoryOrder, timelineDataByCategory } from '../data/timelineData';
@@ -118,12 +119,12 @@ const Timeline = ({
     return out;
   }, [sortedData, firstLabIndex]);
 
-  // Selected work opens the portfolio: the cards marked with a diamond on the strip, as tiles
+  // Selected work opens the portfolio: the cards marked with a diamond on the strip, each as one large card
   const featured = useMemo(() => {
     const cards = Object.values(timelineDataByCategory).flat();
     return FEATURED.map((f) => {
       const card = cards.find((c) => c.title === f.title);
-      return card && { item: card, tile: { ...card, title: f.name, date: f.kind } };
+      return card && { item: card, feature: f };
     }).filter(Boolean);
   }, []);
 
@@ -149,17 +150,20 @@ const Timeline = ({
             land on the card in its band, not on its copy here. */}
         {featured.length > 0 && activeFilters.length === 0 && (
           <section className="timeline__selected" id="selected" aria-labelledby="selected-title">
-            <h2 id="selected-title" className="timeline__selected-title">
-              <SelectedMark on className="timeline__selected-mark" />
-              Selected work
-            </h2>
+            <div className="timeline__selected-head">
+              <h2 id="selected-title" className="timeline__selected-title">
+                <SelectedMark on className="timeline__selected-mark" />
+                Selected work
+              </h2>
+              <a className="timeline__skip" href="#portfolio">Full portfolio</a>
+            </div>
             <div className={`timeline__tiles lab ${lightMode ? 'lab--light' : 'lab--dark'}`}>
               <TileGrid
                 openKey={openTile}
                 holdKey={nextTile}
                 onOpen={openTileNext}
                 onClose={closeTile}
-                entries={featured.map(({ item, tile }) => ({
+                entries={featured.map(({ item, feature }) => ({
                   key: `selected:${item.title}`,
                   attrs: {
                     style: { '--band-hue': bandForSection(item.category)?.hue || '#ff6b35' },
@@ -167,11 +171,12 @@ const Timeline = ({
                     'data-category': 'selected',
                     'data-title': item.title
                   },
-                  tile: (toggle, open) => <CardTile item={tile} open={open} highlighted={highlights.timelineCards.includes(item.title)} onOpen={toggle} />,
-                  detail: detailFor(item)
+                  tile: (toggle, open) => <FeatureCard feature={feature} lightMode={lightMode} open={open} onOpen={toggle} />,
+                  detail: () => <CardDetail item={item} subprojects={childrenOf[item.title]} tab picture />
                 }))}
               />
             </div>
+            <PortfolioDoor lightMode={lightMode} />
           </section>
         )}
 

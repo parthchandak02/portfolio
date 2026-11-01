@@ -202,7 +202,9 @@ spectrumBands.forEach((band) => {
 // (the patent's US publication, not its filing or its international copy), else the newest
 FEATURED.forEach(({ title }) => {
   const card = allCards.find((c) => c.title === title);
-  const lines = spectrumBands.flatMap((band) => band.items).filter((item) => item.card === title);
+  // A project inside a role has its own line, though that line jumps to the role's card
+  const named = spectrumBands.flatMap((band) => band.items).filter((item) => item.title === title);
+  const lines = named.length ? named : spectrumBands.flatMap((band) => band.items).filter((item) => item.card === title);
   const linked = (item) => Number(Boolean(card?.url) && item.url === card.url);
   const pick = [...lines].sort((a, b) => linked(b) - linked(a) || b.t - a.t)[0];
   if (pick) pick.featured = true;
@@ -217,9 +219,10 @@ export const selectedBand = {
   sections: ['selected'],
   section: 'selected',
   items: FEATURED.map(({ title }) => {
-    const band = spectrumBands.find((b) => b.items.some((item) => item.featured && item.card === title));
-    const item = band && band.items.find((i) => i.featured && i.card === title);
-    return item && { ...item, hue: band.hue };
+    const isIt = (i) => i.featured && (i.card === title || i.title === title);
+    const band = spectrumBands.find((b) => b.items.some(isIt));
+    const item = band && band.items.find(isIt);
+    return item && { ...item, card: title, hue: band.hue };
   }).filter(Boolean)
 };
 

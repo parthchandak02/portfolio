@@ -122,14 +122,18 @@
 /* Selected work, ahead of the bands */
 .timeline__selected { margin-bottom: 56px; }
 .timeline__selected-title {
-  display: flex; align-items: center; gap: 10px; margin: 0 0 16px;
+  display: flex; align-items: center; gap: 10px; margin: 0;
   font-family: var(--font-family-label); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
 }
 .timeline--dark .timeline__selected-title { color: rgba(255, 255, 255, 0.82); }
 .timeline--light .timeline__selected-title { color: rgba(20, 20, 24, 0.78); }
 .timeline__selected-mark { --d: 8px; }
-.timeline__selected .lab__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-@media (max-width: 900px) { .timeline__selected .lab__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.timeline__selected-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 16px; }
+.timeline__skip { font-family: var(--font-family-label); font-weight: 600; font-size: 0.8rem; color: inherit; opacity: 0.66; text-decoration: none; transition: opacity 0.2s ease; }
+.timeline__skip:hover, .timeline__skip:focus-visible { opacity: 1; }
+.timeline--dark .timeline__skip { color: #fff; }
+.timeline--light .timeline__skip { color: #141418; }
+.timeline__selected .lab__grid, .timeline__selected .timeline__tiles .lab__grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
 .timeline__tiles .timeline__item { margin-bottom: 0; }
 
 /* An opened tile hands its glass over to one shape that runs from it down into its details (see TileGrid). The
