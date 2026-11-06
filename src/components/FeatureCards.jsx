@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { spectrumBands } from '../data/spectrum';
-import { warp } from './Spectrograph';
+import { useEffect, useRef, useState } from 'react';
 import { reducedMotion } from '../hooks/glassMotion';
 import { glassNotes, glassPad } from '../hooks/glassSound';
 import SelectedMark from './SelectedMark';
@@ -45,6 +43,7 @@ const LightMoment = ({ card }) => {
   return (
     <>
       <span ref={glow} className="fcard__glow" style={{ '--light': hue.hue }} aria-hidden="true" />
+      <span className="fcard__note">Example light and chime, not the real ones</span>
       <div className="fcard__swatches" role="group" aria-label="Try a color">
         {SWATCHES.map((s) => (
           <button
@@ -198,7 +197,7 @@ const AudioMoment = ({ card, lightMode }) => {
       <canvas ref={canvas} className="fcard__wave" aria-hidden="true" />
       <div className="fcard__audio-row">
         <span className="fcard__level" aria-live="polite">
-          {mode === 'none' ? 'Music at full volume' : mode === 'nav' ? 'Navigation prompt: music steps back' : 'Urgent alert: music almost silent'}
+          {mode === 'none' ? 'Example sounds. Music at full volume' : mode === 'nav' ? 'Example sounds. Navigation prompt: music steps back' : 'Example sounds. Urgent alert: music almost silent'}
         </span>
         <span className="fcard__actions">
           <button type="button" className="fcard__action" onClick={() => hear('nav')}>Navigation prompt</button>
@@ -274,32 +273,11 @@ const FeatureCard = ({ feature, lightMode, open, onOpen }) => {
   );
 };
 
-// After the last card, the eight bands of the strip open up, and each one goes to its part of the portfolio
-export const PortfolioDoor = ({ lightMode }) => {
-  const door = useRef(null);
-  const [on, setOn] = useState(false);
-  useFirstSight(door, () => setOn(true));
-  const lanes = useMemo(() => spectrumBands.map((band) => ({ band, ticks: band.items.map((i) => warp(i.t)) })), []);
-  const go = (e, band) => {
-    e.preventDefault();
-    const target = document.getElementById(band.section);
-    if (!target) return;
-    // Its top lands just under the band bar
-    target.closest('.main-content-scroll')?.scrollBy({ top: target.getBoundingClientRect().top - 96, behavior: reducedMotion() ? 'auto' : 'smooth' });
-  };
-  return (
-    <nav ref={door} id="portfolio" className={`fdoor ${lightMode ? 'fdoor--light' : 'fdoor--dark'}${on ? ' is-on' : ''}`} aria-label="The full portfolio">
-      <h2 className="fdoor__title"><SelectedMark on className="timeline__selected-mark" />The full portfolio</h2>
-      {lanes.map(({ band, ticks }, i) => (
-        <a key={band.key} className="fdoor__lane" href={`#${band.section}`} style={{ '--hue': band.hue, '--lane': i }} onClick={(e) => go(e, band)}>
-          <span className="fdoor__name">{band.name}</span>
-          <span className="fdoor__track" aria-hidden="true">
-            {ticks.map((t, j) => <i key={j} style={{ left: `${t * 100}%`, '--j': (j * 37) % 90 }} />)}
-          </span>
-        </a>
-      ))}
-    </nav>
-  );
-};
+// After the last card, a quiet heading where the full portfolio starts (Selected work's skip link lands here)
+export const PortfolioDoor = ({ lightMode }) => (
+  <h2 id="portfolio" className={`fdoor ${lightMode ? 'fdoor--light' : 'fdoor--dark'}`}>
+    <SelectedMark on className="timeline__selected-mark" />The full portfolio
+  </h2>
+);
 
 export default FeatureCard;

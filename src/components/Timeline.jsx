@@ -172,7 +172,7 @@ const Timeline = ({
                     'data-title': item.title
                   },
                   tile: (toggle, open) => <FeatureCard feature={feature} lightMode={lightMode} open={open} onOpen={toggle} />,
-                  detail: () => <CardDetail item={item} subprojects={childrenOf[item.title]} tab picture />
+                  detail: () => <CardDetail item={item} subprojects={childrenOf[item.title]} tab picture={feature.moment !== 'robot'} />
                 }))}
               />
             </div>

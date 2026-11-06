@@ -39,6 +39,10 @@
     linear-gradient(color-mix(in srgb, var(--light) 9%, transparent), transparent 70%);
   transition: background 0.5s ease;
 }
+.fcard__note {
+  position: absolute; top: calc(clamp(22px, 4vw, 40px) + 38px); right: clamp(22px, 4vw, 40px); z-index: 1;
+  font-family: var(--font-family-label); font-size: 0.7rem; opacity: 0.55; pointer-events: none;
+}
 .fcard__swatches { position: absolute; top: clamp(22px, 4vw, 40px); right: clamp(22px, 4vw, 40px); z-index: 3; display: flex; gap: 10px; }
 .fcard__swatch {
   width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; background: var(--swatch);
@@ -89,33 +93,16 @@
 @keyframes fcard-ring { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 115, 107, 0); } 30% { box-shadow: 0 0 42px 6px rgba(255, 115, 107, 0.42); } }
 .fcard__clock.is-ring { animation: fcard-ring 1.3s ease-in-out; }
 
-/* After the last card, the bands of the strip open up: each lane draws in, then its lines rise, as at the top */
-.fdoor { display: grid; gap: 2px; margin-top: 44px; scroll-margin-top: 90px; }
-.fdoor--dark { color: rgba(255, 255, 255, 0.92); --rule: rgba(255, 255, 255, 0.14); --ink: 0; }
-.fdoor--light { color: rgba(20, 20, 24, 0.92); --rule: rgba(0, 0, 0, 0.16); --ink: 0.38; }
-.fdoor__title { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-family: var(--font-family-label); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.82; }
-.fdoor__lane { display: grid; grid-template-columns: 104px minmax(0, 1fr); align-items: center; height: 42px; color: inherit; text-decoration: none; border-radius: 8px; }
-.fdoor__lane:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; }
-.fdoor__name {
-  font-family: var(--font-family-label); font-weight: 600; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
-  color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); opacity: 0.8; transition: opacity 0.2s ease;
+/* Where the full portfolio starts, after the last card */
+.fdoor {
+  display: flex; align-items: center; gap: 10px; margin: 44px 0 0; scroll-margin-top: 96px;
+  font-family: var(--font-family-label); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
 }
-.fdoor__track { position: relative; height: 26px; }
-.fdoor__track::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--rule); transform-origin: left center; }
-.fdoor__track i { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; border-radius: 2px; background: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000); opacity: 0.9; }
-.fdoor__lane:hover .fdoor__name { opacity: 1; }
-@media (prefers-reduced-motion: no-preference) {
-  .fdoor:not(.is-on) .fdoor__track::before { transform: scaleX(0); }
-  .fdoor:not(.is-on) .fdoor__track i, .fdoor:not(.is-on) .fdoor__name { opacity: 0; }
-  .fdoor.is-on .fdoor__track::before { transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--lane) * 55ms); }
-  .fdoor.is-on .fdoor__name { transition: opacity 0.5s ease calc(var(--lane) * 55ms); }
-  .fdoor.is-on .fdoor__track i { animation: fdoor-tick 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(160ms + var(--lane) * 55ms + var(--j) * 2ms); }
-}
-@keyframes fdoor-tick { from { scale: 1 0; opacity: 0; } to { scale: 1 1; opacity: 0.9; } }
+.fdoor--dark { color: rgba(255, 255, 255, 0.82); }
+.fdoor--light { color: rgba(20, 20, 24, 0.78); }
 
 @media (max-width: 560px) {
   .fcard { min-height: min(74vh, 560px); }
-  .fdoor__lane { grid-template-columns: 84px minmax(0, 1fr); }
   .fcard__action { flex: 1; }
   .fcard__actions { width: 100%; }
 }

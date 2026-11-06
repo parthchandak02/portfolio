@@ -161,9 +161,9 @@
 }
 .timeline__tiles .timeline__item[data-joined] .ctile--photo::before { -webkit-mask-position: 0 60%; mask-position: 0 60%; }
 .timeline__tiles .timeline__item[data-joined] .ctile--photo .ctile__img {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 14%, #000 42%, transparent 94%);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 66%, transparent 100%);
   -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 14%, #000 42%, transparent 94%);
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 66%, transparent 100%);
   mask-composite: intersect;
 }
 .timeline__tiles .timeline__item[data-joined] .ctile--photo .ctile__name { text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7); }

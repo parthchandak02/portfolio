@@ -71,7 +71,7 @@ sends the strip's colours flying into the chevron as light.
 It opens with Selected work: Find My Zoox, Centi-seed, the audio prioritization patent and CALarm, each
 marked on the strip by a small diamond. These are large cards with one small thing happening inside each:
 a light that calls out, a 3D robot that follows your pointer, music that steps back for an alert, and a
-flip clock that rings. After them, the eight bands open up as links into the full portfolio. Scrolling hands the strip over to a sticky band bar that tracks
+flip clock that rings. A "Full portfolio" link skips past them. Scrolling hands the strip over to a sticky band bar that tracks
 which band and card you are on. Cards with a picture or video show as glass tiles, the rest as wide
 cards, newest first.
 

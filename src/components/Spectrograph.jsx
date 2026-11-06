@@ -35,7 +35,7 @@ const linkLabel = (url) => {
   return 'Open link';
 };
 
-export const warp = (t) => {
+const warp = (t) => {
   for (let i = 1; i < KNOTS.length; i += 1) {
     const [t1, f1] = KNOTS[i];
     if (t <= t1) {

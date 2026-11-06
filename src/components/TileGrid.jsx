@@ -258,7 +258,17 @@ const TileGrid = ({ entries, openKey, holdKey = null, onOpen, onClose }) => {
     // Corrected as the content changes size, after layout and before it paints, so the tile never visibly moves
     const ro = new ResizeObserver(() => { if (performance.now() < end) hold(); });
     [...scroller.children].forEach((c) => ro.observe(c));
-    const t = at >= 0 && setTimeout(() => drawers.current[row]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), Math.max(OPEN_MS, CLOSE_MS) + 120);
+    // Then as much of the details as fits comes into view, but never so much that the tile goes up under the bar
+    const reveal = () => {
+      const d = drawers.current[row];
+      if (!d) return;
+      const view = scroller.getBoundingClientRect();
+      const below = d.getBoundingClientRect().bottom - (view.bottom - 24);
+      const room = el.getBoundingClientRect().top - (view.top + 96);
+      const by = Math.min(below, room);
+      if (by > 1) scroller.scrollBy({ top: by, behavior: reducedMotion() ? 'auto' : 'smooth' });
+    };
+    const t = at >= 0 && setTimeout(reveal, Math.max(OPEN_MS, CLOSE_MS) + 120);
     const stop = setTimeout(() => ro.disconnect(), end - performance.now());
     return () => { ro.disconnect(); clearTimeout(t); clearTimeout(stop); };
   }, [held, at, row]);
