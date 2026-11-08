@@ -2,7 +2,12 @@
 import { useRef, useEffect } from 'react';
 import { ReactTyped } from 'react-typed';
 import { useTypewriterHighlight } from '../contexts/TypewriterHighlightContext';
+import { timelineDataByCategory } from '../data/timelineData';
 import './UITypewriter.css';
+
+// The role held now, from its card, so this line stays current by itself
+const now = timelineDataByCategory.experience.find((c) => /present/i.test(c.date));
+const currentRole = now && `${now.title} at ${now.company}`;
 
 const UITypewriter = ({ lightMode }) => {
   const { updateCurrentPhrase, getTypewriterData, getFullSentences } = useTypewriterHighlight();
@@ -34,6 +39,9 @@ const UITypewriter = ({ lightMode }) => {
         />
       </div>
       
+      {/* Who you are, at a glance: it settles in quietly as the greeting finishes */}
+      {currentRole && <p className={`ui-typewriter-role ${lightMode ? 'ui-typewriter--light' : 'ui-typewriter--dark'}`}>{currentRole}</p>}
+
       {/* Cycling professional titles typewriter */}
       <div className={`ui-typewriter-cycling ${lightMode ? 'ui-typewriter--light' : 'ui-typewriter--dark'}`}>
         <ReactTyped

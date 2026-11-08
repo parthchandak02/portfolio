@@ -13,7 +13,7 @@ export const FEATURED = [
     title: 'Centi-seed, a Sunlight-Seeking Robot',
     name: 'Centi-seed',
     kind: '1st place, Crimson Code · 2018',
-    line: 'A walking robot that carries plants and seeks out sunlight. Move or tap across this card and it follows the light.',
+    line: 'A walking robot that carries plants and seeks out sunlight. Point or tap anywhere below and it walks to the light.',
     moment: 'robot'
   },
   {

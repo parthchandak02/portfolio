@@ -4,6 +4,7 @@ company: Springer Nature
 companyLogo: /logos/springer-nature-logo.png
 date: February 2026 - October 2026
 location: 8 journals
+note: 9 reviews across 8 journals
 skills:
   - Research
   - Advisor

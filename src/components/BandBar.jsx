@@ -30,9 +30,15 @@ const elementFor = (card, selected) => {
 const isCurrentCard = (item, title) => item.card === title || (title === 'Lab' && LAB_TITLES.has(item.card));
 
 const scrollToCard = (card, selected = false) => {
-  const target = elementFor(card, selected);
   const scroller = document.querySelector('.main-content-scroll');
-  if (target && scroller) scrollCardToLine(target, scroller);
+  const target = elementFor(card, selected);
+  if (target) { if (scroller) scrollCardToLine(target, scroller); return; }
+  // A card a long section isn't showing yet: the section shows all its cards, then the bar goes to it
+  window.dispatchEvent(new CustomEvent('pc-show-card', { detail: card }));
+  setTimeout(() => {
+    const shown = elementFor(card, selected);
+    if (shown && scroller) scrollCardToLine(shown, scroller);
+  }, 80);
 };
 
 // Lay one band's items out by date between its first and last item, then keep them apart

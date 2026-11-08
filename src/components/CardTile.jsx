@@ -66,6 +66,7 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
       {year && <span className={`ctile__year${item.video && photo ? ' ctile__year--beside' : ''}`} aria-hidden="true">{year}</span>}
       <span className="ctile__text">
         <span className="ctile__name">{item.title}</span>
+        {item.note && <span className="ctile__note">{item.note}</span>}
         {meta && <span className="ctile__meta">{meta}</span>}
       </span>
     </button>

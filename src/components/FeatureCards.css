@@ -56,6 +56,8 @@
 .fcard--robot { justify-content: flex-start; }
 .fcard__robot { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 0.5s ease; }
 .fcard__robot[data-ready] { opacity: 1; }
+/* The floor, under the text: clicks there move the sun rather than open the details */
+.fcard__floor { position: absolute; left: 0; right: 0; bottom: 0; top: 42%; z-index: 3; cursor: crosshair; -webkit-tap-highlight-color: transparent; }
 
 /* The audio patent */
 .fcard--audio { justify-content: space-between; }

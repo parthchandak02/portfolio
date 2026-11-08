@@ -52,6 +52,16 @@
   line-height: 1.5; /* the typed text is a span, which takes the global span line-height */
 }
 
+/* The role held now, under the greeting. Its space is held from the start, so nothing below moves when it appears. */
+.ui-typewriter-role {
+  margin: 0; font-family: var(--font-family-label); font-weight: 600; font-size: clamp(0.72rem, 1.6vw, 0.82rem);
+  letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.62;
+}
+@keyframes ui-role-in { from { opacity: 0; filter: blur(6px); transform: translateY(-3px); } }
+@media (prefers-reduced-motion: no-preference) {
+  .ui-typewriter-role { animation: ui-role-in 0.8s cubic-bezier(0.32, 0.72, 0, 1) 2.2s both; }
+}
+
 /* Cycling Professional Titles Typewriter - larger, cycles continuously */
 .ui-typewriter-cycling {
   font-family: var(--font-family-primary);

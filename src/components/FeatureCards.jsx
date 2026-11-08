@@ -99,17 +99,23 @@ const RobotMoment = ({ card, lightMode }) => {
       const r = el.getBoundingClientRect();
       robot.current.follow((e.clientX - r.left) / r.width);
     };
-    const tap = (e) => {
-      if (!robot.current) return;
-      const r = el.getBoundingClientRect();
-      robot.current.follow((e.clientX - r.left) / r.width);
-    };
     el.addEventListener('pointermove', move);
-    el.addEventListener('pointerdown', tap);
-    return () => { el.removeEventListener('pointermove', move); el.removeEventListener('pointerdown', tap); };
+    return () => el.removeEventListener('pointermove', move);
   }, [card]);
 
-  return <canvas ref={canvas} className="fcard__robot" aria-hidden="true" />;
+  // A click on the floor moves the sun there and nothing else; the rest of the card opens the details
+  const tap = (e) => {
+    e.stopPropagation();
+    const r = card.current.getBoundingClientRect();
+    robot.current?.follow((e.clientX - r.left) / r.width);
+  };
+
+  return (
+    <>
+      <canvas ref={canvas} className="fcard__robot" aria-hidden="true" />
+      <span className="fcard__floor" onClick={tap} aria-hidden="true" />
+    </>
+  );
 };
 
 // The audio patent: music, and sounds that matter more. The more one matters, the further the music steps back,

@@ -29,6 +29,7 @@ the folders easy to scan. The Lab's projects are kept separately, in `src/data/l
 | `video` | `{ id, title }` for a YouTube video, which plays in place. |
 | `url` | A link shown in the card's details. |
 | `location` | Where it happened. For press pieces, the outlet. |
+| `note` | A short line a tile always shows under its name, such as a count. Its date and place only show on hover. |
 | `volume` | For papers: `Journal, Volume n, Issue m`. The journal shows on the tile. |
 | `skills` | Tags shown in the details, each with an icon from `iconMap` in `src/data/timelineData.js`. |
 | `parent` | The title of a card to show this one inside, as Find My Zoox sits in Creative Technologist. |

@@ -20,6 +20,7 @@
 }
 .ctile:focus-visible .ctile__meta, .ctile.is-open .ctile__meta { opacity: 0.72; filter: none; transform: none; }
 @media (hover: hover) { .ctile:hover .ctile__meta { opacity: 0.72; filter: none; transform: none; } }
+.ctile__note { font-size: 0.74rem; opacity: 0.72; }
 .ctile__year {
   position: absolute; top: 14px; right: 14px; z-index: 1;
   font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;

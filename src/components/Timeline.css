@@ -119,6 +119,25 @@
 /* A run of picture cards shown as tiles; an opened one takes the whole row */
 .timeline__tiles { margin-bottom: 32px; }
 
+/* "Show all": a quiet glass pill under a section that opens on a few of its cards */
+.timeline__more {
+  display: flex; align-items: center; justify-content: center; margin: 14px auto 0; min-height: 40px; padding: 0 20px;
+  border: 0; border-radius: 999px; cursor: pointer;
+  font-family: var(--font-family-label); font-weight: 600; font-size: 0.82rem;
+  background: var(--glass-bg-base); -webkit-backdrop-filter: var(--glass-blur-subtle); backdrop-filter: var(--glass-blur-subtle);
+  box-shadow: inset 0 0 0 1px var(--glass-border-base); transition: background 0.25s ease;
+}
+.timeline__more--dark { color: rgba(255, 255, 255, 0.86); }
+.timeline__more--light { color: rgba(20, 20, 24, 0.86); }
+.timeline__more--dark:hover { background: rgba(255, 255, 255, 0.1); }
+.timeline__more--light:hover { background: rgba(255, 255, 255, 0.6); }
+.timeline__more:focus-visible { outline: 2px solid #ff6b35; outline-offset: 3px; }
+/* The cards it brings in condense into their places, as glass does when it opens */
+@keyframes timeline-condense { from { opacity: 0; filter: blur(6px); transform: translateY(-4px) scale(0.99); } }
+@media (prefers-reduced-motion: no-preference) {
+  .timeline__item[data-revealed] > *, .lab-tile[data-revealed] { animation: timeline-condense 0.64s cubic-bezier(0.32, 0.72, 0, 1) both; }
+}
+
 /* Selected work, ahead of the bands */
 .timeline__selected { margin-bottom: 56px; }
 .timeline__selected-title {

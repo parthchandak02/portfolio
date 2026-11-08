@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import CardDetail from './CardDetail';
 import CompanyCard from './CompanyCard';
 import LabShowcase from './LabShowcase';
@@ -7,6 +7,7 @@ import FeatureCard, { PortfolioDoor } from './FeatureCards';
 import TileGrid from './TileGrid';
 import { useTypewriterHighlight } from '../contexts/TypewriterHighlightContext';
 import { categoryOrder, timelineDataByCategory } from '../data/timelineData';
+import { sectionOf } from '../data/sections';
 import { FEATURED } from '../data/featured';
 import SelectedMark from './SelectedMark';
 import { bandForSection, spectrumBands, startOf, endOf } from '../data/spectrum';
@@ -57,6 +58,33 @@ const Timeline = ({
       return startOf(b.date) - startOf(a.date) || endOf(b.date) - endOf(a.date);
     });
   }, [filteredData, activeFilters]);
+
+  // Long sections open on a few of their cards (preview in data/sections.js); "Show all" brings in the rest, which
+  // condense into their places. Jumping to a card that isn't showing yet (from the band bar) opens its section.
+  const [shownAll, setShownAll] = useState({});
+  const showAll = (id) => setShownAll((s) => ({ ...s, [id]: true }));
+  const previewOf = (item) => sectionOf(item.category?.toLowerCase())?.preview;
+  const isShown = (item) => {
+    const preview = previewOf(item);
+    return !preview || shownAll[item.category?.toLowerCase()] || preview.includes(item.title);
+  };
+  // Cards that came in with "Show all" condense into place (see Timeline.css)
+  const revealed = (item) => (previewOf(item) && !previewOf(item).includes(item.title) ? '' : undefined);
+  useEffect(() => {
+    const onShow = (e) => {
+      const card = data.find((c) => c.title === e.detail);
+      if (card && previewOf(card)) showAll(card.category.toLowerCase());
+    };
+    window.addEventListener('pc-show-card', onShow);
+    return () => window.removeEventListener('pc-show-card', onShow);
+    // previewOf only reads static data
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
+  const showAllButton = (id, hidden) => hidden > 0 && (
+    <button type="button" className={`timeline__more ${lightMode ? 'timeline__more--light' : 'timeline__more--dark'}`} onClick={() => showAll(id)}>
+      Show all {sortedData.filter((c) => c.category?.toLowerCase() === id).length} {sectionOf(id).noun}
+    </button>
+  );
 
   // The Lab renders as one card of tiles, in the place of its first item
   const labItems = sortedData.filter((item) => item.category === 'lab');
@@ -134,7 +162,8 @@ const Timeline = ({
     'data-category': item.category?.toLowerCase() || 'other',
     'data-title': item.title,
     'data-index': index,
-    id: sortedData.findIndex((d) => d.category === item.category) === index ? item.category?.toLowerCase() : undefined
+    // The section's anchor goes on its first card that is showing
+    id: sortedData.findIndex((d) => d.category === item.category && isShown(d)) === index ? item.category?.toLowerCase() : undefined
   });
 
 
@@ -187,7 +216,8 @@ const Timeline = ({
               if (segment.kind === 'lab') {
                 return (
                   <div key="lab" className="timeline__item" data-category="lab" data-title="Lab" data-index={segment.index} id="lab">
-                    <LabShowcase items={labItems} lightMode={lightMode} />
+                    <LabShowcase items={labItems.filter(isShown)} revealed={revealed} lightMode={lightMode} />
+                    {showAllButton('lab', labItems.filter((c) => !isShown(c)).length)}
                   </div>
                 );
               }
@@ -199,15 +229,18 @@ const Timeline = ({
                       holdKey={nextTile}
                       onOpen={openTileNext}
                       onClose={closeTile}
-                      entries={segment.items.map(({ item, index }) => ({
+                      entries={segment.items.filter(({ item }) => isShown(item)).map(({ item, index }) => ({
                         key: item.title,
-                        attrs: itemAttrs(item, index),
+                        attrs: { ...itemAttrs(item, index), 'data-revealed': revealed(item) },
                         tile: (toggle, open) => (
                           <CardTile item={item} open={open} highlighted={highlights.timelineCards.includes(item.title)} onOpen={toggle} />
                         ),
                         detail: detailFor(item)
                       }))}
                     />
+                    {[...new Set(segment.items.map(({ item }) => item.category?.toLowerCase()))].map((id) => (
+                      <Fragment key={id}>{showAllButton(id, segment.items.filter(({ item }) => item.category?.toLowerCase() === id && !isShown(item)).length)}</Fragment>
+                    ))}
                   </div>
                 );
               }

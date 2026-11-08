@@ -9,7 +9,7 @@ const openLabel = (url) => (url.includes('github.com') ? 'View on GitHub' : 'Ope
  * hovering (mouse), focusing (keyboard) or the first tap (touch) lifts the fog to show the
  * project, its description and a link. On touch, the second tap follows the link.
  */
-const LabShowcase = ({ items = [], lightMode = false }) => {
+const LabShowcase = ({ items = [], lightMode = false, revealed = () => undefined }) => {
   const [openId, setOpenId] = useState(null);
 
   // Tapping anywhere outside the open tile puts the fog back
@@ -39,6 +39,7 @@ const LabShowcase = ({ items = [], lightMode = false }) => {
           <a
             key={item.title}
             className={`lab-tile${openId === item.title ? ' is-open' : ''}`}
+            data-revealed={revealed(item)}
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"

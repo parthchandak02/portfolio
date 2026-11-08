@@ -23,6 +23,7 @@ const Card = z.strictObject({
   url: z.url().optional(),
   date: z.string().regex(/\d{4}/, 'needs a year'),
   location: z.string().optional(),
+  note: z.string().max(40).optional(), // a short line a tile always shows under its name
   volume: z.string().optional(), // for papers: "Journal, Volume n, Issue m"
   skills: z.array(z.string()).optional(),
   typewriterTitle: z.string().optional(),
