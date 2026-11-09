@@ -153,6 +153,7 @@
 .timeline--dark .timeline__skip { color: #fff; }
 .timeline--light .timeline__skip { color: #141418; }
 .timeline__selected .lab__grid, .timeline__selected .timeline__tiles .lab__grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+@media (min-width: 900px) { .timeline__selected .lab__grid, .timeline__selected .timeline__tiles .lab__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } }
 .timeline__tiles .timeline__item { margin-bottom: 0; }
 
 /* An opened tile hands its glass over to one shape that runs from it down into its details (see TileGrid). The

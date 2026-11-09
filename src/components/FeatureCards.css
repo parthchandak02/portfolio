@@ -2,7 +2,9 @@
    moment the card holds, and the rest of the card stays quiet, so the scene still shows through. */
 .fcard {
   aspect-ratio: auto; display: flex; flex-direction: column; justify-content: flex-end; gap: 20px;
-  min-height: clamp(420px, 66vh, 580px); padding: clamp(22px, 4vw, 40px);
+  --pad: clamp(22px, 3vw, 32px);
+  min-height: clamp(420px, 66vh, 580px); padding: var(--pad);
+  container-type: inline-size; /* what's inside sizes to the card, which is half the width beside another */
   box-sizing: border-box; cursor: default;
 }
 .fcard__open {
@@ -13,8 +15,8 @@
 
 .fcard__text { position: relative; z-index: 1; display: grid; gap: 8px; max-width: 34rem; pointer-events: none; }
 .fcard__kind { font-family: var(--font-family-label); font-weight: 600; font-size: 0.74rem; letter-spacing: 0.09em; text-transform: uppercase; opacity: 0.68; }
-.fcard__name { margin: 0; font-family: var(--font-family-primary); font-weight: 800; font-size: clamp(2.1rem, 6.4vw, 3.5rem); line-height: 1.04; letter-spacing: -0.02em; text-wrap: balance; }
-.fcard__line { margin: 0; font-size: clamp(0.95rem, 2.2vw, 1.06rem); line-height: 1.5; opacity: 0.8; text-wrap: pretty; }
+.fcard__name { margin: 0; font-family: var(--font-family-primary); font-weight: 800; font-size: clamp(1.75rem, 8cqi, 3.4rem); line-height: 1.04; letter-spacing: -0.02em; text-wrap: balance; }
+.fcard__line { margin: 0; font-size: clamp(0.9rem, 2.6cqi, 1.04rem); line-height: 1.5; opacity: 0.8; text-wrap: pretty; }
 
 /* Text reads over the rainbow behind the glass: a soft shade from the text's own side, with no edge to it */
 .fcard::after { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1); }
@@ -40,10 +42,10 @@
   transition: background 0.5s ease;
 }
 .fcard__note {
-  position: absolute; top: calc(clamp(22px, 4vw, 40px) + 38px); right: clamp(22px, 4vw, 40px); z-index: 1;
+  position: absolute; top: calc(var(--pad) + 38px); right: var(--pad); z-index: 1;
   font-family: var(--font-family-label); font-size: 0.7rem; opacity: 0.55; pointer-events: none;
 }
-.fcard__swatches { position: absolute; top: clamp(22px, 4vw, 40px); right: clamp(22px, 4vw, 40px); z-index: 3; display: flex; gap: 10px; }
+.fcard__swatches { position: absolute; top: var(--pad); right: var(--pad); z-index: 3; display: flex; gap: 10px; }
 .fcard__swatch {
   width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; background: var(--swatch);
   box-shadow: 0 0 0 0 transparent; transition: box-shadow 0.25s ease, transform 0.25s ease;
@@ -77,18 +79,18 @@
 
 /* CALarm: the app's own flip clock, near-black in both modes, as on a phone. It opens out of a small pill. */
 .fcard__clock {
-  position: absolute; top: clamp(22px, 4vw, 40px); right: clamp(22px, 4vw, 40px); z-index: 1;
+  position: absolute; top: var(--pad); right: var(--pad); z-index: 1;
   display: flex; align-items: center; gap: 8px; padding: 14px;
   border-radius: 20px; background: #0e0e11; color: #ff736b;
   font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums;
   transform-origin: 100% 0;
   transition: transform 0.7s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.7s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.4s ease;
 }
-.fcard__clock i { font-style: normal; font-size: clamp(1.6rem, 4.6vw, 2.4rem); }
+.fcard__clock i { font-style: normal; font-size: clamp(1.3rem, 5cqi, 2.4rem); }
 .fcard__flip {
   position: relative; display: inline-flex; align-items: center; justify-content: center;
-  width: clamp(44px, 10vw, 64px); height: clamp(60px, 13vw, 86px); border-radius: 8px; background: #2a2a2e;
-  font-size: clamp(2rem, 6.4vw, 3.3rem);
+  width: clamp(36px, 11cqi, 64px); height: clamp(50px, 15cqi, 86px); border-radius: 8px; background: #2a2a2e;
+  font-size: clamp(1.6rem, 7.5cqi, 3.3rem);
 }
 .fcard__flip::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #0e0e11; }
 .fcard__clock.is-pill { transform: scale(0.26); border-radius: 60px; }
@@ -102,6 +104,11 @@
 }
 .fdoor--dark { color: rgba(255, 255, 255, 0.82); }
 .fdoor--light { color: rgba(20, 20, 24, 0.78); }
+
+/* On a wide screen the four sit two by two, each about half a screen tall; an opened one's details span the row */
+@media (min-width: 900px) {
+  .fcard { min-height: clamp(360px, 46vh, 440px); }
+}
 
 @media (max-width: 560px) {
   .fcard { min-height: min(74vh, 560px); }
