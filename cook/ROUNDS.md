@@ -76,3 +76,33 @@ Top gaps:
 3. Phone: scene and diamonds show through content; floating buttons over cards.
 
 Commit: b9731706. Next focus: hero type (round 2, already built).
+
+## Round 02
+
+Time: 09:22 to 09:30
+Focus: S01 and S04 hero type, because round 1 critics ranked the hero weakest and both flagged kicker plus greeting plus small type.
+
+Changes:
+- "Hi, my name is Parth Chandak" (typed) replaced by the name set still at display size (800, clamp 2.5rem to 5.6rem, -0.035em), fading in.
+- Role line in sentence case at 0.95 to 1.15rem, no tracking; appears at 0.6s instead of 2.2s.
+- Typed "I am a ..." line steps down to clamp 1.35rem to 2.5rem and starts at 1.4s.
+
+Stills: `cook/stills/r02/` | Side by side: `cook/compare/r02/`
+
+Scores, eyeballed: mean of 2 fresh Claude critics, no calibration
+
+| Shot | Layout | Type | Color | Components | Polish | vs r01 (mean) |
+|---|---|---|---|---|---|---|
+| S01 | 79 | 81 | 84 | 76 | 76 | +11 |
+| S02 | 74 | 72 | 76 | 72 | 70 | +7 |
+| S03 | 71 | 71 | 70 | 68 | 64 | +7 |
+| S04 | 75 | 81 | 74 | 75 | 75 | +14 |
+
+Measured: S01-390 visible words 42 to 32, text nodes under 14px 1 to 0; no overflow.
+
+Top gaps:
+1. S03: fogged thumbnails read as placeholders; Show all pill washed out by the beam; bottom row titles long.
+2. S02: duplicate Selected work heading looks greyed; card copy small; demo caption.
+3. All: diamonds, beam bleed, floating buttons over content on phone (3D parts out of scope this run).
+
+Commit: 931db59a. Next focus: S03 polish.

@@ -129,8 +129,8 @@
 }
 .timeline__more--dark { color: rgba(255, 255, 255, 0.86); }
 .timeline__more--light { color: rgba(20, 20, 24, 0.86); }
-.timeline__more--dark:hover { background: rgba(255, 255, 255, 0.1); }
-.timeline__more--light:hover { background: rgba(255, 255, 255, 0.6); }
+.timeline__more--dark:hover { background: rgba(44, 44, 50, 0.92); }
+.timeline__more--light:hover { background: rgba(244, 244, 246, 0.96); }
 .timeline__more:focus-visible { outline: 2px solid #ff6b35; outline-offset: 3px; }
 /* The cards it brings in condense into their places, as glass does when it opens */
 @keyframes timeline-condense { from { opacity: 0; filter: blur(6px); transform: translateY(-4px) scale(0.99); } }
@@ -301,3 +301,9 @@
 @media (min-width: 1200px) {
   .timeline, .timeline__cards { max-width: 72rem; }
 }
+
+/* Show all reads as a solid control, even with the beam behind it (cook round 3) */
+.timeline__more--dark { background: rgba(22, 22, 26, 0.86); }
+.timeline__more--light { background: rgba(255, 255, 255, 0.92); }
+/* A jump to Selected work lands with its heading clear of the sticky strip's fade (cook round 3) */
+.timeline__selected { scroll-margin-top: 156px; } /* below the bar's 150px veil */
