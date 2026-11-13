@@ -54,12 +54,12 @@
 
 /* The role held now, under the greeting. Its space is held from the start, so nothing below moves when it appears. */
 .ui-typewriter-role {
-  margin: 0; font-family: var(--font-family-label); font-weight: 600; font-size: clamp(0.72rem, 1.6vw, 0.82rem);
-  letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.62;
+  margin: 0; font-family: var(--font-family-label); font-weight: 500; font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+  letter-spacing: 0; opacity: 0.74;
 }
 @keyframes ui-role-in { from { opacity: 0; filter: blur(6px); transform: translateY(-3px); } }
 @media (prefers-reduced-motion: no-preference) {
-  .ui-typewriter-role { animation: ui-role-in 0.8s cubic-bezier(0.32, 0.72, 0, 1) 2.2s both; }
+  .ui-typewriter-role { animation: ui-role-in 0.8s cubic-bezier(0.32, 0.72, 0, 1) 0.6s both; }
 }
 
 /* Cycling Professional Titles Typewriter - larger, cycles continuously */
@@ -370,3 +370,15 @@
   background-clip: text;
   -webkit-background-clip: text;
 } 
+/* The name: the one display line of the hero (cook round 2) */
+.ui-typewriter-container .ui-typewriter-name {
+  margin: 0; font-family: var(--font-family-primary); font-weight: 800;
+  font-size: clamp(2.5rem, 10.4vw, 5.6rem); line-height: 0.98; letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+@keyframes ui-name-in { from { opacity: 0; filter: blur(10px); transform: translateY(6px); } }
+@media (prefers-reduced-motion: no-preference) {
+  .ui-typewriter-container .ui-typewriter-name { animation: ui-name-in 0.9s cubic-bezier(0.32, 0.72, 0, 1) 0.15s both; }
+}
+/* The cycling line steps down so the name leads */
+.ui-typewriter-container .ui-typewriter-cycling { font-size: clamp(1.35rem, 3.4vw, 2.5rem); margin-top: 0.35em; }

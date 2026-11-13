@@ -44,3 +44,35 @@ Top gaps (both critics agree):
 5. Hero: generic centred stack with uppercase kicker, small type, crowded right rail with labels.
 
 Next focus: round 1, S02 and S03 layout and polish.
+
+## Round 01
+
+Time: 09:15 to 09:22
+Focus: S02 and S03 layout and polish, because both critics ranked the work sections weakest.
+
+Changes:
+- Timeline and cards widen to 72rem at 1200px and up (was 50rem): Selected work and Lab use the wide screen.
+- Card kickers and tile venues in sentence case, no tracking; Selected work and Full portfolio headings set as real headings.
+- Full portfolio link visible, underlined, 44px tall.
+- Lab tiles: ghost image 0.16 to 0.46, blur 6px to 2px, deeper scrim under the name, tag 0.78rem; five columns at 1200px+.
+- Phone: deeper text shade on feature cards.
+
+Stills: `cook/stills/r01/` | Side by side: `cook/compare/r01/`
+
+Scores, eyeballed: mean of 2 fresh Claude critics, no calibration
+
+| Shot | Layout | Type | Color | Components | Polish | vs r00 (mean) |
+|---|---|---|---|---|---|---|
+| S01 | 71 | 64 | 79 | 65 | 66 | -3 (hero unchanged; critic noise) |
+| S02 | 69 | 66 | 67 | 66 | 61 | +5 |
+| S03 | 70 | 60 | 60 | 63 | 57 | +5 |
+| S04 | 60 | 62 | 66 | 61 | 57 | -2 (unchanged) |
+
+Measured: S02-390 text nodes under 14px 7 to 5; S03-1440 visible words 43 to 48; no overflow.
+
+Top gaps:
+1. Hero: no display-scale type; kicker plus greeting plus typewriter template; mid-word captures.
+2. Cards and tiles lack real imagery; bottom project row titles truncated.
+3. Phone: scene and diamonds show through content; floating buttons over cards.
+
+Commit: b9731706. Next focus: hero type (round 2, already built).

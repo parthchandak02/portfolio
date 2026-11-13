@@ -28,16 +28,8 @@ const UITypewriter = ({ lightMode }) => {
 
   return (
     <div className="ui-typewriter-container">
-      {/* Static introduction typewriter - appears once */}
-      <div className={`ui-typewriter-static ${lightMode ? 'ui-typewriter--light' : 'ui-typewriter--dark'}`}>
-        <ReactTyped
-          strings={['Hi, my name is Parth Chandak']}
-          typeSpeed={50}
-          startDelay={500}
-          showCursor={false}
-          loop={false}
-        />
-      </div>
+      {/* The name, set large and still, so it reads at once at any width */}
+      <p className={`ui-typewriter-name ${lightMode ? 'ui-typewriter--light' : 'ui-typewriter--dark'}`}>Parth Chandak</p>
       
       {/* Who you are, at a glance: it settles in quietly as the greeting finishes */}
       {currentRole && <p className={`ui-typewriter-role ${lightMode ? 'ui-typewriter--light' : 'ui-typewriter--dark'}`}>{currentRole}</p>}
@@ -56,7 +48,7 @@ const UITypewriter = ({ lightMode }) => {
           typeSpeed={80}
           backSpeed={50}
           backDelay={2500}
-          startDelay={3000} // Start after the static typewriter finishes
+          startDelay={1400} // Start once the name has settled in
           loop={true}
           showCursor={true}
           smartBackspace={true}
