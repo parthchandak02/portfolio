@@ -106,3 +106,32 @@ Top gaps:
 3. All: diamonds, beam bleed, floating buttons over content on phone (3D parts out of scope this run).
 
 Commit: 931db59a. Next focus: S03 polish.
+
+## Round 03
+
+Time: 09:30 to 09:40
+Focus: S03 polish, because both round 2 critics ranked the Lab grid weakest (fogged thumbnails read as placeholders).
+
+Changes:
+- Lab tile pictures show at rest (opacity 0.9, no blur), with a scrim only behind the label. Hover and tap still reveal the description.
+- Show all is a solid pill (dark 0.86, light 0.92) so the beam cannot wash it out.
+- Tried a scroll offset for the Selected work landing; no effect (the jump is done in script), reverted.
+
+Stills: `cook/stills/r03/` | Side by side: `cook/compare/r03/`
+
+Scores, eyeballed: mean of 2 fresh Claude critics, no calibration
+
+| Shot | Layout | Type | Color | Components | Polish | vs r02 (mean) |
+|---|---|---|---|---|---|---|
+| S01 | 82 | 85 | 83 | 81 | 78 | +3 (unchanged; noise) |
+| S02 | 74 | 78 | 77 | 70 | 69 | +2 |
+| S03 | 76 | 76 | 77 | 76 | 70 | +6 |
+| S04 | 76 | 82 | 80 | 76 | 73 | +1 |
+
+Top gaps:
+1. S02: heading greyed at the jump landing; meta line above titles reads as a kicker; phone card a screen of empty gradient; rail buttons over cards on phone.
+2. S03: mixed thumbnail brightness; long bottom row titles.
+3. Hero: empty lower half on phone; diamonds (3D, out of scope).
+
+Review page for Parth: https://claude.ai/artifact/MdqJxMPAt2N2JvKD6uGjHZ (only Parth's site, no references).
+Commit: 5343180f. Next focus: S02 components and polish.

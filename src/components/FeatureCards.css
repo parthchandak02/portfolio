@@ -111,7 +111,7 @@
 }
 
 @media (max-width: 560px) {
-  .fcard { min-height: min(74vh, 560px); }
+  .fcard { min-height: min(58vh, 460px); } /* cook round 4: was 74vh, a screen of gradient before the words */
   .fcard__action { flex: 1; }
   .fcard__actions { width: 100%; }
 }
@@ -121,3 +121,8 @@
   .lab--dark .fcard { --fcard-shade: rgba(0, 0, 0, 0.72); }
   .lab--light .fcard { --fcard-shade: rgba(255, 255, 255, 0.8); }
 }
+
+/* The meta (company, year) reads as a quiet line under the title, not a label above it (cook round 4) */
+.fcard__name { order: 1; }
+.fcard__kind { order: 2; margin-top: -2px; font-size: 0.82rem; opacity: 0.62; }
+.fcard__line { order: 3; }
