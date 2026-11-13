@@ -162,3 +162,34 @@ Top gaps (most now outside CSS scope):
 4. Typewriter line called a template trope by all critics (content, Parth's call).
 
 Commit: 1ce4521b. Next: round 5, phone rail and phone hero position.
+
+## Round 05
+
+Time: 09:38 to 09:45
+Focus: phone rail over content, because every critic since round 0 flagged it.
+
+Changes:
+- Phone (560px and under): sound button sits beside the contact button at the bottom instead of above it.
+- Tried moving the phone hero lower; the prism is fixed in 3D space, so the text would collide with it. Not done.
+
+Scores, eyeballed: mean of 2 fresh Claude critics, no calibration
+
+| Shot | Layout | Type | Color | Components | Polish | vs r04 (mean) |
+|---|---|---|---|---|---|---|
+| S01 | 84 | 86 | 86 | 81 | 80 | +0 |
+| S02 | 79 | 78 | 79 | 80 | 74 | +0 |
+| S03 | 82 | 77 | 79 | 82 | 75 | +4 |
+| S04 | 79 | 85 | 82 | 80 | 77 | +1 |
+
+Measured: lint 0 errors (1 old warning); no overflow at 390 or 1440.
+
+Plateau: CSS-only gains have flattened (r04 to r05 about +1). Every remaining top gap needs Parth's call or touches the 3D scene:
+1. Typewriter "I am a ..." line (all critics: template trope).
+2. Grey diamonds; beam showing through cards (3D).
+3. Demo cards at rest look empty; three-line descriptions; "Example light and chime" caption.
+4. Lab thumbnails with cropped UI text (new crops).
+5. Light mode: pure white ground, rainbow strip on white.
+6. Six round buttons; could fold into one menu on phone.
+
+Gate: review page updated; waiting for Parth's approval and picks. Stop check: bar no | cap not reached (0h47m of 3h) | stills approved no.
+Commit: 7faa9bad.
