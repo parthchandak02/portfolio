@@ -241,3 +241,11 @@ Round 07 scores, eyeballed: mean of 2 fresh critics
 Best so far: round 07, commit 1cd6dfeb.
 Remaining gaps (both critics): beam and bubbles crossing text (3D), rainbow showing through glass cards, buttons over the first card on phone, demo micro text inside Lab thumbnails (new crops), Find My Zoox card still mostly gradient at rest.
 Gate: review page updated; waiting for Parth's approval. Stop check: bar no | cap passed (continued on feedback) | stills approved no.
+
+## Ship
+
+- Parth approved ("Approve"). gitleaks on the branch: no leaks. No reference sites named in cook/ (public repo).
+- main fast-forwarded to 85db2d2f and pushed; Cloudflare Pages served the new build within about 15s.
+- Live check: parthchandak.info hero (390, 1440) and #lab (1440) shot with shoot.mjs and matched the round 7 stills.
+- Open for Parth: ?perf check on a real Mac and phone (mirror blocks are a 3D change); whether the Centi-seed robot shows at rest (never rendered headless).
+Stop check: bar no (84/80/78/81 against a 99 stretch) | stills approved yes | final deployed and checked yes.
