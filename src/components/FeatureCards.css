@@ -14,7 +14,7 @@
 .fcard__open:focus-visible { outline: 2px solid #ff6b35; outline-offset: -3px; }
 
 .fcard__text { position: relative; z-index: 1; display: grid; gap: 8px; max-width: 34rem; pointer-events: none; }
-.fcard__kind { font-family: var(--font-family-label); font-weight: 600; font-size: 0.74rem; letter-spacing: 0.09em; text-transform: uppercase; opacity: 0.68; }
+.fcard__kind { font-family: var(--font-family-label); font-weight: 500; font-size: 0.86rem; letter-spacing: 0; opacity: 0.72; }
 .fcard__name { margin: 0; font-family: var(--font-family-primary); font-weight: 800; font-size: clamp(1.75rem, 8cqi, 3.4rem); line-height: 1.04; letter-spacing: -0.02em; text-wrap: balance; }
 .fcard__line { margin: 0; font-size: clamp(0.9rem, 2.6cqi, 1.04rem); line-height: 1.5; opacity: 0.8; text-wrap: pretty; }
 
@@ -100,7 +100,7 @@
 /* Where the full portfolio starts, after the last card */
 .fdoor {
   display: flex; align-items: center; gap: 10px; margin: 44px 0 0; scroll-margin-top: 96px;
-  font-family: var(--font-family-label); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+  font-family: var(--font-family-primary); font-weight: 700; font-size: clamp(1.5rem, 3.2vw, 2.1rem); letter-spacing: -0.02em; line-height: 1.1;
 }
 .fdoor--dark { color: rgba(255, 255, 255, 0.82); }
 .fdoor--light { color: rgba(20, 20, 24, 0.78); }
@@ -114,4 +114,10 @@
   .fcard { min-height: min(74vh, 560px); }
   .fcard__action { flex: 1; }
   .fcard__actions { width: 100%; }
+}
+
+/* Phone: the scene sits right behind the text, so the shade goes deeper (cook round 1) */
+@media (max-width: 560px) {
+  .lab--dark .fcard { --fcard-shade: rgba(0, 0, 0, 0.72); }
+  .lab--light .fcard { --fcard-shade: rgba(255, 255, 255, 0.8); }
 }

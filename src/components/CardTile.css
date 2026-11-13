@@ -53,7 +53,7 @@
 .ctile__top { display: flex; align-items: center; gap: 11px; padding: 13px 14px 0; min-width: 0; }
 .ctile__logo { height: 40px; width: auto; max-width: 128px; object-fit: contain; flex: none; opacity: 0.9; }
 .ctile__venue {
-  font-family: var(--font-family-label); font-weight: 600; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+  font-family: var(--font-family-label); font-weight: 600; font-size: 0.8rem; letter-spacing: 0;
   color: var(--hue, #ff9a3d); line-height: 1.35;
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-width: 0;
 }

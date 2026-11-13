@@ -142,13 +142,13 @@
 .timeline__selected { margin-bottom: 56px; }
 .timeline__selected-title {
   display: flex; align-items: center; gap: 10px; margin: 0;
-  font-family: var(--font-family-label); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+  font-family: var(--font-family-primary); font-weight: 700; font-size: clamp(1.5rem, 3.2vw, 2.1rem); letter-spacing: -0.02em; line-height: 1.1;
 }
 .timeline--dark .timeline__selected-title { color: rgba(255, 255, 255, 0.82); }
 .timeline--light .timeline__selected-title { color: rgba(20, 20, 24, 0.78); }
 .timeline__selected-mark { --d: 8px; }
 .timeline__selected-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 16px; }
-.timeline__skip { font-family: var(--font-family-label); font-weight: 600; font-size: 0.8rem; color: inherit; opacity: 0.66; text-decoration: none; transition: opacity 0.2s ease; }
+.timeline__skip { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--font-family-label); font-weight: 600; font-size: 0.9rem; color: inherit; opacity: 0.82; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; transition: opacity 0.2s ease; }
 .timeline__skip:hover, .timeline__skip:focus-visible { opacity: 1; }
 .timeline--dark .timeline__skip { color: #fff; }
 .timeline--light .timeline__skip { color: #141418; }
@@ -295,4 +295,9 @@
 .timeline__item[data-current] > .timeline-card,
 .timeline__item[data-current] > .lab-tile {
   box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--band-hue) 12%, transparent), var(--glass-shadow-base);
+}
+
+/* Wide screens: the work gets the room (cook round 1) */
+@media (min-width: 1200px) {
+  .timeline, .timeline__cards { max-width: 72rem; }
 }

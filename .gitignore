@@ -237,3 +237,8 @@ dev-debug.log
 # Screenshots from local checks; only thumbnail.png belongs at the root
 /*.png
 !/thumbnail.png
+
+# cook: third-party references and screenshots stay local
+cook/refs/
+cook/stills/
+cook/compare/
