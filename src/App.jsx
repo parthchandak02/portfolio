@@ -231,14 +231,8 @@ export default function App() {
             {!isPlayMode && (
               <>
                 {/* Empty space container to showcase prism/rainbow effects */}
-                <div className="navigation-placeholder" style={{
-                  width: '100%',
-                  height: '400px',
-                  minHeight: '35vh',
-                  marginBottom: '3rem'
-                }}>
-                  {/* Completely empty - just space for prism effects */}
-                </div>
+                {/* Empty space to show the prism and rainbow; shorter on a phone, so Selected work peeks in (styles.css) */}
+                <div className="navigation-placeholder" aria-hidden="true" />
                 <Timeline 
                  data={timelineData}
                  lightMode={lightMode}

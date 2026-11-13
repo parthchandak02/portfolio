@@ -364,7 +364,7 @@ html.light-mode {
 }
 
 /* The light page's colour, shared by the page, the layout and the top bar's veil */
-html { --page-light: #ffffff; }
+html { --page-light: #f4f5f7; } /* pearl white: a breath cooler than white, like the bubbles' sheen (cook round 6) */
 
 body,
 #root {
@@ -495,3 +495,8 @@ p, span, div, button, input, textarea {
 /* Switching modes (see hooks/modeShift): the page fades out and changes colour unseen, so its usual colour
    fades are skipped */
 html.is-shifting, html.is-shifting * { transition: none !important; }
+
+/* Room under the hero for the prism and rainbow. On a phone it is shorter, so the top of Selected work peeks
+   in under the prism and the screen reads as the start of something (cook round 6) */
+.navigation-placeholder { width: 100%; height: 400px; min-height: 35vh; margin-bottom: 3rem; }
+@media (max-width: 560px) { .navigation-placeholder { height: 96px; min-height: 0; margin-bottom: 1rem; } }

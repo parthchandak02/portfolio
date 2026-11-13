@@ -28,8 +28,13 @@ const UITypewriter = ({ lightMode }) => {
 
   return (
     <div className="ui-typewriter-container">
-      {/* The name, set large and still, so it reads at once at any width */}
-      <p className={`ui-typewriter-name ${lightMode ? 'ui-typewriter--light' : 'ui-typewriter--dark'}`}>Parth Chandak</p>
+      {/* The name types itself in, large and bold; its full width is held from the start so nothing below moves */}
+      <p className={`ui-typewriter-name ${lightMode ? 'ui-typewriter--light' : 'ui-typewriter--dark'}`}>
+        <span className="ui-typewriter-name__hold" aria-hidden="true">Parth Chandak</span>
+        <span className="ui-typewriter-name__typed">
+          <ReactTyped strings={['Parth Chandak']} typeSpeed={70} startDelay={350} showCursor={false} loop={false} />
+        </span>
+      </p>
       
       {/* Who you are, at a glance: it settles in quietly as the greeting finishes */}
       {currentRole && <p className={`ui-typewriter-role ${lightMode ? 'ui-typewriter--light' : 'ui-typewriter--dark'}`}>{currentRole}</p>}
@@ -48,7 +53,7 @@ const UITypewriter = ({ lightMode }) => {
           typeSpeed={80}
           backSpeed={50}
           backDelay={2500}
-          startDelay={1400} // Start once the name has settled in
+          startDelay={1900} // Start once the name has typed in
           loop={true}
           showCursor={true}
           smartBackspace={true}

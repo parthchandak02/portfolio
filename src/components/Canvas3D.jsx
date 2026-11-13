@@ -150,7 +150,7 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, focusHue =
         pointerEvents: 'none' // Allow UI events to pass through, global tracking handles 3D
       }}
     >
-      <color attach="background" args={[lightMode ? 'white' : 'black']} />
+      <color attach="background" args={[lightMode ? '#f4f5f7' : 'black']} /> {/* pearl white, the same as --page-light (cook round 6) */}
       {/* Dark mode is the prism and its beam; light mode, soap bubbles (a white page can't show added light) */}
       <Bubbles active={light} interactive={isPlayMode || !isLocked} canPop={isPlayMode} viewportPosition={viewportPosition} tint={focusHue} shift={shift} />
       <Scene active={dark} lightMode={false} viewportPosition={viewportPosition} isLocked={isLocked} focusWave={focusWave} shift={shift} />

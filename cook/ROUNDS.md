@@ -16,7 +16,11 @@ Best so far: round 0 (baseline)
 
 ## Feedback inbox
 
-(none yet)
+- 09:50 "I still need the typed name animations. But I do agree put my name in bold above on the first line with slightly bigger font" | round 6 | open
+- 09:50 "Grey diamonds - we can replace them if there's something better? The idea was to highlight selected work" | proposal | open
+- 09:50 "Ok so what do you propose to fix the emptiness?" | proposal | open
+- 09:50 "Ok make the lab area better" | round 6 | open
+- 09:50 "Light mode yes keep it whiteish but what are you proposing instead!" | proposal | open
 
 ---
 

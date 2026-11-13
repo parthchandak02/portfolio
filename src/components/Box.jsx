@@ -27,13 +27,13 @@ export const Box = forwardRef((props, ref) => {
   const [hovered, hover] = useState(false)
   const inner = useRef(null)
   useFrame(() => {
-    lerpC(inner.current.material.emissive, hovered ? 'white' : '#454545', 0.1)
+    lerpC(inner.current.material.emissive, hovered ? 'white' : '#2a2a2c', 0.1) // dimmer at rest (cook round 6)
   })
   return (
-    <group scale={0.5} ref={ref} {...props}>
+    <group scale={0.34} ref={ref} {...props}>{/* about two thirds the old size (cook round 6) */}
       <mesh visible={false} onRayOver={() => hover(true)} onRayOut={() => hover(false)} geometry={boxGeometry} />
       <mesh ref={inner} geometry={roundedBoxGeometry}>
-        <meshStandardMaterial color="#333" toneMapped={false} emissiveIntensity={2} />
+        <meshStandardMaterial color="#262628" toneMapped={false} emissiveIntensity={2} />
       </mesh>
     </group>
   )

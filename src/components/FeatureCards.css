@@ -126,3 +126,16 @@
 .fcard__name { order: 1; }
 .fcard__kind { order: 2; margin-top: -2px; font-size: 0.82rem; opacity: 0.62; }
 .fcard__line { order: 3; }
+
+/* Demos lit at rest (cook round 6): each card shows its moment before anyone touches it */
+/* Find My Zoox: the light already glows in its colour */
+.fcard__glow {
+  background:
+    radial-gradient(64% 70% at 58% 0%, color-mix(in srgb, var(--light) 86%, transparent), transparent 78%),
+    radial-gradient(30% 22% at 58% 6%, color-mix(in srgb, var(--light) 70%, #fff), transparent 70%),
+    linear-gradient(color-mix(in srgb, var(--light) 16%, transparent), transparent 72%);
+}
+/* CALarm: the clock is the picture, large and centred in the space above the words */
+.fcard--alarm .fcard__clock { left: 0; right: 0; width: fit-content; margin: 0 auto; top: calc(var(--pad) + 8px); transform-origin: 50% 0; padding: 18px; gap: 10px; border-radius: 24px; }
+.fcard--alarm .fcard__flip { width: clamp(48px, 15cqi, 88px); height: clamp(66px, 21cqi, 120px); font-size: clamp(2.2rem, 10.5cqi, 4.6rem); border-radius: 10px; }
+.fcard--alarm .fcard__clock i { font-size: clamp(1.8rem, 7cqi, 3.2rem); }

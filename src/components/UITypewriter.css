@@ -59,7 +59,7 @@
 }
 @keyframes ui-role-in { from { opacity: 0; filter: blur(6px); transform: translateY(-3px); } }
 @media (prefers-reduced-motion: no-preference) {
-  .ui-typewriter-role { animation: ui-role-in 0.8s cubic-bezier(0.32, 0.72, 0, 1) 0.6s both; }
+  .ui-typewriter-role { animation: ui-role-in 0.8s cubic-bezier(0.32, 0.72, 0, 1) 1.4s both; }
 }
 
 /* Cycling Professional Titles Typewriter - larger, cycles continuously */
@@ -373,12 +373,14 @@
 /* The name: the one display line of the hero (cook round 2) */
 .ui-typewriter-container .ui-typewriter-name {
   margin: 0; font-family: var(--font-family-primary); font-weight: 800;
-  font-size: clamp(2.5rem, 10.4vw, 5.6rem); line-height: 0.98; letter-spacing: -0.035em;
-  white-space: nowrap;
+  font-size: clamp(2.7rem, 11vw, 6.4rem); line-height: 0.98; letter-spacing: -0.035em;
+  white-space: nowrap; position: relative;
 }
-@keyframes ui-name-in { from { opacity: 0; filter: blur(10px); transform: translateY(6px); } }
-@media (prefers-reduced-motion: no-preference) {
-  .ui-typewriter-container .ui-typewriter-name { animation: ui-name-in 0.9s cubic-bezier(0.32, 0.72, 0, 1) 0.15s both; }
-}
+/* The full name, invisible, holds the line's width and height; the typed name sits on top of it (cook round 6) */
+.ui-typewriter-name__hold { visibility: hidden; }
+.ui-typewriter-name__typed { position: absolute; inset: 0; text-align: center; }
 /* The cycling line steps down so the name leads */
 .ui-typewriter-container .ui-typewriter-cycling { font-size: clamp(1.35rem, 3.4vw, 2.5rem); margin-top: 0.35em; }
+
+/* Light mode: the role line one step darker on the pearl page (cook round 6) */
+.ui-typewriter-role.ui-typewriter--light { opacity: 0.84; }

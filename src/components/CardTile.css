@@ -3,14 +3,16 @@
 .timeline__tiles .lab__grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 .ctile {
   width: 100%; padding: 0; font: inherit; text-align: left;
-  aspect-ratio: auto; min-height: 184px;
+  aspect-ratio: auto; min-height: 204px; /* room for a three line title under the logo (cook round 6) */
   display: flex; flex-direction: column;
 }
 .ctile__img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
 .ctile__text { margin-top: auto; display: grid; gap: 3px; padding: 0 14px 13px; min-width: 0; }
+/* A long title wraps onto up to three whole lines, breaking only between words (cook round 6) */
 .ctile__name {
-  font-size: 0.92rem; font-weight: 600; line-height: 1.28;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  font-size: 0.94rem; font-weight: 600; line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  overflow-wrap: normal; word-break: normal; hyphens: manual; text-wrap: pretty;
 }
 .ctile__meta {
   font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -24,9 +26,9 @@
 .ctile__year {
   position: absolute; top: 14px; right: 14px; z-index: 1;
   font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
-  opacity: 0.55;
+  opacity: 0.72; /* the same on every tile (cook round 6) */
 }
-.ctile--photo .ctile__year { text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); opacity: 0.8; }
+.ctile--photo .ctile__year { text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); }
 .ctile__year--beside { right: 46px; top: 16px; }
 .ctile .ctile__top { padding-right: 52px; }
 

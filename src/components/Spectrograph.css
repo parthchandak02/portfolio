@@ -173,3 +173,7 @@
 .spectro__link:hover { text-decoration: underline; }
 
 .spectro__sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* Light mode: the strip's lines go soft, mixed toward the pearl page rather than toward black (cook round 6) */
+.spectro--light .spectro__line:not(.spectro__line--future) { background: color-mix(in srgb, var(--hue) 64%, var(--page-light, #f4f5f7)); }
+.spectro--light .spectro__line.spectro__line--on:not(.spectro__line--future) { background: var(--hue); }
