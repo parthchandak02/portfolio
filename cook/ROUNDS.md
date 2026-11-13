@@ -16,11 +16,11 @@ Best so far: round 0 (baseline)
 
 ## Feedback inbox
 
-- 09:50 "I still need the typed name animations. But I do agree put my name in bold above on the first line with slightly bigger font" | round 6 | open
-- 09:50 "Grey diamonds - we can replace them if there's something better? The idea was to highlight selected work" | proposal | open
-- 09:50 "Ok so what do you propose to fix the emptiness?" | proposal | open
-- 09:50 "Ok make the lab area better" | round 6 | open
-- 09:50 "Light mode yes keep it whiteish but what are you proposing instead!" | proposal | open
+- 09:50 "I still need the typed name animations. But I do agree put my name in bold above on the first line with slightly bigger font" | round 6 | done, proof: cook/stills/r06/S01-1440.png
+- 09:50 "Grey diamonds - we can replace them if there's something better? The idea was to highlight selected work" | round 6 | done (picked by Parth)
+- 09:50 "Ok so what do you propose to fix the emptiness?" | round 6 | done (picked by Parth)
+- 09:50 "Ok make the lab area better" | round 7 | done, proof: cook/stills/r07/S03-1440.png
+- 09:50 "Light mode yes keep it whiteish but what are you proposing instead!" | round 6 | done (picked by Parth)
 
 ---
 
@@ -197,3 +197,47 @@ Plateau: CSS-only gains have flattened (r04 to r05 about +1). Every remaining to
 
 Gate: review page updated; waiting for Parth's approval and picks. Stop check: bar no | cap not reached (0h47m of 3h) | stills approved no.
 Commit: 7faa9bad.
+
+## Round 06 (Parth's feedback)
+
+Time: after Parth's reply; the 3h cap had passed in wall time while waiting at the gate. Continued because the feedback asked for this work.
+Focus: the feedback inbox.
+
+Parth's picks (AskUserQuestion): name size "slightly bigger than now"; diamonds "keep, smaller and dimmer"; emptiness "demos lit at rest", "one line per card", "phone hero peek"; light mode "pearl white".
+
+Changes:
+- Name types itself in again (ReactTyped), bold, line 1, clamp 2.7rem to 6.4rem; an invisible copy holds the line so nothing moves.
+- Mirror blocks (Box.jsx): scale 0.5 to 0.34, emissive #454545 to #2a2a2c, colour #333 to #262628. 3D file: needs the ?perf check on a real Mac and phone before deploy.
+- Card lines cut to one sentence each (featured.js); Zoox light glows at rest; CALarm clock large and centred.
+- Phone: spacer under the hero 96px (was 400px, min 35vh), so Selected work peeks in. Spacer moved from inline style to styles.css.
+- Light mode: --page-light and the canvas clear colour #f4f5f7; strip lines mixed toward the page; role line darker.
+- Lab (helper agent): one grade for all thumbnails, crop of the top UI strip, captions 1.08 and 0.84rem, project card titles wrap to 3 lines, near-opaque tiles and cards.
+
+Scores, eyeballed: mean of 2 fresh critics
+
+| Shot | Layout | Type | Color | Components | Polish | vs r05 (mean) |
+|---|---|---|---|---|---|---|
+| S01 | 83 | 84 | 87 | 79 | 78 | -1 |
+| S02 | 74 | 78 | 76 | 71 | 68 | -5 |
+| S03 | 80 | 74 | 78 | 79 | 72 | -3 |
+| S04 | 74 | 81 | 78 | 74 | 70 | -5 |
+
+Why lower: critics read pearl white plus the pastel strip as washed out, and the Lab's all-over veil turned the white shots milky. Fixed in round 7. The other picks are Parth's and stay.
+
+## Round 07
+
+Changes: Lab grade 0.84 to 0.95 brightness and the all-over veil removed; light strip mix 64% to 84%.
+Commit: 1cd6dfeb.
+
+Round 07 scores, eyeballed: mean of 2 fresh critics
+
+| Shot | Layout | Type | Color | Components | Polish | Mean | vs r05 |
+|---|---|---|---|---|---|---|---|
+| S01 | 85 | 87 | 87 | 81 | 82 | 84 | +1 |
+| S02 | 80 | 83 | 81 | 79 | 78 | 80 | +2 |
+| S03 | 79 | 76 | 80 | 79 | 76 | 78 | -1 |
+| S04 | 82 | 86 | 79 | 80 | 79 | 81 | +1 |
+
+Best so far: round 07, commit 1cd6dfeb.
+Remaining gaps (both critics): beam and bubbles crossing text (3D), rainbow showing through glass cards, buttons over the first card on phone, demo micro text inside Lab thumbnails (new crops), Find My Zoox card still mostly gradient at rest.
+Gate: review page updated; waiting for Parth's approval. Stop check: bar no | cap passed (continued on feedback) | stills approved no.
