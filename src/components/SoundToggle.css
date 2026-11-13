@@ -24,3 +24,9 @@
   }
   .sound-toggle svg { width: 16px; height: 16px; }
 }
+
+/* Phone: sound sits beside the contact button instead of above it, so the pair takes one row at the bottom
+   rather than a column over the cards (cook round 5) */
+@media (max-width: 560px) {
+  .sound-toggle { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right: calc(16px + 44px + 10px + env(safe-area-inset-right, 0px)); }
+}

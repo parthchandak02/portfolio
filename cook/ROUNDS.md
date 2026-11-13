@@ -135,3 +135,30 @@ Top gaps:
 
 Review page for Parth: https://claude.ai/artifact/MdqJxMPAt2N2JvKD6uGjHZ (only Parth's site, no references).
 Commit: 5343180f. Next focus: S02 components and polish.
+
+## Round 04
+
+Time: 09:40 to 09:45
+Focus: S02 components and polish, because both round 3 critics ranked Selected work weakest.
+
+Changes:
+- Card meta (company, year) moves under the title as a quiet line (CSS order), 0.82rem at 0.62.
+- Phone feature cards min-height 74vh to 58vh (max 460px).
+- Decision: the Selected work heading greys only where it meets the bar's designed fade; left as intended.
+
+Scores, eyeballed: mean of 2 fresh Claude critics, no calibration
+
+| Shot | Layout | Type | Color | Components | Polish | vs r03 (mean) |
+|---|---|---|---|---|---|---|
+| S01 | 83 | 85 | 87 | 80 | 81 | +2 (unchanged) |
+| S02 | 78 | 78 | 82 | 77 | 76 | +5 |
+| S03 | 77 | 74 | 78 | 76 | 72 | -1 (unchanged) |
+| S04 | 79 | 83 | 80 | 79 | 74 | +2 (unchanged) |
+
+Top gaps (most now outside CSS scope):
+1. S03: thumbnails with cropped UI text (content: new crops needed); beam through the grid (3D).
+2. S02: demo cards at rest look empty (Centi-seed, CALarm); three-line descriptions; demo caption (content, Parth's call).
+3. Phone: rail buttons over content; hero lower half empty.
+4. Typewriter line called a template trope by all critics (content, Parth's call).
+
+Commit: 1ce4521b. Next: round 5, phone rail and phone hero position.
