@@ -2,8 +2,17 @@ import { useEffect, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import './LabShowcase.css';
 
+const isGitHub = (url) => {
+  try {
+    const { hostname } = new URL(url);
+    return hostname === 'github.com' || hostname.endsWith('.github.com');
+  } catch {
+    return false;
+  }
+};
+
 const openLabel = (url) =>
-  url.includes('github.com') ? 'View on GitHub' : 'Open live site';
+  isGitHub(url) ? 'View on GitHub' : 'Open live site';
 
 /**
  * The Lab: tall portrait tiles on the page itself, with no card around them. Each tile rests under frosted fog;
