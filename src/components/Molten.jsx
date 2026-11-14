@@ -13,6 +13,10 @@ const Molten = ({ open, contentKey, className = '', style, children, onClosed, .
   const outer = useRef(null);
   const inner = useRef(null);
   const sheen = useRef(null);
+  const onClosedRef = useRef(onClosed);
+  useLayoutEffect(() => {
+    onClosedRef.current = onClosed;
+  });
   const [mounted, setMounted] = useState(open);
   const lastChildren = useRef(children);
   // What showed before the content last changed, melting away over the new content
@@ -87,11 +91,11 @@ const Molten = ({ open, contentKey, className = '', style, children, onClosed, .
     glassSound('close');
     flowing.current?.cancel();
     height.current = 0;
-    if (reducedMotion()) { setMounted(false); onClosed?.(); return undefined; }
+    if (reducedMotion()) { setMounted(false); onClosedRef.current?.(); return undefined; }
     inner.current?.animate(CONDENSE.slice().reverse(), { duration: CLOSE_MS, easing: GLASS_CLOSE_EASE, fill: 'forwards' });
     const a = o.animate([{ height: `${from}px`, opacity: 1 }, { height: '0px', opacity: 0 }], { duration: CLOSE_MS, easing: GLASS_CLOSE_EASE, fill: 'forwards' });
     closing.current = a;
-    a.onfinish = () => { if (closing.current === a) { setMounted(false); onClosed?.(); } };
+    a.onfinish = () => { if (closing.current === a) { setMounted(false); onClosedRef.current?.(); } };
     return undefined;
   }, [open, mounted]);
 
