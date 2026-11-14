@@ -1,5 +1,12 @@
 // eslint-disable-next-line no-unused-vars
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer, LUT } from '@react-three/postprocessing';
@@ -34,35 +41,58 @@ const Warmup = () => {
   const { gl, scene, camera } = useThree();
   useEffect(() => {
     let live = true;
-    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType });
+    const target = new THREE.WebGLRenderTarget(1, 1, {
+      type: THREE.HalfFloatType,
+    });
     // Runs `fn` with everything shown (three.js prepares every material, seen or not, but only counts the lights
     // it can see) and drawing into the buffer, then puts it all back
     const exposed = (lightsOn, fn) => {
       const hidden = [];
-      scene.traverse((o) => { if (!o.visible) { hidden.push(o); o.visible = true; } });
+      scene.traverse((o) => {
+        if (!o.visible) {
+          hidden.push(o);
+          o.visible = true;
+        }
+      });
       const lights = [];
-      scene.traverse((o) => { if (o.isLight) lights.push(o); });
+      scene.traverse((o) => {
+        if (o.isLight) lights.push(o);
+      });
       const before = gl.getRenderTarget();
       try {
-        lights.forEach((l) => { l.visible = lightsOn; });
+        lights.forEach((l) => {
+          l.visible = lightsOn;
+        });
         gl.setRenderTarget(target);
         return fn();
       } finally {
-        lights.forEach((l) => { l.visible = true; });
+        lights.forEach((l) => {
+          l.visible = true;
+        });
         gl.setRenderTarget(before);
-        hidden.forEach((o) => { o.visible = false; });
+        hidden.forEach((o) => {
+          o.visible = false;
+        });
       }
     };
     // compileAsync hands the shaders to the GPU to build in the background, without holding up the page. Once
     // they're built, the scene is drawn once with them: that sends the meshes' geometry and textures to the
     // GPU, and finishes setting each shader up, both of which otherwise happen the first time each one shows
     const prepare = async (lightsOn) => {
-      const built = exposed(lightsOn, () => (gl.compileAsync ? gl.compileAsync(scene, camera) : gl.compile(scene, camera)));
+      const built = exposed(lightsOn, () =>
+        gl.compileAsync
+          ? gl.compileAsync(scene, camera)
+          : gl.compile(scene, camera)
+      );
       await Promise.resolve(built).catch(() => {});
       if (live) exposed(lightsOn, () => gl.render(scene, camera));
     };
-    prepare(true).then(() => live && prepare(false)).finally(() => target.dispose());
-    return () => { live = false; };
+    prepare(true)
+      .then(() => live && prepare(false))
+      .finally(() => target.dispose());
+    return () => {
+      live = false;
+    };
   }, [gl, scene, camera]);
   return null;
 };
@@ -83,14 +113,31 @@ const Finish = memo(({ lut }) => {
     return () => cancelAnimationFrame(frame);
   }, []);
   return (
-    <EffectComposer ref={composer} disableNormalPass multisampling={QUALITY.msaa}>
-      <Bloom mipmapBlur levels={9} intensity={1.5} luminanceThreshold={1} luminanceSmoothing={1} />
+    <EffectComposer
+      ref={composer}
+      disableNormalPass
+      multisampling={QUALITY.msaa}
+    >
+      <Bloom
+        mipmapBlur
+        levels={9}
+        intensity={1.5}
+        luminanceThreshold={1}
+        luminanceSmoothing={1}
+      />
       <LUT lut={lut} />
     </EffectComposer>
   );
 });
 
-const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, focusHue = null, isPlayMode = false }) => {
+const Canvas3D = ({
+  lightMode,
+  viewportPosition,
+  isLocked,
+  focusWave,
+  focusHue = null,
+  isPlayMode = false,
+}) => {
   const loaded = useLoader(LUTCubeLoader, '/lut/F-6800-STD.cube');
   // The colour grade loads as 32-bit float data, which iPhones can't filter (no OES_texture_float_linear):
   // sampled that way it reads as black, and the whole scene went dark. Half floats filter on every WebGL2
@@ -100,7 +147,8 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, focusHue =
     if (loaded.type !== THREE.FloatType) return loaded;
     const data = loaded.image.data;
     const half = new Uint16Array(data.length);
-    for (let i = 0; i < data.length; i += 1) half[i] = THREE.DataUtils.toHalfFloat(data[i]);
+    for (let i = 0; i < data.length; i += 1)
+      half[i] = THREE.DataUtils.toHalfFloat(data[i]);
     loaded.image.data = half;
     loaded.type = THREE.HalfFloatType;
     loaded.needsUpdate = true;
@@ -124,21 +172,27 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, focusHue =
     if (modeShift.kind) setShift(modeShift.kind);
     else setShown(want);
   }, [want, shown]);
-  const finish = useCallback(() => { setShown(want); setShift(null); endShift(); }, [want]);
+  const finish = useCallback(() => {
+    setShown(want);
+    setShift(null);
+    endShift();
+  }, [want]);
   const dark = shown === 'dark' || Boolean(shift);
   const light = shown === 'light' || Boolean(shift);
 
   return (
-    <Canvas 
-      orthographic 
+    <Canvas
+      orthographic
       gl={{ antialias: false, powerPreference: 'high-performance' }}
       // three.js asks the GPU for each shader's error log the first time it draws with it, which makes the
       // page wait for the GPU to finish building it; the shaders are known good, so the live site doesn't ask
-      onCreated={({ gl }) => { gl.debug.checkShaderErrors = !import.meta.env.PROD; }}
+      onCreated={({ gl }) => {
+        gl.debug.checkShaderErrors = !import.meta.env.PROD;
+      }}
       dpr={QUALITY.dpr}
       camera={{ position: [0, 0, 100], zoom: 60 }}
       className="scene3d"
-      style={{ 
+      style={{
         position: 'fixed',
         top: 0,
         left: 0,
@@ -147,13 +201,28 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, focusHue =
         minWidth: '100%', // Fallback for better support
         minHeight: '100%', // Fallback for better support
         zIndex: 0, // Behind UI elements
-        pointerEvents: 'none' // Allow UI events to pass through, global tracking handles 3D
+        pointerEvents: 'none', // Allow UI events to pass through, global tracking handles 3D
       }}
     >
-      <color attach="background" args={[lightMode ? '#f4f5f7' : 'black']} /> {/* pearl white, the same as --page-light (cook round 6) */}
+      <color attach="background" args={[lightMode ? '#f4f5f7' : 'black']} />{' '}
+      {/* pearl white, the same as --page-light (cook round 6) */}
       {/* Dark mode is the prism and its beam; light mode, soap bubbles (a white page can't show added light) */}
-      <Bubbles active={light} interactive={isPlayMode || !isLocked} canPop={isPlayMode} viewportPosition={viewportPosition} tint={focusHue} shift={shift} />
-      <Scene active={dark} lightMode={false} viewportPosition={viewportPosition} isLocked={isLocked} focusWave={focusWave} shift={shift} />
+      <Bubbles
+        active={light}
+        interactive={isPlayMode || !isLocked}
+        canPop={isPlayMode}
+        viewportPosition={viewportPosition}
+        tint={focusHue}
+        shift={shift}
+      />
+      <Scene
+        active={dark}
+        lightMode={false}
+        viewportPosition={viewportPosition}
+        isLocked={isLocked}
+        focusWave={focusWave}
+        shift={shift}
+      />
       <ModeShift kind={shift} onDone={finish} />
       <Warmup />
       <Ready />
@@ -163,4 +232,4 @@ const Canvas3D = ({ lightMode, viewportPosition, isLocked, focusWave, focusHue =
   );
 };
 
-export default Canvas3D; 
+export default Canvas3D;

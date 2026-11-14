@@ -33,35 +33,72 @@ export const SwarmLight = ({ lightMode }) => {
   const { gl, camera, size } = useThree();
   const geometry = useMemo(() => {
     const g = new THREE.PlaneGeometry(1, 1);
-    g.setAttribute('aColor', new THREE.InstancedBufferAttribute(new Float32Array(MAX * 4), 4));
+    g.setAttribute(
+      'aColor',
+      new THREE.InstancedBufferAttribute(new Float32Array(MAX * 4), 4)
+    );
     return g;
   }, []);
-  const material = useMemo(() => new THREE.ShaderMaterial({
-    vertexShader, fragmentShader, transparent: true, depthWrite: false, depthTest: false, toneMapped: false,
-    uniforms: { lightMode: { value: false } }
-  }), []);
-  const scratch = useMemo(() => ({ m: new THREE.Matrix4(), q: new THREE.Quaternion(), v: new THREE.Vector3(), s: new THREE.Vector3(), z: new THREE.Vector3(0, 0, 1), c: new THREE.Color() }), []);
+  const material = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
+        toneMapped: false,
+        uniforms: { lightMode: { value: false } },
+      }),
+    []
+  );
+  const scratch = useMemo(
+    () => ({
+      m: new THREE.Matrix4(),
+      q: new THREE.Quaternion(),
+      v: new THREE.Vector3(),
+      s: new THREE.Vector3(),
+      z: new THREE.Vector3(0, 0, 1),
+      c: new THREE.Color(),
+    }),
+    []
+  );
 
   useEffect(() => {
     material.uniforms.lightMode.value = lightMode;
     // blending is drawing state, not part of the shader, so this needs no recompile
-    material.blending = lightMode ? THREE.NormalBlending : THREE.AdditiveBlending;
+    material.blending = lightMode
+      ? THREE.NormalBlending
+      : THREE.AdditiveBlending;
   }, [lightMode, material]);
 
   useEffect(() => {
     swarmLight.ready = true;
-    return () => { swarmLight.ready = false; };
+    return () => {
+      swarmLight.ready = false;
+    };
   }, []);
-  useEffect(() => () => { geometry.dispose(); material.dispose(); }, [geometry, material]);
+  useEffect(
+    () => () => {
+      geometry.dispose();
+      material.dispose();
+    },
+    [geometry, material]
+  );
 
   const box = useRef(null);
   useEffect(() => {
-    const read = () => { box.current = gl.domElement.getBoundingClientRect(); };
+    const read = () => {
+      box.current = gl.domElement.getBoundingClientRect();
+    };
     read();
     const watch = new ResizeObserver(read);
     watch.observe(gl.domElement);
     window.addEventListener('resize', read);
-    return () => { watch.disconnect(); window.removeEventListener('resize', read); };
+    return () => {
+      watch.disconnect();
+      window.removeEventListener('resize', read);
+    };
   }, [gl]);
 
   useFrame(() => {
@@ -85,7 +122,13 @@ export const SwarmLight = ({ lightMode }) => {
       scratch.m.compose(scratch.v, scratch.q, scratch.s);
       inst.setMatrixAt(n, scratch.m);
       scratch.c.set(p.hue);
-      colour.setXYZW(n, scratch.c.r, scratch.c.g, scratch.c.b, clamp((now - p.born) / 160, 0, 1));
+      colour.setXYZW(
+        n,
+        scratch.c.r,
+        scratch.c.g,
+        scratch.c.b,
+        clamp((now - p.born) / 160, 0, 1)
+      );
       n += 1;
     });
     inst.count = n;
@@ -93,5 +136,12 @@ export const SwarmLight = ({ lightMode }) => {
     colour.needsUpdate = true;
   });
 
-  return <instancedMesh ref={mesh} args={[geometry, material, MAX]} frustumCulled={false} renderOrder={30} />;
+  return (
+    <instancedMesh
+      ref={mesh}
+      args={[geometry, material, MAX]}
+      frustumCulled={false}
+      renderOrder={30}
+    />
+  );
 };

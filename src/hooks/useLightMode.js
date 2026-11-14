@@ -9,13 +9,13 @@ const useLightMode = (initialValue = false) => {
   const [lightMode, setLightMode] = useState(initialValue);
 
   const toggleLightMode = () => {
-    setLightMode(prev => !prev);
+    setLightMode((prev) => !prev);
   };
 
   return {
     lightMode,
-    toggleLightMode
+    toggleLightMode,
   };
 };
 
-export default useLightMode; 
+export default useLightMode;

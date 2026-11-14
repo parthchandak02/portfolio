@@ -2,14 +2,19 @@ import { useEffect, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import './LabShowcase.css';
 
-const openLabel = (url) => (url.includes('github.com') ? 'View on GitHub' : 'Open live site');
+const openLabel = (url) =>
+  url.includes('github.com') ? 'View on GitHub' : 'Open live site';
 
 /**
  * The Lab: tall portrait tiles on the page itself, with no card around them. Each tile rests under frosted fog;
  * hovering (mouse), focusing (keyboard) or the first tap (touch) lifts the fog to show the
  * project, its description and a link. On touch, the second tap follows the link.
  */
-const LabShowcase = ({ items = [], lightMode = false, revealed = () => undefined }) => {
+const LabShowcase = ({
+  items = [],
+  lightMode = false,
+  revealed = () => undefined,
+}) => {
   const [openId, setOpenId] = useState(null);
 
   // Tapping anywhere outside the open tile puts the fog back
@@ -46,7 +51,12 @@ const LabShowcase = ({ items = [], lightMode = false, revealed = () => undefined
             aria-label={`${item.title}: ${item.description} ${openLabel(item.url)}`}
             onClick={(e) => onTileClick(e, item.title)}
           >
-            <img className="lab-tile__img" src={item.projectImage} alt="" loading="lazy" />
+            <img
+              className="lab-tile__img"
+              src={item.projectImage}
+              alt=""
+              loading="lazy"
+            />
 
             <span className="lab-tile__fog" aria-hidden="true">
               <span className="lab-tile__name">{item.title}</span>

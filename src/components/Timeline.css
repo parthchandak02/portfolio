@@ -65,7 +65,7 @@
 .timeline__filter.active {
   background: var(--color-highlight-bg) !important;
   border-color: var(--color-highlight-border) !important;
-  box-shadow: 
+  box-shadow:
     0 8px 32px var(--color-highlight-shadow),
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     0 0 0 1px var(--color-highlight-border) !important;
@@ -80,7 +80,7 @@
 .timeline__filter.active:hover {
   background: var(--color-highlight-active-bg) !important;
   border-color: var(--color-highlight-active-border) !important;
-  box-shadow: 
+  box-shadow:
     0 12px 48px var(--color-highlight-active-shadow),
     inset 0 1px 0 rgba(255, 255, 255, 0.15),
     0 0 0 2px var(--color-highlight-active-border) !important;
@@ -117,102 +117,258 @@
 }
 
 /* A run of picture cards shown as tiles; an opened one takes the whole row */
-.timeline__tiles { margin-bottom: 32px; }
+.timeline__tiles {
+  margin-bottom: 32px;
+}
 
 /* "Show all": a quiet glass pill under a section that opens on a few of its cards */
 .timeline__more {
-  display: flex; align-items: center; justify-content: center; margin: 14px auto 0; min-height: 40px; padding: 0 20px;
-  border: 0; border-radius: 999px; cursor: pointer;
-  font-family: var(--font-family-label); font-weight: 600; font-size: 0.82rem;
-  background: var(--glass-bg-base); -webkit-backdrop-filter: var(--glass-blur-subtle); backdrop-filter: var(--glass-blur-subtle);
-  box-shadow: inset 0 0 0 1px var(--glass-border-base); transition: background 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 14px auto 0;
+  min-height: 40px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font-family-label);
+  font-weight: 600;
+  font-size: 0.82rem;
+  background: var(--glass-bg-base);
+  -webkit-backdrop-filter: var(--glass-blur-subtle);
+  backdrop-filter: var(--glass-blur-subtle);
+  box-shadow: inset 0 0 0 1px var(--glass-border-base);
+  transition: background 0.25s ease;
 }
-.timeline__more--dark { color: rgba(255, 255, 255, 0.86); }
-.timeline__more--light { color: rgba(20, 20, 24, 0.86); }
-.timeline__more--dark:hover { background: rgba(44, 44, 50, 0.92); }
-.timeline__more--light:hover { background: rgba(244, 244, 246, 0.96); }
-.timeline__more:focus-visible { outline: 2px solid #ff6b35; outline-offset: 3px; }
+.timeline__more--dark {
+  color: rgba(255, 255, 255, 0.86);
+}
+.timeline__more--light {
+  color: rgba(20, 20, 24, 0.86);
+}
+.timeline__more--dark:hover {
+  background: rgba(44, 44, 50, 0.92);
+}
+.timeline__more--light:hover {
+  background: rgba(244, 244, 246, 0.96);
+}
+.timeline__more:focus-visible {
+  outline: 2px solid #ff6b35;
+  outline-offset: 3px;
+}
 /* The cards it brings in condense into their places, as glass does when it opens */
-@keyframes timeline-condense { from { opacity: 0; filter: blur(6px); transform: translateY(-4px) scale(0.99); } }
+@keyframes timeline-condense {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(-4px) scale(0.99);
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
-  .timeline__item[data-revealed] > *, .lab-tile[data-revealed] { animation: timeline-condense 0.64s cubic-bezier(0.32, 0.72, 0, 1) both; }
+  .timeline__item[data-revealed] > *,
+  .lab-tile[data-revealed] {
+    animation: timeline-condense 0.64s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
 }
 
 /* Selected work, ahead of the bands */
-.timeline__selected { margin-bottom: 56px; }
-.timeline__selected-title {
-  display: flex; align-items: center; gap: 10px; margin: 0;
-  font-family: var(--font-family-primary); font-weight: 700; font-size: clamp(1.5rem, 3.2vw, 2.1rem); letter-spacing: -0.02em; line-height: 1.1;
+.timeline__selected {
+  margin-bottom: 56px;
 }
-.timeline--dark .timeline__selected-title { color: rgba(255, 255, 255, 0.82); }
-.timeline--light .timeline__selected-title { color: rgba(20, 20, 24, 0.78); }
-.timeline__selected-mark { --d: 8px; }
-.timeline__selected-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 16px; }
-.timeline__skip { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--font-family-label); font-weight: 600; font-size: 0.9rem; color: inherit; opacity: 0.82; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; transition: opacity 0.2s ease; }
-.timeline__skip:hover, .timeline__skip:focus-visible { opacity: 1; }
-.timeline--dark .timeline__skip { color: #fff; }
-.timeline--light .timeline__skip { color: #141418; }
-.timeline__selected .lab__grid, .timeline__selected .timeline__tiles .lab__grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
-@media (min-width: 900px) { .timeline__selected .lab__grid, .timeline__selected .timeline__tiles .lab__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } }
-.timeline__tiles .timeline__item { margin-bottom: 0; }
+.timeline__selected-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--font-family-primary);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.timeline--dark .timeline__selected-title {
+  color: rgba(255, 255, 255, 0.82);
+}
+.timeline--light .timeline__selected-title {
+  color: rgba(20, 20, 24, 0.78);
+}
+.timeline__selected-mark {
+  --d: 8px;
+}
+.timeline__selected-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 16px;
+}
+.timeline__skip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-family-label);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: inherit;
+  opacity: 0.82;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: opacity 0.2s ease;
+}
+.timeline__skip:hover,
+.timeline__skip:focus-visible {
+  opacity: 1;
+}
+.timeline--dark .timeline__skip {
+  color: #fff;
+}
+.timeline--light .timeline__skip {
+  color: #141418;
+}
+.timeline__selected .lab__grid,
+.timeline__selected .timeline__tiles .lab__grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+@media (min-width: 900px) {
+  .timeline__selected .lab__grid,
+  .timeline__selected .timeline__tiles .lab__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+.timeline__tiles .timeline__item {
+  margin-bottom: 0;
+}
 
 /* An opened tile hands its glass over to one shape that runs from it down into its details (see TileGrid). The
    shape is the very same glass, swapped in within one frame (no transition), so nothing changes but that the tile
    now flows on below. Its picture squares off at the foot to meet it. */
-.tile-grid { position: relative; }
+.tile-grid {
+  position: relative;
+}
 .timeline__tiles .lab-tile {
-  transition: border-color 0.4s ease, box-shadow 0.5s ease, border-radius 0.64s cubic-bezier(0.32, 0.72, 0, 1), clip-path 0.64s cubic-bezier(0.32, 0.72, 0, 1);
+  transition:
+    border-color 0.4s ease,
+    box-shadow 0.5s ease,
+    border-radius 0.64s cubic-bezier(0.32, 0.72, 0, 1),
+    clip-path 0.64s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .timeline__tiles .timeline__item[data-joined] .lab-tile {
   transition: none;
-  background: transparent; border-color: transparent; box-shadow: none;
-  -webkit-backdrop-filter: none; backdrop-filter: none;
-  border-radius: 16px 16px 0 0; clip-path: inset(0 0 -1px 0 round 16px 16px 0 0);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-radius: 16px 16px 0 0;
+  clip-path: inset(0 0 -1px 0 round 16px 16px 0 0);
 }
 /* Joined, a photo melts into the glass on all four sides, and most towards the tile's foot, so nothing marks where
    the tile ends and the neck begins; its shade goes too, and the title reads on the glass there */
-.timeline__tiles .ctile--photo .ctile__img, .timeline__tiles .ctile--photo::before {
-  transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1), filter 0.64s cubic-bezier(0.32, 0.72, 0, 1), transform 0.64s cubic-bezier(0.32, 0.72, 0, 1), -webkit-mask-position 0.64s cubic-bezier(0.32, 0.72, 0, 1), mask-position 0.64s cubic-bezier(0.32, 0.72, 0, 1);
+.timeline__tiles .ctile--photo .ctile__img,
+.timeline__tiles .ctile--photo::before {
+  transition:
+    opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1),
+    filter 0.64s cubic-bezier(0.32, 0.72, 0, 1),
+    transform 0.64s cubic-bezier(0.32, 0.72, 0, 1),
+    -webkit-mask-position 0.64s cubic-bezier(0.32, 0.72, 0, 1),
+    mask-position 0.64s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .timeline__tiles .ctile--photo::before {
-  -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent 75%); mask-image: linear-gradient(to bottom, #000 50%, transparent 75%);
-  -webkit-mask-size: 100% 300%; mask-size: 100% 300%;
-  -webkit-mask-position: 0 0; mask-position: 0 0;
+  -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent 75%);
+  mask-image: linear-gradient(to bottom, #000 50%, transparent 75%);
+  -webkit-mask-size: 100% 300%;
+  mask-size: 100% 300%;
+  -webkit-mask-position: 0 0;
+  mask-position: 0 0;
 }
-.timeline__tiles .timeline__item[data-joined] .ctile--photo::before { -webkit-mask-position: 0 60%; mask-position: 0 60%; }
+.timeline__tiles .timeline__item[data-joined] .ctile--photo::before {
+  -webkit-mask-position: 0 60%;
+  mask-position: 0 60%;
+}
 .timeline__tiles .timeline__item[data-joined] .ctile--photo .ctile__img {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 66%, transparent 100%);
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 6%, #000 66%, transparent 100%);
   -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 66%, transparent 100%);
+  mask-image:
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 6%, #000 66%, transparent 100%);
   mask-composite: intersect;
 }
-.timeline__tiles .timeline__item[data-joined] .ctile--photo .ctile__name { text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7); }
-.lab--light .timeline__item[data-joined] .ctile--veiled.is-open { color: rgba(20, 20, 24, 0.92); }
-.lab--light .timeline__item[data-joined] .ctile--veiled.is-open .ctile__name { text-shadow: 0 1px 10px rgba(255, 255, 255, 0.9); }
+.timeline__tiles .timeline__item[data-joined] .ctile--photo .ctile__name {
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7);
+}
+.lab--light .timeline__item[data-joined] .ctile--veiled.is-open {
+  color: rgba(20, 20, 24, 0.92);
+}
+.lab--light .timeline__item[data-joined] .ctile--veiled.is-open .ctile__name {
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.9);
+}
 /* The year sits on the photo, which still shows at the top */
-.lab--light .timeline__item[data-joined] .ctile--veiled.is-open .ctile__year { color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); }
-.lab--light .timeline__item[data-joined] .ctile--veiled.is-open::before { opacity: 0; }
+.lab--light .timeline__item[data-joined] .ctile--veiled.is-open .ctile__year {
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+.lab--light .timeline__item[data-joined] .ctile--veiled.is-open::before {
+  opacity: 0;
+}
 
 /* The shape: the tiles' own glass, its edge their edge, tinted like them when its tile is the lit one */
 .tab-glass {
-  position: absolute; left: 0; right: 0; top: 0; height: 0; pointer-events: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 0;
+  pointer-events: none;
   background: var(--glass-bg-base);
   transition: box-shadow 0.5s ease;
-  -webkit-backdrop-filter: var(--glass-blur-subtle); backdrop-filter: var(--glass-blur-subtle);
-  clip-path: path("M0 0");
+  -webkit-backdrop-filter: var(--glass-blur-subtle);
+  backdrop-filter: var(--glass-blur-subtle);
+  clip-path: path('M0 0');
 }
 .tile-grid:has(> .timeline__item[data-joined][data-current]) > .tab-glass {
-  box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--tab-hue, transparent) 12%, transparent);
+  box-shadow: inset 0 0 0 100vmax
+    color-mix(in srgb, var(--tab-hue, transparent) 12%, transparent);
 }
-.tab-glass__edge { position: absolute; left: 0; top: 0; width: 100%; height: 0; overflow: visible; pointer-events: none; }
-.tab-glass__edge path { fill: none; stroke: var(--glass-border-base); stroke-width: 1; }
+.tab-glass__edge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.tab-glass__edge path {
+  fill: none;
+  stroke: var(--glass-border-base);
+  stroke-width: 1;
+}
 /* The details row starts right at the tile's foot, so the glass can run straight down from it */
-.tile-drawer { grid-column: 1 / -1; position: relative; isolation: isolate; margin-top: calc(-1 * var(--gap, 12px)); }
-.tile-drawer__inner { position: relative; padding: calc(var(--gap, 12px) + 26px) 28px 28px; }
+.tile-drawer {
+  grid-column: 1 / -1;
+  position: relative;
+  isolation: isolate;
+  margin-top: calc(-1 * var(--gap, 12px));
+}
+.tile-drawer__inner {
+  position: relative;
+  padding: calc(var(--gap, 12px) + 26px) 28px 28px;
+}
 /* The shape carries the glass, so the row's own band of light would show past its edges */
-.tile-drawer .molten__sheen { display: none; }
-@media (max-width: 560px) { .tile-drawer__inner { padding: calc(var(--gap, 10px) + 20px) 18px 22px; } }
-
+.tile-drawer .molten__sheen {
+  display: none;
+}
+@media (max-width: 560px) {
+  .tile-drawer__inner {
+    padding: calc(var(--gap, 10px) + 20px) 18px 22px;
+  }
+}
 
 /* Timeline dots removed for cleaner design */
 
@@ -262,30 +418,30 @@
     /* Maintain bottom spacing for scroll highlighting on mobile */
     padding-bottom: calc(16px + 50vh);
   }
-  
+
   .timeline__filters {
     gap: 8px;
     margin-bottom: 24px;
     margin: 0 0 24px 0;
     padding: 12px 16px;
   }
-  
+
   .timeline__filter {
     padding: 6px 12px;
     font-size: 12px;
   }
-  
+
   /* Removed leftover padding from circular dots */
   .timeline__content {
     padding-left: 0; /* Was 16px - leftover from dots */
   }
-  
+
   .timeline__item {
     padding-left: 0; /* Was 32px - leftover from dots */
   }
-  
+
   /* Removed all .timeline__dot references - no longer needed */
-  
+
   .timeline__empty {
     margin-left: 0; /* Was -32px - compensating for padding that no longer exists */
     padding: 32px 16px;
@@ -294,14 +450,23 @@
 /* The card whose line is lit on the band bar: its glass takes on a little of the band's colour, with no edge */
 .timeline__item[data-current] > .timeline-card,
 .timeline__item[data-current] > .lab-tile {
-  box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--band-hue) 12%, transparent), var(--glass-shadow-base);
+  box-shadow:
+    inset 0 0 0 100vmax color-mix(in srgb, var(--band-hue) 12%, transparent),
+    var(--glass-shadow-base);
 }
 
 /* Wide screens: the work gets the room (cook round 1) */
 @media (min-width: 1200px) {
-  .timeline, .timeline__cards { max-width: 72rem; }
+  .timeline,
+  .timeline__cards {
+    max-width: 72rem;
+  }
 }
 
 /* Show all reads as a solid control, even with the beam behind it (cook round 3) */
-.timeline__more--dark { background: rgba(22, 22, 26, 0.86); }
-.timeline__more--light { background: rgba(255, 255, 255, 0.92); }
+.timeline__more--dark {
+  background: rgba(22, 22, 26, 0.86);
+}
+.timeline__more--light {
+  background: rgba(255, 255, 255, 0.92);
+}

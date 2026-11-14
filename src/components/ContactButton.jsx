@@ -1,16 +1,41 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { animate, stagger } from 'motion';
-import { Calendar, FileText, Github, Linkedin, Mail, MessageCircle, X } from 'lucide-react';
+import {
+  Calendar,
+  FileText,
+  Github,
+  Linkedin,
+  Mail,
+  MessageCircle,
+  X,
+} from 'lucide-react';
 import { glowPrism } from '../hooks/prismGlow';
-import { CLOSE_MS, GLASS_EASE_ARRAY, OPEN_MS, reducedMotion } from '../hooks/glassMotion';
+import {
+  CLOSE_MS,
+  GLASS_EASE_ARRAY,
+  OPEN_MS,
+  reducedMotion,
+} from '../hooks/glassMotion';
 import './ContactButton.css';
 
 const LINKS = [
   { icon: Mail, label: 'Email', url: 'mailto:parthchandak02@gmail.com' },
-  { icon: Linkedin, label: 'LinkedIn', url: 'https://linkedin.com/in/parthchandak02' },
+  {
+    icon: Linkedin,
+    label: 'LinkedIn',
+    url: 'https://linkedin.com/in/parthchandak02',
+  },
   { icon: Github, label: 'GitHub', url: 'https://github.com/parthchandak02' },
-  { icon: FileText, label: 'Resume', url: 'https://tiny.cc/parthchandakresume' },
-  { icon: Calendar, label: 'Book a meeting', url: 'https://tiny.cc/parthchandakbook' }
+  {
+    icon: FileText,
+    label: 'Resume',
+    url: 'https://tiny.cc/parthchandakresume',
+  },
+  {
+    icon: Calendar,
+    label: 'Book a meeting',
+    url: 'https://tiny.cc/parthchandakbook',
+  },
 ];
 
 const CARD_W = 240; // px, or the window less its gutters on narrow phones
@@ -51,21 +76,43 @@ const ContactButton = ({ lightMode = false, away = false }) => {
     const items = card.querySelectorAll('.contact__title, .contact__links li');
 
     if (prefersReducedMotion()) {
-      Object.assign(shell.style, { width: `${target.width}px`, height: `${target.height}px`, borderRadius: `${target.borderRadius}px` });
-      items.forEach((el) => { el.style.opacity = to ? 1 : 0; });
-      if (!to) Object.assign(shell.style, { width: '', height: '', borderRadius: '' });
+      Object.assign(shell.style, {
+        width: `${target.width}px`,
+        height: `${target.height}px`,
+        borderRadius: `${target.borderRadius}px`,
+      });
+      items.forEach((el) => {
+        el.style.opacity = to ? 1 : 0;
+      });
+      if (!to)
+        Object.assign(shell.style, { width: '', height: '', borderRadius: '' });
       return;
     }
 
     if (to) {
       runningRef.current.push(
         animate(shell, target, OPEN),
-        animate(items, { opacity: [0, 1], y: [6, 0], filter: ['blur(10px)', 'blur(0px)'] }, { delay: stagger(0.05, { startDelay: 0.14 }), duration: 0.56, ease: GLASS_EASE_ARRAY })
+        animate(
+          items,
+          { opacity: [0, 1], y: [6, 0], filter: ['blur(10px)', 'blur(0px)'] },
+          {
+            delay: stagger(0.05, { startDelay: 0.14 }),
+            duration: 0.56,
+            ease: GLASS_EASE_ARRAY,
+          }
+        )
       );
     } else {
       // The glass closes over the links as they fade, the open played backwards
       const shrink = animate(shell, target, CLOSE);
-      runningRef.current.push(animate(items, { opacity: 0, y: 4, filter: 'blur(8px)' }, { duration: 0.2 }), shrink);
+      runningRef.current.push(
+        animate(
+          items,
+          { opacity: 0, y: 4, filter: 'blur(8px)' },
+          { duration: 0.2 }
+        ),
+        shrink
+      );
       // Back to the stylesheet's size once closed, so the button follows the layout again
       shrink.then(() => {
         if (shellRef.current?.classList.contains('is-open')) return;
@@ -74,17 +121,23 @@ const ContactButton = ({ lightMode = false, away = false }) => {
     }
   }, []);
 
-  const set = useCallback((to) => {
-    setOpen(to);
-    morph(to);
-    if (to) glowPrism();
-  }, [morph]);
+  const set = useCallback(
+    (to) => {
+      setOpen(to);
+      morph(to);
+      if (to) glowPrism();
+    },
+    [morph]
+  );
 
   // Escape or a tap anywhere else closes it; a resize while open re-fits the card
   useEffect(() => {
     if (!open) return undefined;
     const onKey = (e) => {
-      if (e.key === 'Escape') { set(false); buttonRef.current?.focus(); }
+      if (e.key === 'Escape') {
+        set(false);
+        buttonRef.current?.focus();
+      }
     };
     const onDown = (e) => {
       if (!shellRef.current?.contains(e.target)) set(false);
@@ -103,14 +156,32 @@ const ContactButton = ({ lightMode = false, away = false }) => {
   useEffect(() => () => runningRef.current.forEach((c) => c.stop()), []);
 
   return (
-    <div className={`contact ${lightMode ? 'contact--light' : 'contact--dark'}${away ? ' contact--away' : ''}`} inert={away}>
+    <div
+      className={`contact ${lightMode ? 'contact--light' : 'contact--dark'}${away ? ' contact--away' : ''}`}
+      inert={away}
+    >
       <div ref={shellRef} className={`contact__shell${open ? ' is-open' : ''}`}>
-        <div ref={cardRef} id="contact-card" className="contact__card" role="dialog" aria-label="Contact" aria-hidden={!open} inert={!open}>
+        <div
+          ref={cardRef}
+          id="contact-card"
+          className="contact__card"
+          role="dialog"
+          aria-label="Contact"
+          aria-hidden={!open}
+          inert={!open}
+        >
           <ul className="contact__links">
             {LINKS.map(({ icon: Icon, label, url }) => (
               <li key={label}>
-                <a href={url} {...(url.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
-                  <span className="contact__icon"><Icon size={16} strokeWidth={1.75} /></span>
+                <a
+                  href={url}
+                  {...(url.startsWith('http')
+                    ? { target: '_blank', rel: 'noopener noreferrer' }
+                    : {})}
+                >
+                  <span className="contact__icon">
+                    <Icon size={16} strokeWidth={1.75} />
+                  </span>
                   <span className="contact__text">{label}</span>
                 </a>
               </li>
@@ -128,8 +199,16 @@ const ContactButton = ({ lightMode = false, away = false }) => {
           aria-controls="contact-card"
           onClick={() => set(!open)}
         >
-          <MessageCircle className="contact__glyph contact__glyph--chat" size={20} strokeWidth={1.75} />
-          <X className="contact__glyph contact__glyph--close" size={20} strokeWidth={1.75} />
+          <MessageCircle
+            className="contact__glyph contact__glyph--chat"
+            size={20}
+            strokeWidth={1.75}
+          />
+          <X
+            className="contact__glyph contact__glyph--close"
+            size={20}
+            strokeWidth={1.75}
+          />
         </button>
       </div>
     </div>

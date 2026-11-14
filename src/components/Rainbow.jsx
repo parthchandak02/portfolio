@@ -1,7 +1,7 @@
-import { forwardRef, useMemo, useRef } from 'react'
-import { extend, useFrame, useThree } from '@react-three/fiber'
-import { shaderMaterial } from '@react-three/drei'
-import * as THREE from 'three'
+import { forwardRef, useMemo, useRef } from 'react';
+import { extend, useFrame, useThree } from '@react-three/fiber';
+import { shaderMaterial } from '@react-three/drei';
+import * as THREE from 'three';
 
 // Based on
 // "Improving the Rainbow" by Alan Zucconi: https://www.alanzucconi.com/2017/07/15/improving-the-rainbow-2/
@@ -23,7 +23,7 @@ const RainbowMaterial = shaderMaterial(
     pulseAmt: 0,
     pulseWave: 0,
     flash: 0,
-    dispersion: 0.4
+    dispersion: 0.4,
   },
   /*glsl*/ ` varying vec2 vUv;
     void main() {
@@ -142,55 +142,80 @@ const RainbowMaterial = shaderMaterial(
       }
       #include <colorspace_fragment>
     }`
-)
+);
 
-extend({ RainbowMaterial })
+extend({ RainbowMaterial });
 
 // The fan covers a narrow wedge of the plane the shader is written for: from the plane's centre, where the light
 // leaves the prism, out to its edge, within a quarter of the distance either side. Drawing only that wedge (with
 // a margin) instead of the whole plane, which is larger than the screen, saves most of the shader's work.
 const WEDGE = 0.4; // width at the far end, either side, as a share of the length; the colours reach 0.33 at the widest spread
 const wedgeGeometry = () => {
-  const g = new THREE.BufferGeometry()
-  const pts = [0, 0, 0, 0.5, -0.5 * WEDGE, 0, 0.5, 0.5 * WEDGE, 0]
-  g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3))
-  g.setAttribute('uv', new THREE.Float32BufferAttribute([0.5, 0.5, 1, 0.5 - 0.5 * WEDGE, 1, 0.5 + 0.5 * WEDGE], 2))
-  return g
-}
+  const g = new THREE.BufferGeometry();
+  const pts = [0, 0, 0, 0.5, -0.5 * WEDGE, 0, 0.5, 0.5 * WEDGE, 0];
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+  g.setAttribute(
+    'uv',
+    new THREE.Float32BufferAttribute(
+      [0.5, 0.5, 1, 0.5 - 0.5 * WEDGE, 1, 0.5 + 0.5 * WEDGE],
+      2
+    )
+  );
+  return g;
+};
 
-export const Rainbow = forwardRef(({ lightMode, startRadius = 0, endRadius = 0.5, emissiveIntensity = 2.5, fade = 0.25, ...props }, fRef) => {
-  const material = useRef(null)
-  const geometry = useMemo(wedgeGeometry, [])
-  const { width, height } = useThree((state) => state.viewport)
-  // calculate the maximum length the rainbow has to have to reach all screen corners
-  const length = Math.hypot(width, height) + 1.5 // add 1.5 to due motion of the rainbow
-  
-  useFrame((state, delta) => {
-    if (material.current) {
-      material.current.time += delta * material.current.speed;
-      // Update the lightMode uniform
-      material.current.lightMode = lightMode;
-    }
-  });
-  
-  // Dynamic blending based on background mode
-  // Use additive for dark backgrounds (traditional), normal for light backgrounds (shader-handled)
-  const blendingMode = lightMode ? THREE.NormalBlending : THREE.AdditiveBlending;
-  
-  return (
-    <mesh ref={fRef} scale={[length, length, 1]} geometry={geometry} {...props}>
-      <rainbowMaterial 
-        ref={material} 
-        key={RainbowMaterial.key} 
-        fade={fade} 
-        startRadius={startRadius} 
-        endRadius={endRadius} 
-        ratio={1} 
-        toneMapped={false}
-        blending={blendingMode}
-        transparent={true}
-        lightMode={lightMode}
-      />
-    </mesh>
-  )
-})
+export const Rainbow = forwardRef(
+  (
+    {
+      lightMode,
+      startRadius = 0,
+      endRadius = 0.5,
+      emissiveIntensity = 2.5,
+      fade = 0.25,
+      ...props
+    },
+    fRef
+  ) => {
+    const material = useRef(null);
+    const geometry = useMemo(wedgeGeometry, []);
+    const { width, height } = useThree((state) => state.viewport);
+    // calculate the maximum length the rainbow has to have to reach all screen corners
+    const length = Math.hypot(width, height) + 1.5; // add 1.5 to due motion of the rainbow
+
+    useFrame((state, delta) => {
+      if (material.current) {
+        material.current.time += delta * material.current.speed;
+        // Update the lightMode uniform
+        material.current.lightMode = lightMode;
+      }
+    });
+
+    // Dynamic blending based on background mode
+    // Use additive for dark backgrounds (traditional), normal for light backgrounds (shader-handled)
+    const blendingMode = lightMode
+      ? THREE.NormalBlending
+      : THREE.AdditiveBlending;
+
+    return (
+      <mesh
+        ref={fRef}
+        scale={[length, length, 1]}
+        geometry={geometry}
+        {...props}
+      >
+        <rainbowMaterial
+          ref={material}
+          key={RainbowMaterial.key}
+          fade={fade}
+          startRadius={startRadius}
+          endRadius={endRadius}
+          ratio={1}
+          toneMapped={false}
+          blending={blendingMode}
+          transparent={true}
+          lightMode={lightMode}
+        />
+      </mesh>
+    );
+  }
+);

@@ -1,5 +1,12 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { CLOSE_MS, CONDENSE, GLASS_CLOSE_EASE, GLASS_EASE, OPEN_MS, reducedMotion } from '../hooks/glassMotion';
+import {
+  CLOSE_MS,
+  CONDENSE,
+  GLASS_CLOSE_EASE,
+  GLASS_EASE,
+  OPEN_MS,
+  reducedMotion,
+} from '../hooks/glassMotion';
 import { glassSound } from '../hooks/glassSound';
 import './Molten.css';
 
@@ -9,7 +16,15 @@ import './Molten.css';
  * the glass flows to the new height while the old content melts away and the new condenses in its place; closing melts it back to
  * nothing before it leaves the page, then calls `onClosed`.
  */
-const Molten = ({ open, contentKey, className = '', style, children, onClosed, ...rest }) => {
+const Molten = ({
+  open,
+  contentKey,
+  className = '',
+  style,
+  children,
+  onClosed,
+  ...rest
+}) => {
   const outer = useRef(null);
   const inner = useRef(null);
   const sheen = useRef(null);
@@ -30,14 +45,22 @@ const Molten = ({ open, contentKey, className = '', style, children, onClosed, .
     flowing.current?.cancel();
     height.current = to;
     if (Math.abs(start - to) < 1 || reducedMotion()) return;
-    flowing.current = o.animate([{ height: `${start}px` }, { height: `${to}px` }], { duration: OPEN_MS, easing: GLASS_EASE });
+    flowing.current = o.animate(
+      [{ height: `${start}px` }, { height: `${to}px` }],
+      { duration: OPEN_MS, easing: GLASS_EASE }
+    );
   };
   // The height the glass needs for its content: the content plus its own border (sizes are border-box)
-  const fit = () => inner.current.offsetHeight + (outer.current.offsetHeight - outer.current.clientHeight);
+  const fit = () =>
+    inner.current.offsetHeight +
+    (outer.current.offsetHeight - outer.current.clientHeight);
   if (open && mounted && contentKey !== shownKey.current) {
     setGhost({ key: shownKey.current, children: lastChildren.current });
   }
-  if (open) { lastChildren.current = children; shownKey.current = contentKey; }
+  if (open) {
+    lastChildren.current = children;
+    shownKey.current = contentKey;
+  }
 
   if (open && !mounted) setMounted(true);
 
@@ -52,8 +75,20 @@ const Molten = ({ open, contentKey, className = '', style, children, onClosed, .
     flowing.current?.cancel();
     flow(fit(), from);
     if (reducedMotion()) return;
-    inner.current?.animate(CONDENSE, { duration: OPEN_MS + 80, delay: from ? 40 : 90, easing: GLASS_EASE, fill: 'backwards' });
-    if (!from) sheen.current?.animate([{ transform: 'translateY(-100%)', opacity: 0.9 }, { transform: 'translateY(100%)', opacity: 0 }], { duration: OPEN_MS + 260, easing: GLASS_EASE });
+    inner.current?.animate(CONDENSE, {
+      duration: OPEN_MS + 80,
+      delay: from ? 40 : 90,
+      easing: GLASS_EASE,
+      fill: 'backwards',
+    });
+    if (!from)
+      sheen.current?.animate(
+        [
+          { transform: 'translateY(-100%)', opacity: 0.9 },
+          { transform: 'translateY(100%)', opacity: 0 },
+        ],
+        { duration: OPEN_MS + 260, easing: GLASS_EASE }
+      );
   }, [open, mounted, contentKey]);
 
   // The old content melts away where it was, as the new condenses in
@@ -61,8 +96,15 @@ const Molten = ({ open, contentKey, className = '', style, children, onClosed, .
     const g = ghostEl.current;
     if (!ghost || !g) return undefined;
     g.inert = true;
-    if (reducedMotion()) { setGhost(null); return undefined; }
-    const a = g.animate(CONDENSE.slice().reverse(), { duration: CLOSE_MS, easing: GLASS_CLOSE_EASE, fill: 'forwards' });
+    if (reducedMotion()) {
+      setGhost(null);
+      return undefined;
+    }
+    const a = g.animate(CONDENSE.slice().reverse(), {
+      duration: CLOSE_MS,
+      easing: GLASS_CLOSE_EASE,
+      fill: 'forwards',
+    });
     a.onfinish = () => setGhost((cur) => (cur === ghost ? null : cur));
     return () => a.cancel();
   }, [ghost]);
@@ -87,19 +129,49 @@ const Molten = ({ open, contentKey, className = '', style, children, onClosed, .
     glassSound('close');
     flowing.current?.cancel();
     height.current = 0;
-    if (reducedMotion()) { setMounted(false); onClosed?.(); return undefined; }
-    inner.current?.animate(CONDENSE.slice().reverse(), { duration: CLOSE_MS, easing: GLASS_CLOSE_EASE, fill: 'forwards' });
-    const a = o.animate([{ height: `${from}px`, opacity: 1 }, { height: '0px', opacity: 0 }], { duration: CLOSE_MS, easing: GLASS_CLOSE_EASE, fill: 'forwards' });
+    if (reducedMotion()) {
+      setMounted(false);
+      onClosed?.();
+      return undefined;
+    }
+    inner.current?.animate(CONDENSE.slice().reverse(), {
+      duration: CLOSE_MS,
+      easing: GLASS_CLOSE_EASE,
+      fill: 'forwards',
+    });
+    const a = o.animate(
+      [
+        { height: `${from}px`, opacity: 1 },
+        { height: '0px', opacity: 0 },
+      ],
+      { duration: CLOSE_MS, easing: GLASS_CLOSE_EASE, fill: 'forwards' }
+    );
     closing.current = a;
-    a.onfinish = () => { if (closing.current === a) { setMounted(false); onClosed?.(); } };
+    a.onfinish = () => {
+      if (closing.current === a) {
+        setMounted(false);
+        onClosed?.();
+      }
+    };
     return undefined;
   }, [open, mounted]);
 
   if (!mounted) return null;
   return (
     <div ref={outer} className={`molten ${className}`} style={style} {...rest}>
-      <div ref={inner} className="molten__inner">{open ? children : lastChildren.current}</div>
-      {ghost && <div key={ghost.key} ref={ghostEl} className="molten__ghost" aria-hidden="true">{ghost.children}</div>}
+      <div ref={inner} className="molten__inner">
+        {open ? children : lastChildren.current}
+      </div>
+      {ghost && (
+        <div
+          key={ghost.key}
+          ref={ghostEl}
+          className="molten__ghost"
+          aria-hidden="true"
+        >
+          {ghost.children}
+        </div>
+      )}
       <span ref={sheen} className="molten__sheen" aria-hidden="true" />
     </div>
   );

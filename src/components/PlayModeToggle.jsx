@@ -1,4 +1,11 @@
-import { Rainbow, Glasses, Pyramid, FileUser, Bubbles, Droplet } from 'lucide-react';
+import {
+  Rainbow,
+  Glasses,
+  Pyramid,
+  FileUser,
+  Bubbles,
+  Droplet,
+} from 'lucide-react';
 import './PlayModeToggle.css';
 
 // The playground's toy: the prism in dark mode, soap bubbles in light mode
@@ -32,9 +39,11 @@ const PlayModeToggle = ({ isPlayMode, onToggle, lightMode = false }) => {
           </span>
         )}
       </span>
-      <span className="ui-hint" aria-hidden="true">{isPlayMode ? 'Back to the portfolio' : play}</span>
+      <span className="ui-hint" aria-hidden="true">
+        {isPlayMode ? 'Back to the portfolio' : play}
+      </span>
     </button>
   );
 };
 
-export default PlayModeToggle; 
+export default PlayModeToggle;

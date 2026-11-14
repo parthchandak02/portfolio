@@ -6,16 +6,12 @@ const Layout = ({ children, darkMode = false, leftSidebar }) => {
   return (
     <div className={`layout ${darkMode ? 'layout--dark' : 'layout--light'}`}>
       {/* Left sidebar container */}
-      {leftSidebar && (
-        <div className="layout__left-sidebar">
-          {leftSidebar}
-        </div>
-      )}
-      
+      {leftSidebar && <div className="layout__left-sidebar">{leftSidebar}</div>}
+
       {/* Main content */}
       {children}
     </div>
   );
 };
 
-export default Layout; 
+export default Layout;

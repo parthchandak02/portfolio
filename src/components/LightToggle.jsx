@@ -11,9 +11,11 @@ const LightToggle = ({ lightMode, onToggle }) => {
       <span className="light-toggle__icon">
         {lightMode ? <Moon size={20} /> : <Sun size={20} />}
       </span>
-      <span className="ui-hint" aria-hidden="true">{lightMode ? 'Dark mode' : 'Light mode'}</span>
+      <span className="ui-hint" aria-hidden="true">
+        {lightMode ? 'Dark mode' : 'Light mode'}
+      </span>
     </button>
   );
 };
 
-export default LightToggle; 
+export default LightToggle;

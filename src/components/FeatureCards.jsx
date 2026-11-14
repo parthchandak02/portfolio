@@ -11,23 +11,65 @@ const useFirstSight = (ref, onSight) => {
   useEffect(() => {
     const el = ref.current;
     if (!el) return undefined;
-    const io = new IntersectionObserver((entries) => {
-      if (!entries[0].isIntersecting) return;
-      io.disconnect();
-      fn.current();
-    }, { threshold: 0.55 });
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting) return;
+        io.disconnect();
+        fn.current();
+      },
+      { threshold: 0.55 }
+    );
     io.observe(el);
     return () => io.disconnect();
   }, [ref]);
 };
 
 const SWATCHES = [
-  { name: 'Blue', hue: '#6a8cff', notes: [[659, 0], [880, 0.26], [988, 0.52]] },
-  { name: 'Pink', hue: '#ff6b9d', notes: [[880, 0], [740, 0.26], [988, 0.52]] },
-  { name: 'Teal', hue: '#35d6c0', notes: [[587, 0], [740, 0.26], [880, 0.52]] },
-  { name: 'Amber', hue: '#ffb02e', notes: [[784, 0], [988, 0.26], [1175, 0.52]] }
+  {
+    name: 'Blue',
+    hue: '#6a8cff',
+    notes: [
+      [659, 0],
+      [880, 0.26],
+      [988, 0.52],
+    ],
+  },
+  {
+    name: 'Pink',
+    hue: '#ff6b9d',
+    notes: [
+      [880, 0],
+      [740, 0.26],
+      [988, 0.52],
+    ],
+  },
+  {
+    name: 'Teal',
+    hue: '#35d6c0',
+    notes: [
+      [587, 0],
+      [740, 0.26],
+      [880, 0.52],
+    ],
+  },
+  {
+    name: 'Amber',
+    hue: '#ffb02e',
+    notes: [
+      [784, 0],
+      [988, 0.26],
+      [1175, 0.52],
+    ],
+  },
 ];
-const PULSE = [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 0.3, offset: 0.4 }, { opacity: 1, offset: 0.6 }, { opacity: 0.3, offset: 0.8 }, { opacity: 1 }];
+const PULSE = [
+  { opacity: 0 },
+  { opacity: 1, offset: 0.2 },
+  { opacity: 0.3, offset: 0.4 },
+  { opacity: 1, offset: 0.6 },
+  { opacity: 0.3, offset: 0.8 },
+  { opacity: 1 },
+];
 
 // Find My Zoox: the glass calls out once with a light and three notes of its own. Each colour has its own notes,
 // the way each rider's car would. Abstract on purpose: it is not the vehicle's real light pattern.
@@ -42,8 +84,15 @@ const LightMoment = ({ card }) => {
   useFirstSight(card, () => call(SWATCHES[0]));
   return (
     <>
-      <span ref={glow} className="fcard__glow" style={{ '--light': hue.hue }} aria-hidden="true" />
-      <span className="fcard__note">Example light and chime, not the real ones</span>
+      <span
+        ref={glow}
+        className="fcard__glow"
+        style={{ '--light': hue.hue }}
+        aria-hidden="true"
+      />
+      <span className="fcard__note">
+        Example light and chime, not the real ones
+      </span>
       <div className="fcard__swatches" role="group" aria-label="Try a color">
         {SWATCHES.map((s) => (
           <button
@@ -53,7 +102,10 @@ const LightMoment = ({ card }) => {
             style={{ '--swatch': s.hue }}
             aria-label={s.name}
             aria-pressed={hue === s}
-            onClick={() => { setHue(s); call(s); }}
+            onClick={() => {
+              setHue(s);
+              call(s);
+            }}
           />
         ))}
       </div>
@@ -68,29 +120,48 @@ const RobotMoment = ({ card, lightMode }) => {
   const light = useRef(lightMode);
   light.current = lightMode;
   const seen = useRef(false);
-  const start = () => { if (reducedMotion()) robot.current?.rest(); else robot.current?.walkIn(); };
+  const start = () => {
+    if (reducedMotion()) robot.current?.rest();
+    else robot.current?.walkIn();
+  };
 
   useEffect(() => {
     const el = canvas.current;
     let live = true;
-    const io = new IntersectionObserver((entries) => {
-      if (!entries[0].isIntersecting) return;
-      io.disconnect();
-      import('./centiSeedRobot').then(({ createCentiSeed }) => {
-        if (!live) return;
-        try { robot.current = createCentiSeed(el, { lightMode: light.current }); }
-        catch { return; } // no WebGL: the card still reads without it
-        el.dataset.ready = '';
-        if (seen.current) start();
-      });
-    }, { rootMargin: '400px 0px' });
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting) return;
+        io.disconnect();
+        import('./centiSeedRobot').then(({ createCentiSeed }) => {
+          if (!live) return;
+          try {
+            robot.current = createCentiSeed(el, { lightMode: light.current });
+          } catch {
+            return;
+          } // no WebGL: the card still reads without it
+          el.dataset.ready = '';
+          if (seen.current) start();
+        });
+      },
+      { rootMargin: '400px 0px' }
+    );
     io.observe(el);
-    return () => { live = false; io.disconnect(); robot.current?.dispose(); robot.current = null; };
+    return () => {
+      live = false;
+      io.disconnect();
+      robot.current?.dispose();
+      robot.current = null;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => { robot.current?.setLightMode(lightMode); }, [lightMode]);
-  useFirstSight(card, () => { seen.current = true; start(); });
+  useEffect(() => {
+    robot.current?.setLightMode(lightMode);
+  }, [lightMode]);
+  useFirstSight(card, () => {
+    seen.current = true;
+    start();
+  });
 
   useEffect(() => {
     const el = card.current;
@@ -140,7 +211,13 @@ const AudioMoment = ({ card, lightMode }) => {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
     const w = cv.clientWidth;
     const h = cv.clientHeight;
-    if (cv.width !== Math.round(w * ratio) || cv.height !== Math.round(h * ratio)) { cv.width = Math.round(w * ratio); cv.height = Math.round(h * ratio); }
+    if (
+      cv.width !== Math.round(w * ratio) ||
+      cv.height !== Math.round(h * ratio)
+    ) {
+      cv.width = Math.round(w * ratio);
+      cv.height = Math.round(h * ratio);
+    }
     const x = cv.getContext('2d');
     x.setTransform(ratio, 0, 0, ratio, 0, 0);
     x.clearRect(0, 0, w, h);
@@ -149,12 +226,20 @@ const AudioMoment = ({ card, lightMode }) => {
     const ink = dark.current ? 'rgba(255,255,255,0.72)' : 'rgba(20,20,24,0.62)';
     for (let i = 0; i < n; i += 1) {
       const px = ((i + 0.5) * w) / n;
-      const wave = 0.3 + 0.7 * Math.abs(Math.sin(i * 0.42 + t / 620) * Math.sin(i * 0.13 - t / 900));
+      const wave =
+        0.3 +
+        0.7 *
+          Math.abs(Math.sin(i * 0.42 + t / 620) * Math.sin(i * 0.13 - t / 900));
       const a = wave * s.music * mid * 0.72;
       x.fillStyle = ink;
       x.fillRect(px - 1, mid - a, 2, a * 2);
       if (s.other > 0.02) {
-        const b = s.other * (0.4 + 0.6 * Math.abs(Math.sin(i * 1.3 + t / 150))) * mid * 0.9 * Math.max(0, 1 - Math.abs(i - n * 0.5) / (n * 0.3));
+        const b =
+          s.other *
+          (0.4 + 0.6 * Math.abs(Math.sin(i * 1.3 + t / 150))) *
+          mid *
+          0.9 *
+          Math.max(0, 1 - Math.abs(i - n * 0.5) / (n * 0.3));
         x.fillStyle = '#ff5a52';
         x.fillRect(px + 1.5, mid - b, 2, b * 2);
       }
@@ -170,7 +255,10 @@ const AudioMoment = ({ card, lightMode }) => {
     };
     frame.current = requestAnimationFrame(tick);
   };
-  const clear = () => { timers.current.forEach(clearTimeout); timers.current = []; };
+  const clear = () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+  };
   const set = (m) => {
     state.current.mode = m;
     setMode(m);
@@ -180,11 +268,31 @@ const AudioMoment = ({ card, lightMode }) => {
     clear();
     if (!pad.current) pad.current = glassPad();
     set(m);
-    if (m === 'nav') glassNotes([[880, 0], [1109, 0.2]], { gain: 0.06, decay: 0.8 });
-    if (m === 'urgent') glassNotes([[1319, 0], [1319, 0.22], [1319, 0.44]], { gain: 0.07, decay: 0.4, from: 1 });
+    if (m === 'nav')
+      glassNotes(
+        [
+          [880, 0],
+          [1109, 0.2],
+        ],
+        { gain: 0.06, decay: 0.8 }
+      );
+    if (m === 'urgent')
+      glassNotes(
+        [
+          [1319, 0],
+          [1319, 0.22],
+          [1319, 0.44],
+        ],
+        { gain: 0.07, decay: 0.4, from: 1 }
+      );
     run(performance.now() + 4200);
     timers.current.push(setTimeout(() => set('none'), 2000));
-    timers.current.push(setTimeout(() => { pad.current?.stop(); pad.current = null; }, 3400));
+    timers.current.push(
+      setTimeout(() => {
+        pad.current?.stop();
+        pad.current = null;
+      }, 3400)
+    );
   };
 
   // First sight plays it silently, so the idea shows even without a press
@@ -195,19 +303,44 @@ const AudioMoment = ({ card, lightMode }) => {
     timers.current.push(setTimeout(() => set('none'), 4300));
     run(performance.now() + 5600);
   });
-  useEffect(() => { requestAnimationFrame(draw); }, [lightMode]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => () => { clear(); cancelAnimationFrame(frame.current); pad.current?.stop(); }, []);
+  useEffect(() => {
+    requestAnimationFrame(draw);
+  }, [lightMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(
+    () => () => {
+      clear();
+      cancelAnimationFrame(frame.current);
+      pad.current?.stop();
+    },
+    []
+  );
 
   return (
     <div className="fcard__audio">
       <canvas ref={canvas} className="fcard__wave" aria-hidden="true" />
       <div className="fcard__audio-row">
         <span className="fcard__level" aria-live="polite">
-          {mode === 'none' ? 'Example sounds. Music at full volume' : mode === 'nav' ? 'Example sounds. Navigation prompt: music steps back' : 'Example sounds. Urgent alert: music almost silent'}
+          {mode === 'none'
+            ? 'Example sounds. Music at full volume'
+            : mode === 'nav'
+              ? 'Example sounds. Navigation prompt: music steps back'
+              : 'Example sounds. Urgent alert: music almost silent'}
         </span>
         <span className="fcard__actions">
-          <button type="button" className="fcard__action" onClick={() => hear('nav')}>Navigation prompt</button>
-          <button type="button" className="fcard__action" onClick={() => hear('urgent')}>Urgent alert</button>
+          <button
+            type="button"
+            className="fcard__action"
+            onClick={() => hear('nav')}
+          >
+            Navigation prompt
+          </button>
+          <button
+            type="button"
+            className="fcard__action"
+            onClick={() => hear('urgent')}
+          >
+            Urgent alert
+          </button>
         </span>
       </div>
     </div>
@@ -217,7 +350,10 @@ const AudioMoment = ({ card, lightMode }) => {
 // CALarm: a pill opens into the app's flip clock, counts down, rings once, then keeps the visitor's own time
 const clockNow = () => {
   const d = new Date();
-  return [(d.getHours() % 12 || 12).toString(), String(d.getMinutes()).padStart(2, '0')];
+  return [
+    (d.getHours() % 12 || 12).toString(),
+    String(d.getMinutes()).padStart(2, '0'),
+  ];
 };
 const AlarmMoment = ({ card }) => {
   const [digits, setDigits] = useState(clockNow);
@@ -231,13 +367,36 @@ const AlarmMoment = ({ card }) => {
     at(800, () => setPhase('open'));
     at(1500, () => setDigits(['0', '02']));
     at(2200, () => setDigits(['0', '01']));
-    at(2900, () => { setDigits(['0', '00']); setPhase('ring'); glassNotes([[1319, 0], [1568, 0.12]], { gain: 0.04, decay: 0.4, from: 1 }); });
-    at(4300, () => { setPhase('rest'); setDigits(clockNow()); });
+    at(2900, () => {
+      setDigits(['0', '00']);
+      setPhase('ring');
+      glassNotes(
+        [
+          [1319, 0],
+          [1568, 0.12],
+        ],
+        { gain: 0.04, decay: 0.4, from: 1 }
+      );
+    });
+    at(4300, () => {
+      setPhase('rest');
+      setDigits(clockNow());
+    });
   });
   useEffect(() => {
-    const t = setInterval(() => setPhase((p) => { if (p === 'rest') setDigits(clockNow()); return p; }), 20000);
+    const t = setInterval(
+      () =>
+        setPhase((p) => {
+          if (p === 'rest') setDigits(clockNow());
+          return p;
+        }),
+      20000
+    );
     const list = timers.current;
-    return () => { clearInterval(t); list.forEach(clearTimeout); };
+    return () => {
+      clearInterval(t);
+      list.forEach(clearTimeout);
+    };
   }, []);
   const [h, m] = digits;
   return (
@@ -258,7 +417,10 @@ const FeatureCard = ({ feature, lightMode, open, onOpen }) => {
   const card = useRef(null);
   const { moment } = feature;
   return (
-    <div ref={card} className={`lab-tile fcard fcard--${moment}${open ? ' is-open' : ''}`}>
+    <div
+      ref={card}
+      className={`lab-tile fcard fcard--${moment}${open ? ' is-open' : ''}`}
+    >
       {moment === 'robot' && <RobotMoment card={card} lightMode={lightMode} />}
       {moment === 'light' && <LightMoment card={card} />}
       <button
@@ -281,8 +443,12 @@ const FeatureCard = ({ feature, lightMode, open, onOpen }) => {
 
 // After the last card, a quiet heading where the full portfolio starts (Selected work's skip link lands here)
 export const PortfolioDoor = ({ lightMode }) => (
-  <h2 id="portfolio" className={`fdoor ${lightMode ? 'fdoor--light' : 'fdoor--dark'}`}>
-    <SelectedMark on className="timeline__selected-mark" />The full portfolio
+  <h2
+    id="portfolio"
+    className={`fdoor ${lightMode ? 'fdoor--light' : 'fdoor--dark'}`}
+  >
+    <SelectedMark on className="timeline__selected-mark" />
+    The full portfolio
   </h2>
 );
 

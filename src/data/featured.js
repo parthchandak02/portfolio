@@ -7,29 +7,30 @@ export const FEATURED = [
     name: 'Find My Zoox',
     kind: 'Zoox · 2026',
     line: 'Riders find their robotaxi by its own light and sound.',
-    moment: 'light'
+    moment: 'light',
   },
   {
     title: 'Centi-seed, a Sunlight-Seeking Robot',
     name: 'Centi-seed',
     kind: '1st place, Crimson Code · 2018',
     line: 'A robot that walks its plants to the sun. Tap below to lead it.',
-    moment: 'robot'
+    moment: 'robot',
   },
   {
     title: 'Audio Prioritization (US20260003563A1)',
     name: 'Audio prioritization',
     kind: 'Published patent application · 2026',
     line: 'How a robotaxi picks the sound you hear first. Try it.',
-    moment: 'audio'
+    moment: 'audio',
   },
   {
     title: 'Calendar and Alarm Productivity System',
     name: 'CALarm',
     kind: 'iOS app · 2024',
     line: 'Your calendar, as alarms that ring through Silent.',
-    moment: 'alarm'
-  }
+    moment: 'alarm',
+  },
 ];
 
-export const featuredName = (title) => FEATURED.find((f) => f.title === title)?.name;
+export const featuredName = (title) =>
+  FEATURED.find((f) => f.title === title)?.name;

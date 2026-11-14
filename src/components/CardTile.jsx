@@ -7,7 +7,8 @@ import './CardTile.css';
 // The picture a card shows as a tile: its own image, else its video's still
 export const tileImageFor = (item) => {
   if (item.projectImage) return item.projectImage;
-  if (item.video) return `https://i.ytimg.com/vi/${item.video.id}/hqdefault.jpg`;
+  if (item.video)
+    return `https://i.ytimg.com/vi/${item.video.id}/hqdefault.jpg`;
   return null;
 };
 
@@ -15,16 +16,32 @@ export const tileImageFor = (item) => {
 export const isTile = (item) => layoutOf(item.category) === 'tiles';
 
 // Who it's from (the journal for a paper, else the organisation), and the line under the title
-const venueOf = (item) => (item.volume ? item.volume.split(',')[0] : item.company) || '';
+const venueOf = (item) =>
+  (item.volume ? item.volume.split(',')[0] : item.company) || '';
 // The year a tile shows in its corner: when it ended, or Now
-const yearOf = (item) => (/present/i.test(item.date) ? 'Now' : (item.date.match(/\d{4}/g) || []).pop() || '');
+const yearOf = (item) =>
+  /present/i.test(item.date)
+    ? 'Now'
+    : (item.date.match(/\d{4}/g) || []).pop() || '';
 // Logos that spell out the organisation's name, so the name isn't written again beside them
-const WORDMARKS = ['springer-nature-logo.png', 'ieee-logo.png', 'sigma-xi-logo.png', 'buildon-logo.png'];
+const WORDMARKS = [
+  'springer-nature-logo.png',
+  'ieee-logo.png',
+  'sigma-xi-logo.png',
+  'buildon-logo.png',
+];
 // The date and place under the title, leaving out a date that's only the year already in the corner
 const metaOf = (item) => {
   const venue = venueOf(item);
-  const rest = item.volume ? item.volume.split(',').slice(1).join(',').trim() : item.location;
-  return [item.date.trim() === yearOf(item) ? null : item.date, rest && rest !== venue ? rest : null].filter(Boolean).join(' · ');
+  const rest = item.volume
+    ? item.volume.split(',').slice(1).join(',').trim()
+    : item.location;
+  return [
+    item.date.trim() === yearOf(item) ? null : item.date,
+    rest && rest !== venue ? rest : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 };
 // Stock topic icons stand in for a venue without a logo of its own; a tile names the venue alone instead
 const isTopic = (logo) => /\/topic-[^/]+$/.test(logo || '');
@@ -42,9 +59,15 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
   const meta = metaOf(item);
   const year = yearOf(item);
   const band = bandForSection(item.category);
-  const logo = typeof item.companyLogo === 'string' && !isTopic(item.companyLogo) ? item.companyLogo : null;
+  const logo =
+    typeof item.companyLogo === 'string' && !isTopic(item.companyLogo)
+      ? item.companyLogo
+      : null;
   // Every tile shows its logo the same size, from the copy with its empty margins cut off (public/logos/trim)
-  const bigLogo = logo && /^\/logos\/[^/]+\.png$/.test(logo) ? logo.replace('/logos/', '/logos/trim/') : logo;
+  const bigLogo =
+    logo && /^\/logos\/[^/]+\.png$/.test(logo)
+      ? logo.replace('/logos/', '/logos/trim/')
+      : logo;
   // Photos rest frosted over, like the Lab's tiles, and come into focus on hover or when opened
   const veiled = photo;
 
@@ -57,13 +80,28 @@ const CardTile = ({ item, highlighted = false, open = false, onOpen }) => {
       aria-expanded={open}
       aria-label={`${item.title}, ${item.date}. ${open ? 'Close' : 'Show'} the details`}
     >
-      {image && <img className="ctile__img" src={image} alt="" loading="lazy" />}
+      {image && (
+        <img className="ctile__img" src={image} alt="" loading="lazy" />
+      )}
       <span className="ctile__top" aria-hidden="true">
         {logo && <img className="ctile__logo" src={bigLogo} alt="" />}
-        {venue && !WORDMARKS.some((w) => logo?.endsWith(`/${w}`)) && <span className="ctile__venue">{venue}</span>}
+        {venue && !WORDMARKS.some((w) => logo?.endsWith(`/${w}`)) && (
+          <span className="ctile__venue">{venue}</span>
+        )}
       </span>
-      {item.video && photo && <span className="ctile__play" aria-hidden="true"><Play size={12} fill="currentColor" /></span>}
-      {year && <span className={`ctile__year${item.video && photo ? ' ctile__year--beside' : ''}`} aria-hidden="true">{year}</span>}
+      {item.video && photo && (
+        <span className="ctile__play" aria-hidden="true">
+          <Play size={12} fill="currentColor" />
+        </span>
+      )}
+      {year && (
+        <span
+          className={`ctile__year${item.video && photo ? ' ctile__year--beside' : ''}`}
+          aria-hidden="true"
+        >
+          {year}
+        </span>
+      )}
       <span className="ctile__text">
         <span className="ctile__name">{item.title}</span>
         {item.note && <span className="ctile__note">{item.note}</span>}

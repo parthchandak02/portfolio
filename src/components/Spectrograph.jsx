@@ -16,7 +16,7 @@ const KNOTS = [
   [2023, 0.34],
   [2025, 0.62],
   [2026, 0.8],
-  [2027, 1]
+  [2027, 1],
 ];
 const MIN_GAP = 3.5; // px between neighbouring lines
 const EDGE = 4; // px kept free at each end of a track
@@ -79,7 +79,8 @@ export const useWidth = () => {
 
   useEffect(() => {
     if (!node) return undefined;
-    const measure = () => setWidth(Math.max(120, Math.round(node.getBoundingClientRect().width)));
+    const measure = () =>
+      setWidth(Math.max(120, Math.round(node.getBoundingClientRect().width)));
     measure();
     if (typeof ResizeObserver === 'undefined') {
       window.addEventListener('resize', measure);
@@ -98,7 +99,16 @@ export const useWidth = () => {
  * drag or tap on a phone), and the arrow keys step through lines. The lines themselves are drawn once,
  * for every row, by the Spectrograph, so they can travel between the strip and the lanes.
  */
-const Track = ({ band, placed, active, onActive, onLeave, top, left = 0, height }) => {
+const Track = ({
+  band,
+  placed,
+  active,
+  onActive,
+  onLeave,
+  top,
+  left = 0,
+  height,
+}) => {
   const trackRef = useRef(null);
 
   const pick = useCallback(
@@ -117,16 +127,29 @@ const Track = ({ band, placed, active, onActive, onLeave, top, left = 0, height 
 
   const step = (delta) => {
     const index = placed.findIndex((p) => active && p.item === active.item);
-    const next = index === -1 ? (delta > 0 ? 0 : placed.length - 1) : Math.min(placed.length - 1, Math.max(0, index + delta));
+    const next =
+      index === -1
+        ? delta > 0
+          ? 0
+          : placed.length - 1
+        : Math.min(placed.length - 1, Math.max(0, index + delta));
     onActive(placed[next]);
   };
 
   const onKeyDown = (e) => {
-    if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
-    else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
-    else if (e.key === 'Home') { e.preventDefault(); onActive(placed[0]); }
-    else if (e.key === 'End') { e.preventDefault(); onActive(placed[placed.length - 1]); }
-    else if (e.key === 'Escape') onActive(null);
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      step(1);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      step(-1);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      onActive(placed[0]);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      onActive(placed[placed.length - 1]);
+    } else if (e.key === 'Escape') onActive(null);
   };
 
   return (
@@ -138,7 +161,14 @@ const Track = ({ band, placed, active, onActive, onLeave, top, left = 0, height 
       tabIndex={0}
       aria-label={`${band ? band.name : 'All bands'}: use left and right arrow keys to move between items`}
       onPointerMove={pick}
-      onPointerDown={(e) => pick({ clientX: e.clientX, clientY: e.clientY, pointerType: e.pointerType, press: true })}
+      onPointerDown={(e) =>
+        pick({
+          clientX: e.clientX,
+          clientY: e.clientY,
+          pointerType: e.pointerType,
+          press: true,
+        })
+      }
       onPointerLeave={onLeave}
       onKeyDown={onKeyDown}
     />
@@ -160,13 +190,22 @@ const SWARM_CAP = 3200; // ms after which any pill still in the air is let go
 const HINT_MS = 2600; // ms the button labels stay up after the first pills land
 
 const prefersReducedMotion = () =>
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const noise = (i, k) => { const v = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return v - Math.floor(v); };
+const noise = (i, k) => {
+  const v = Math.sin(i * 127.1 + k * 311.7) * 43758.5453;
+  return v - Math.floor(v);
+};
 
 const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   // Section links and reduced motion skip the show and start folded
-  const [intro, setIntro] = useState(() => typeof window !== 'undefined' && !window.location.hash && !prefersReducedMotion());
+  const [intro, setIntro] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      !window.location.hash &&
+      !prefersReducedMotion()
+  );
   const [expanded, setExpanded] = useState(intro);
   const [hint, setHint] = useState(false);
   const [active, setActive] = useState(null);
@@ -181,28 +220,55 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
 
   const sectionRef = useRef(null);
   const all = useMemo(
-    () => spectrumBands.flatMap((band) => band.items.map((item) => ({ item, band }))),
+    () =>
+      spectrumBands.flatMap((band) =>
+        band.items.map((item) => ({ item, band }))
+      ),
     []
   );
   const rows = useMemo(
-    () => spectrumBands.map((band) => ({ band, entries: band.items.map((item) => ({ item, band })) })),
+    () =>
+      spectrumBands.map((band) => ({
+        band,
+        entries: band.items.map((item) => ({ item, band })),
+      })),
     []
   );
 
   // Every line has two homes: its spot on the strip and its spot in its band's lane. The first lane sits
   // where the strip is, so opening drops lines down onto their lanes and closing lifts them back up.
   const [stageRef, width] = useWidth();
-  const rowH = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches ? 52 : 46;
+  const rowH =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(pointer: coarse)').matches
+      ? 52
+      : 46;
   // Open, each lane keeps a margin on the left for its band's name
   const gutter = width < 560 ? 84 : 104;
   const stripPlaced = useMemo(() => place(all, width), [all, width]);
-  const lanes = useMemo(() => rows.map(({ band, entries }) => ({ band, placed: place(entries, width - gutter) })), [rows, width, gutter]);
+  const lanes = useMemo(
+    () =>
+      rows.map(({ band, entries }) => ({
+        band,
+        placed: place(entries, width - gutter),
+      })),
+    [rows, width, gutter]
+  );
   const lines = useMemo(() => {
     const laneOf = new Map();
-    lanes.forEach(({ placed }, lane) => placed.forEach((p) => laneOf.set(p.item, { lane, x: p.x })));
+    lanes.forEach(({ placed }, lane) =>
+      placed.forEach((p) => laneOf.set(p.item, { lane, x: p.x }))
+    );
     return stripPlaced.map((p, i) => {
       const home = laneOf.get(p.item);
-      return { ...p, sx: p.x, bx: gutter + home.x, lane: home.lane, jitter: (i * 37) % 90, featured: Boolean(p.item.featured) };
+      return {
+        ...p,
+        sx: p.x,
+        bx: gutter + home.x,
+        lane: home.lane,
+        jitter: (i * 37) % 90,
+        featured: Boolean(p.item.featured),
+      };
     });
   }, [stripPlaced, lanes, gutter]);
 
@@ -217,16 +283,25 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   const pick = useCallback((entry, e) => {
     clearTimeout(switchRef.current);
     // The keyboard picks with no pointer event; a pick is always immediate then
-    if (!e || e.clientX === undefined) { setActive(entry); return; }
+    if (!e || e.clientX === undefined) {
+      setActive(entry);
+      return;
+    }
     // The heading is taken over at least 8 px of travel, since a mouse reports small, jittery steps
     const anchor = anchorRef.current;
     if (!anchor) anchorRef.current = { x: e.clientX, y: e.clientY };
     else if (Math.hypot(e.clientX - anchor.x, e.clientY - anchor.y) >= 8) {
-      headingRef.current = { dx: e.clientX - anchor.x, dy: e.clientY - anchor.y };
+      headingRef.current = {
+        dx: e.clientX - anchor.x,
+        dy: e.clientY - anchor.y,
+      };
       anchorRef.current = { x: e.clientX, y: e.clientY };
     }
     const current = activeRef.current;
-    if (e.press || e.pointerType === 'touch' || !current) { setActive(entry); return; }
+    if (e.press || e.pointerType === 'touch' || !current) {
+      setActive(entry);
+      return;
+    }
     // Carried on, does the path cross the link? Where it passes the link's top and bottom edges brackets it
     const { dx, dy } = headingRef.current;
     const link = sectionRef.current?.querySelector('.spectro__link');
@@ -237,14 +312,22 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
         const at = (y) => e.clientX + (dx * (y - e.clientY)) / dy;
         const a = at(r.top);
         const b = at(r.bottom);
-        aiming = Math.max(a, b) > r.left - AIM_SLACK && Math.min(a, b) < r.right + AIM_SLACK;
+        aiming =
+          Math.max(a, b) > r.left - AIM_SLACK &&
+          Math.min(a, b) < r.right + AIM_SLACK;
       }
     }
-    if (!aiming) { setActive(entry); return; }
+    if (!aiming) {
+      setActive(entry);
+      return;
+    }
     switchRef.current = setTimeout(() => setActive(entry), SWITCH_MS);
   }, []);
   // Leaving a track ends the heading too, so coming back in starts fresh rather than aiming from the exit point
-  const cancelPick = useCallback(() => { clearTimeout(switchRef.current); anchorRef.current = null; }, []);
+  const cancelPick = useCallback(() => {
+    clearTimeout(switchRef.current);
+    anchorRef.current = null;
+  }, []);
   useEffect(() => () => clearTimeout(switchRef.current), []);
 
   // The toggle is one more round button in the column with the other three, so it lives in the fixed UI
@@ -258,10 +341,12 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     const ui = document.querySelector('.layout__ui');
     setHint(true);
     if (ui) ui.classList.add('layout__ui--hints');
-    timersRef.current.push(setTimeout(() => {
-      setHint(false);
-      if (ui) ui.classList.remove('layout__ui--hints');
-    }, HINT_MS));
+    timersRef.current.push(
+      setTimeout(() => {
+        setHint(false);
+        if (ui) ui.classList.remove('layout__ui--hints');
+      }, HINT_MS)
+    );
   }, []);
 
   // Every fourth line lifts off the strip as a pill of its own colour, in a wave from left to right like
@@ -271,107 +356,176 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   const rafRef = useRef(0);
   const flightsRef = useRef([]);
   const pillsRef = useRef([]);
-  const launch = useCallback((withHints) => {
-    // The button labels come up only on the opening; a fold the visitor makes just gets the swarm
-    const hints = withHints ? showHints : () => {};
-    const stage = stageRef.current;
-    const button = toggleRef.current;
-    if (!stage || !button || button.classList.contains('is-away')) return;
-    const s = stage.getBoundingClientRect();
-    if (s.bottom < 0 || s.top > window.innerHeight) { hints(); return; }
-    const b = button.getBoundingClientRect();
-    const T = { x: b.left + b.width / 2, y: b.top + b.height / 2 };
-    const catchR = b.width / 2 - 6; // a pill is absorbed once it is inside the button's glass
-    const chevron = button.querySelector('.spectro__chevron');
-
-    const lines = Array.from(stage.querySelectorAll('.spectro__line'))
-      .map((el) => ({ r: el.getBoundingClientRect(), hue: getComputedStyle(el).getPropertyValue('--hue').trim() }))
-      .sort((p, q) => p.r.left - q.r.left);
-    if (!lines.length) { hints(); return; }
-    const left = lines[0].r.left;
-    const span = lines[lines.length - 1].r.left - left || 1;
-    const pills = lines.filter((_, i) => i % 4 === 0).map((l, i) => {
-      const x = l.r.left + l.r.width / 2;
-      const y = l.r.top + l.r.height / 2;
-      return { hue: l.hue, x, y, px: x, py: y, angle: 0, speed: 0, born: 0, r1: noise(i, 1), r2: noise(i, 2), wave: (x - left) / span, on: false, done: false };
-    });
-
-    let landed = false;
-    const absorb = (p) => {
-      if (p.done) return;
-      p.done = true;
-      p.stop?.();
-      button.style.color = p.hue;
-      if (chevron) {
-        flightsRef.current.push(animate(1.22, 1, {
-          type: 'spring', stiffness: 520, damping: 14,
-          onUpdate: (v) => { chevron.style.scale = v; },
-          onComplete: () => { chevron.style.scale = ''; }
-        }));
+  const launch = useCallback(
+    (withHints) => {
+      // The button labels come up only on the opening; a fold the visitor makes just gets the swarm
+      const hints = withHints ? showHints : () => {};
+      const stage = stageRef.current;
+      const button = toggleRef.current;
+      if (!stage || !button || button.classList.contains('is-away')) return;
+      const s = stage.getBoundingClientRect();
+      if (s.bottom < 0 || s.top > window.innerHeight) {
+        hints();
+        return;
       }
-      // The first pill to land lights the prism too
-      if (!landed) { landed = true; hints(); glowPrism(); }
-    };
+      const b = button.getBoundingClientRect();
+      const T = { x: b.left + b.width / 2, y: b.top + b.height / 2 };
+      const catchR = b.width / 2 - 6; // a pill is absorbed once it is inside the button's glass
+      const chevron = button.querySelector('.spectro__chevron');
 
-    pills.forEach((p) => {
-      p.timer = setTimeout(() => {
-        p.on = true;
-        p.born = performance.now();
-        // Upward the spring is loose, so the throw carries each pill above the button and it drops in.
-        // Sideways it is nearly critical, so no pill swings past the button and off the screen's edge.
-        const stiffness = 55 + p.r1 * 35;
-        const fx = animate(p.x, T.x, { type: 'spring', stiffness, damping: 1.9 * Math.sqrt(stiffness), velocity: (T.x - p.x) * (0.3 + p.r1 * 0.6), onUpdate: (v) => { p.x = v; } });
-        const fy = animate(p.y, T.y, { type: 'spring', stiffness, damping: 9 + p.r2 * 4, velocity: -(600 + p.r2 * 700), onUpdate: (v) => { p.y = v; } });
-        p.stop = () => { fx.stop(); fy.stop(); };
-        flightsRef.current.push(fx, fy);
-        Promise.all([fx, fy]).then(() => absorb(p));
-      }, p.wave * SWARM_WAVE + p.r1 * 80);
-    });
+      const lines = Array.from(stage.querySelectorAll('.spectro__line'))
+        .map((el) => ({
+          r: el.getBoundingClientRect(),
+          hue: getComputedStyle(el).getPropertyValue('--hue').trim(),
+        }))
+        .sort((p, q) => p.r.left - q.r.left);
+      if (!lines.length) {
+        hints();
+        return;
+      }
+      const left = lines[0].r.left;
+      const span = lines[lines.length - 1].r.left - left || 1;
+      const pills = lines
+        .filter((_, i) => i % 4 === 0)
+        .map((l, i) => {
+          const x = l.r.left + l.r.width / 2;
+          const y = l.r.top + l.r.height / 2;
+          return {
+            hue: l.hue,
+            x,
+            y,
+            px: x,
+            py: y,
+            angle: 0,
+            speed: 0,
+            born: 0,
+            r1: noise(i, 1),
+            r2: noise(i, 2),
+            wave: (x - left) / span,
+            on: false,
+            done: false,
+          };
+        });
 
-    // The pills are drawn as light in the 3D scene (SwarmLight); this loop measures each one's speed and
-    // heading for that drawing, and catches it as it reaches the button
-    swarmLight.pills = pills;
-    const t0 = performance.now();
-    let last = t0;
-    const frame = (now) => {
-      const dt = Math.max(1, now - last);
-      last = now;
-      let live = 0;
-      pills.forEach((p) => {
+      let landed = false;
+      const absorb = (p) => {
         if (p.done) return;
-        live += 1;
-        if (!p.on) return;
-        const dx = p.x - p.px;
-        const dy = p.y - p.py;
-        p.px = p.x;
-        p.py = p.y;
-        if (Math.hypot(p.x - T.x, p.y - T.y) < catchR) { absorb(p); return; }
-        // Speed in px per 60 Hz frame sets the pill's length; the heading is in the scene's y-up terms
-        p.speed = (Math.hypot(dx, dy) / dt) * 16.7;
-        if (p.speed > 0.2) p.angle = Math.atan2(-dy, dx) - Math.PI / 2;
+        p.done = true;
+        p.stop?.();
+        button.style.color = p.hue;
+        if (chevron) {
+          flightsRef.current.push(
+            animate(1.22, 1, {
+              type: 'spring',
+              stiffness: 520,
+              damping: 14,
+              onUpdate: (v) => {
+                chevron.style.scale = v;
+              },
+              onComplete: () => {
+                chevron.style.scale = '';
+              },
+            })
+          );
+        }
+        // The first pill to land lights the prism too
+        if (!landed) {
+          landed = true;
+          hints();
+          glowPrism();
+        }
+      };
+
+      pills.forEach((p) => {
+        p.timer = setTimeout(
+          () => {
+            p.on = true;
+            p.born = performance.now();
+            // Upward the spring is loose, so the throw carries each pill above the button and it drops in.
+            // Sideways it is nearly critical, so no pill swings past the button and off the screen's edge.
+            const stiffness = 55 + p.r1 * 35;
+            const fx = animate(p.x, T.x, {
+              type: 'spring',
+              stiffness,
+              damping: 1.9 * Math.sqrt(stiffness),
+              velocity: (T.x - p.x) * (0.3 + p.r1 * 0.6),
+              onUpdate: (v) => {
+                p.x = v;
+              },
+            });
+            const fy = animate(p.y, T.y, {
+              type: 'spring',
+              stiffness,
+              damping: 9 + p.r2 * 4,
+              velocity: -(600 + p.r2 * 700),
+              onUpdate: (v) => {
+                p.y = v;
+              },
+            });
+            p.stop = () => {
+              fx.stop();
+              fy.stop();
+            };
+            flightsRef.current.push(fx, fy);
+            Promise.all([fx, fy]).then(() => absorb(p));
+          },
+          p.wave * SWARM_WAVE + p.r1 * 80
+        );
       });
-      if (live && now - t0 < SWARM_CAP) {
-        rafRef.current = requestAnimationFrame(frame);
-      } else {
-        stopSwarm();
-        if (!landed) hints();
-      }
-    };
-    rafRef.current = requestAnimationFrame(frame);
-    pillsRef.current = pills;
-  // stopSwarm only touches refs
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stageRef, showHints]);
+
+      // The pills are drawn as light in the 3D scene (SwarmLight); this loop measures each one's speed and
+      // heading for that drawing, and catches it as it reaches the button
+      swarmLight.pills = pills;
+      const t0 = performance.now();
+      let last = t0;
+      const frame = (now) => {
+        const dt = Math.max(1, now - last);
+        last = now;
+        let live = 0;
+        pills.forEach((p) => {
+          if (p.done) return;
+          live += 1;
+          if (!p.on) return;
+          const dx = p.x - p.px;
+          const dy = p.y - p.py;
+          p.px = p.x;
+          p.py = p.y;
+          if (Math.hypot(p.x - T.x, p.y - T.y) < catchR) {
+            absorb(p);
+            return;
+          }
+          // Speed in px per 60 Hz frame sets the pill's length; the heading is in the scene's y-up terms
+          p.speed = (Math.hypot(dx, dy) / dt) * 16.7;
+          if (p.speed > 0.2) p.angle = Math.atan2(-dy, dx) - Math.PI / 2;
+        });
+        if (live && now - t0 < SWARM_CAP) {
+          rafRef.current = requestAnimationFrame(frame);
+        } else {
+          stopSwarm();
+          if (!landed) hints();
+        }
+      };
+      rafRef.current = requestAnimationFrame(frame);
+      pillsRef.current = pills;
+      // stopSwarm only touches refs
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [stageRef, showHints]
+  );
 
   // The scene loads a moment after the page; hold the swarm until it is drawing, so the first visit never misses it
-  const sendSpark = useCallback((withHints = true) => {
-    const start = performance.now();
-    const wait = () => {
-      if (swarmLight.ready || performance.now() - start > 3000) launch(withHints);
-      else timersRef.current.push(setTimeout(wait, 100));
-    };
-    wait();
-  }, [launch]);
+  const sendSpark = useCallback(
+    (withHints = true) => {
+      const start = performance.now();
+      const wait = () => {
+        if (swarmLight.ready || performance.now() - start > 3000)
+          launch(withHints);
+        else timersRef.current.push(setTimeout(wait, 100));
+      };
+      wait();
+    },
+    [launch]
+  );
 
   // Ends any flight: the pills, their light in the scene, and the chevron's borrowed colour
   const stopSwarm = () => {
@@ -384,7 +538,9 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     const button = toggleRef.current;
     if (button) {
       // The colour eases back through the button's transition
-      setTimeout(() => { button.style.color = ''; }, 350);
+      setTimeout(() => {
+        button.style.color = '';
+      }, 350);
       const chevron = button.querySelector('.spectro__chevron');
       if (chevron) chevron.style.scale = '';
     }
@@ -394,16 +550,24 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
   useEffect(() => {
     if (!intro) return undefined;
     const timers = timersRef.current;
-    timers.push(setTimeout(() => { setExpanded(false); setIntro(false); }, INTRO_HOLD));
+    timers.push(
+      setTimeout(() => {
+        setExpanded(false);
+        setIntro(false);
+      }, INTRO_HOLD)
+    );
     timers.push(setTimeout(sendSpark, INTRO_HOLD + FOLD_MS));
     return () => timers.forEach(clearTimeout);
     // Once, on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  useEffect(() => () => {
-    timersRef.current.forEach(clearTimeout);
-    stopSwarm();
-  }, []);
+  useEffect(
+    () => () => {
+      timersRef.current.forEach(clearTimeout);
+      stopSwarm();
+    },
+    []
+  );
 
   const onToggle = () => {
     timersRef.current.forEach(clearTimeout);
@@ -414,7 +578,8 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
     const ui = document.querySelector('.layout__ui');
     if (ui) ui.classList.remove('layout__ui--hints');
     // Folding the lanes back into the strip sends the swarm to the button again, once the fold has landed
-    if (expanded && !prefersReducedMotion()) timersRef.current.push(setTimeout(() => sendSpark(false), FOLD_MS));
+    if (expanded && !prefersReducedMotion())
+      timersRef.current.push(setTimeout(() => sendSpark(false), FOLD_MS));
     setExpanded((v) => !v);
     setActive(null);
   };
@@ -443,18 +608,37 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
       <div
         ref={stageRef}
         className="spectro__stage"
-        style={{ '--row-h': `${rowH}px`, height: `${expanded ? rowH * lanes.length : rowH}px` }}
+        style={{
+          '--row-h': `${rowH}px`,
+          height: `${expanded ? rowH * lanes.length : rowH}px`,
+        }}
       >
         {/* Hairlines: the strip's own, and one per lane that draws in as its lines arrive */}
-        <span className="spectro__rule spectro__rule--strip" style={{ top: `${rowH / 2}px` }} />
+        <span
+          className="spectro__rule spectro__rule--strip"
+          style={{ top: `${rowH / 2}px` }}
+        />
         {lanes.map(({ band }, lane) => (
-          <span key={band.key} className="spectro__rule spectro__rule--lane" style={{ top: `${lane * rowH + rowH / 2}px`, left: `${gutter}px`, '--lane': lane }} />
+          <span
+            key={band.key}
+            className="spectro__rule spectro__rule--lane"
+            style={{
+              top: `${lane * rowH + rowH / 2}px`,
+              left: `${gutter}px`,
+              '--lane': lane,
+            }}
+          />
         ))}
         {lanes.map(({ band }, lane) => (
           <span
             key={band.key}
             className={`spectro__label${band === active?.band ? ' is-on' : ''}`}
-            style={{ top: `${lane * rowH}px`, height: `${rowH}px`, '--lane': lane, '--hue': band.hue }}
+            style={{
+              top: `${lane * rowH}px`,
+              height: `${rowH}px`,
+              '--lane': lane,
+              '--hue': band.hue,
+            }}
             aria-hidden="true"
           >
             {band.name}
@@ -469,11 +653,22 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
               <span
                 key={`${l.band.key}-${l.item.title}`}
                 className="spectro__x"
-                style={{ transform: `translateX(${expanded ? l.bx : l.sx}px)`, '--lane': l.lane, '--j': l.jitter }}
+                style={{
+                  transform: `translateX(${expanded ? l.bx : l.sx}px)`,
+                  '--lane': l.lane,
+                  '--j': l.jitter,
+                }}
               >
-                <span className="spectro__y" style={{ transform: `translateY(${(expanded ? l.lane * rowH : 0) + rowH / 2}px)` }}>
+                <span
+                  className="spectro__y"
+                  style={{
+                    transform: `translateY(${(expanded ? l.lane * rowH : 0) + rowH / 2}px)`,
+                  }}
+                >
                   {/* Selected work wears a small diamond above its line, lit while the line is picked */}
-                  {l.featured && <SelectedMark on={on} className="spectro__mark" />}
+                  {l.featured && (
+                    <SelectedMark on={on} className="spectro__mark" />
+                  )}
                   <i
                     className={`spectro__line${l.item.future ? ' spectro__line--future' : ''}${l.featured ? ' spectro__line--featured' : ''}${on ? ' spectro__line--on' : ''}`}
                     style={{ '--hue': l.band.hue }}
@@ -486,32 +681,67 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
           })}
         </div>
 
-        {expanded
-          ? lanes.map(({ band, placed }, lane) => (
-            <Track key={band.key} band={band} placed={placed} active={active} onActive={pick} onLeave={cancelPick} top={lane * rowH} left={gutter} height={rowH} />
+        {expanded ? (
+          lanes.map(({ band, placed }, lane) => (
+            <Track
+              key={band.key}
+              band={band}
+              placed={placed}
+              active={active}
+              onActive={pick}
+              onLeave={cancelPick}
+              top={lane * rowH}
+              left={gutter}
+              height={rowH}
+            />
           ))
-          : <Track placed={stripPlaced} active={active} onActive={pick} onLeave={cancelPick} top={0} height={rowH} />}
+        ) : (
+          <Track
+            placed={stripPlaced}
+            active={active}
+            onActive={pick}
+            onLeave={cancelPick}
+            top={0}
+            height={rowH}
+          />
+        )}
       </div>
 
-      <div className={`spectro__readout${active ? '' : ' is-idle'}`} style={{ '--hue': active ? active.band.hue : 'currentColor' }} aria-live="polite">
+      <div
+        className={`spectro__readout${active ? '' : ' is-idle'}`}
+        style={{ '--hue': active ? active.band.hue : 'currentColor' }}
+        aria-live="polite"
+      >
         {active ? (
           <>
             <span className="spectro__kicker">
-              {active.item.featured && <><SelectedMark on className="spectro__kicker-mark" />Selected · </>}
+              {active.item.featured && (
+                <>
+                  <SelectedMark on className="spectro__kicker-mark" />
+                  Selected ·{' '}
+                </>
+              )}
               {active.band.name} · {active.item.when}
             </span>
             <span className="spectro__title">{active.item.title}</span>
             <span className="spectro__meta">
               <span className="spectro__metatext">{active.item.meta}</span>
               {active.item.url && (
-                <a className="spectro__link" href={active.item.url} target="_blank" rel="noopener noreferrer">
+                <a
+                  className="spectro__link"
+                  href={active.item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {linkLabel(active.item.url)} <ExternalLink size={13} />
                 </a>
               )}
             </span>
           </>
         ) : (
-          <span className="spectro__meta">Slide across the lines to read each one.</span>
+          <span className="spectro__meta">
+            Slide across the lines to read each one.
+          </span>
         )}
       </div>
 
@@ -519,7 +749,9 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
       <ul className="spectro__sr">
         {all.map(({ item, band }) => (
           <li key={`${band.key}-${item.title}`}>
-            {band.name}, {item.when}: {item.url ? <a href={item.url}>{item.title}</a> : item.title}. {item.meta}.
+            {band.name}, {item.when}:{' '}
+            {item.url ? <a href={item.url}>{item.title}</a> : item.title}.{' '}
+            {item.meta}.
           </li>
         ))}
       </ul>
