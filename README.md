@@ -263,6 +263,7 @@ the model at `public/gltf/prism.glb`.
 | `npm run build` | Production build into `build/` |
 | `npm run preview` | Serve the production build on port 3000 |
 | `npm run deploy` | Build and upload to Cloudflare Pages with wrangler |
+| `npm test` | Node's test runner over `scripts/`, covering the card loader the build depends on |
 | `npm run lint` / `lint:fix` | ESLint over `src/` |
 | `npm run format` / `format:check` | Prettier over `src/` |
 | `npm run health` | `npm outdated` and `npm audit` |

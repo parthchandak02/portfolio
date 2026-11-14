@@ -57,4 +57,7 @@ The build (`scripts/cards.mjs`) checks every card and stops with the file's name
 
 While `npm run dev` is running, editing a card reloads the page.
 
+`npm test` runs these checks against throwaway cards in a temp directory, and loads the real ones as well, so
+a card that breaks a rule is caught without waiting for a build.
+
 Public counts (papers, reviews, press) must match the EB-1A petition. Check them after adding or removing cards.
