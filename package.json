@@ -61,6 +61,7 @@
     "dev": "npm run start:app",
     "start:app": "astro dev --port 3000",
     "build": "astro build",
+    "test": "node --test scripts/",
     "lint": "eslint src --ext .js,.jsx",
     "lint:fix": "eslint src --ext .js,.jsx --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,css}\"",

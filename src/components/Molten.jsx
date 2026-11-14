@@ -28,6 +28,10 @@ const Molten = ({
   const outer = useRef(null);
   const inner = useRef(null);
   const sheen = useRef(null);
+  const onClosedRef = useRef(onClosed);
+  useLayoutEffect(() => {
+    onClosedRef.current = onClosed;
+  });
   const [mounted, setMounted] = useState(open);
   const lastChildren = useRef(children);
   // What showed before the content last changed, melting away over the new content
@@ -131,7 +135,7 @@ const Molten = ({
     height.current = 0;
     if (reducedMotion()) {
       setMounted(false);
-      onClosed?.();
+      onClosedRef.current?.();
       return undefined;
     }
     inner.current?.animate(CONDENSE.slice().reverse(), {
@@ -150,7 +154,7 @@ const Molten = ({
     a.onfinish = () => {
       if (closing.current === a) {
         setMounted(false);
-        onClosed?.();
+        onClosedRef.current?.();
       }
     };
     return undefined;
