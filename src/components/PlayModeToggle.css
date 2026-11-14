@@ -62,11 +62,13 @@
 }
 
 /* Continuous cycling animation for reading mode (Pyramid ↔ Rainbow) */
-.play-mode-toggle__icon-container--reading-mode .play-mode-toggle__icon-primary {
+.play-mode-toggle__icon-container--reading-mode
+  .play-mode-toggle__icon-primary {
   animation: icon-cycle-primary 5s infinite ease-in-out;
 }
 
-.play-mode-toggle__icon-container--reading-mode .play-mode-toggle__icon-secondary {
+.play-mode-toggle__icon-container--reading-mode
+  .play-mode-toggle__icon-secondary {
   animation: icon-cycle-secondary 5s infinite ease-in-out;
 }
 
@@ -139,19 +141,22 @@
 
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
-  .play-mode-toggle__icon-container--reading-mode .play-mode-toggle__icon-primary,
-  .play-mode-toggle__icon-container--reading-mode .play-mode-toggle__icon-secondary,
+  .play-mode-toggle__icon-container--reading-mode
+    .play-mode-toggle__icon-primary,
+  .play-mode-toggle__icon-container--reading-mode
+    .play-mode-toggle__icon-secondary,
   .play-mode-toggle__icon-container--play-mode .play-mode-toggle__icon-primary,
-  .play-mode-toggle__icon-container--play-mode .play-mode-toggle__icon-secondary {
+  .play-mode-toggle__icon-container--play-mode
+    .play-mode-toggle__icon-secondary {
     animation: none;
   }
-  
+
   /* Show primary icon by default when animations are disabled */
   .play-mode-toggle__icon-primary {
     opacity: 1;
     transform: rotate(0deg) scale(1);
   }
-  
+
   .play-mode-toggle__icon-secondary {
     opacity: 0;
     transform: rotate(-180deg) scale(0.8);
@@ -186,7 +191,8 @@
 
 /* Orange accent icons - Rainbow (reading mode) and Glasses (play mode) */
 /* Rainbow icon in reading mode gets orange color */
-.play-mode-toggle__icon-container--reading-mode .play-mode-toggle__icon-secondary {
+.play-mode-toggle__icon-container--reading-mode
+  .play-mode-toggle__icon-secondary {
   color: var(--orange-bright) !important;
   text-shadow: 0 0 8px rgba(255, 107, 53, 0.4);
 }
@@ -208,9 +214,9 @@
     width: 44px;
     height: 44px;
   }
-  
+
   .play-mode-toggle__icon svg {
     width: 16px;
     height: 16px;
   }
-} 
+}

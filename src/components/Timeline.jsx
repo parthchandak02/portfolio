@@ -10,26 +10,33 @@ import { categoryOrder, timelineDataByCategory } from '../data/timelineData';
 import { sectionOf } from '../data/sections';
 import { FEATURED } from '../data/featured';
 import SelectedMark from './SelectedMark';
-import { bandForSection, spectrumBands, startOf, endOf } from '../data/spectrum';
+import {
+  bandForSection,
+  spectrumBands,
+  startOf,
+  endOf,
+} from '../data/spectrum';
 import { CLOSE_MS } from '../hooks/glassMotion';
 import './Timeline.css';
 
-const Timeline = ({ 
-  data = [], 
+const Timeline = ({
+  data = [],
   className = '',
   showFilters = false, // Now controlled by parent
   activeFilters = [], // Now receives array of active filters instead of single activeFilter
   lightMode = false,
   currentTitle = null, // the card whose line is lit on the band bar
-  ...props 
+  ...props
 }) => {
   const { getCurrentHighlights } = useTypewriterHighlight();
   const highlights = getCurrentHighlights();
-  
+
   // Projects done inside a role (they name it as their parent) show in that role's card, not on their own
   const childrenOf = useMemo(() => {
     const out = {};
-    data.forEach((item) => { if (item.parent) (out[item.parent] ||= []).push(item); });
+    data.forEach((item) => {
+      if (item.parent) (out[item.parent] ||= []).push(item);
+    });
     return out;
   }, [data]);
 
@@ -38,9 +45,11 @@ const Timeline = ({
     const own = data.filter((item) => !item.parent);
     if (activeFilters.length === 0) return own;
     // Show items that match any of the active filters
-    return own.filter(item => activeFilters.includes(item.category?.toLowerCase()));
+    return own.filter((item) =>
+      activeFilters.includes(item.category?.toLowerCase())
+    );
   }, [data, activeFilters]);
-  
+
   // Cards follow the bands of the spectrograph (Career, Patent, Research, ...), so a band's cards sit together.
   // Inside a band, newest first by start date; ties put the longer or ongoing one first.
   const bandIndex = (item) => {
@@ -52,8 +61,12 @@ const Timeline = ({
       if (activeFilters.length === 0) {
         const byBand = bandIndex(a) - bandIndex(b);
         if (byBand) return byBand;
-        const byCategory = categoryOrder.indexOf(a.category?.toLowerCase()) - categoryOrder.indexOf(b.category?.toLowerCase());
-        if (a.category === 'lab' || b.category === 'lab') { if (byCategory) return byCategory; }
+        const byCategory =
+          categoryOrder.indexOf(a.category?.toLowerCase()) -
+          categoryOrder.indexOf(b.category?.toLowerCase());
+        if (a.category === 'lab' || b.category === 'lab') {
+          if (byCategory) return byCategory;
+        }
       }
       return startOf(b.date) - startOf(a.date) || endOf(b.date) - endOf(a.date);
     });
@@ -66,10 +79,15 @@ const Timeline = ({
   const previewOf = (item) => sectionOf(item.category?.toLowerCase())?.preview;
   const isShown = (item) => {
     const preview = previewOf(item);
-    return !preview || shownAll[item.category?.toLowerCase()] || preview.includes(item.title);
+    return (
+      !preview ||
+      shownAll[item.category?.toLowerCase()] ||
+      preview.includes(item.title)
+    );
   };
   // Cards that came in with "Show all" condense into place (see Timeline.css)
-  const revealed = (item) => (previewOf(item) && !previewOf(item).includes(item.title) ? '' : undefined);
+  const revealed = (item) =>
+    previewOf(item) && !previewOf(item).includes(item.title) ? '' : undefined;
   useEffect(() => {
     const onShow = (e) => {
       const card = data.find((c) => c.title === e.detail);
@@ -80,11 +98,18 @@ const Timeline = ({
     // previewOf only reads static data
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
-  const showAllButton = (id, hidden) => hidden > 0 && (
-    <button type="button" className={`timeline__more ${lightMode ? 'timeline__more--light' : 'timeline__more--dark'}`} onClick={() => showAll(id)}>
-      Show all {sortedData.filter((c) => c.category?.toLowerCase() === id).length} {sectionOf(id).noun}
-    </button>
-  );
+  const showAllButton = (id, hidden) =>
+    hidden > 0 && (
+      <button
+        type="button"
+        className={`timeline__more ${lightMode ? 'timeline__more--light' : 'timeline__more--dark'}`}
+        onClick={() => showAll(id)}
+      >
+        Show all{' '}
+        {sortedData.filter((c) => c.category?.toLowerCase() === id).length}{' '}
+        {sectionOf(id).noun}
+      </button>
+    );
 
   // The Lab renders as one card of tiles, in the place of its first item
   const labItems = sortedData.filter((item) => item.category === 'lab');
@@ -106,7 +131,13 @@ const Timeline = ({
     if (openTile || nextTile) {
       setOpenTile(null);
       setNextTile(key);
-      waiting.current = setTimeout(() => { setNextTile(null); setOpenTile(key); }, openTile ? CLOSE_MS + 80 : CLOSE_MS);
+      waiting.current = setTimeout(
+        () => {
+          setNextTile(null);
+          setOpenTile(key);
+        },
+        openTile ? CLOSE_MS + 80 : CLOSE_MS
+      );
     } else {
       setOpenTile(key);
     }
@@ -114,11 +145,15 @@ const Timeline = ({
   useEffect(() => () => clearTimeout(waiting.current), []);
   useEffect(() => {
     if (!openTile) return undefined;
-    const onKey = (e) => { if (e.key === 'Escape') closeTile(); };
+    const onKey = (e) => {
+      if (e.key === 'Escape') closeTile();
+    };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [openTile]);
-  const detailFor = (item) => () => <CardDetail item={item} subprojects={childrenOf[item.title]} tab />;
+  const detailFor = (item) => () => (
+    <CardDetail item={item} subprojects={childrenOf[item.title]} tab />
+  );
   const segments = useMemo(() => {
     const out = [];
     const seen = new Set();
@@ -134,14 +169,18 @@ const Timeline = ({
         seen.add(key);
         const roles = sortedData
           .map((it, i) => ({ item: it, index: i }))
-          .filter(({ item: it }) => !isTile(it) && `${it.category}|${it.company || it.title}` === key);
+          .filter(
+            ({ item: it }) =>
+              !isTile(it) && `${it.category}|${it.company || it.title}` === key
+          );
         out.push({ kind: 'company', key, roles });
         return;
       }
       const prev = out[out.length - 1];
       // Runs follow the bands, so a keynote sitting among press pieces joins their grid
       const band = bandIndex(item);
-      if (prev && prev.kind === 'tiles' && prev.band === band) prev.items.push({ item, index });
+      if (prev && prev.kind === 'tiles' && prev.band === band)
+        prev.items.push({ item, index });
       else out.push({ kind: 'tiles', band, items: [{ item, index }] });
     });
     return out;
@@ -157,36 +196,53 @@ const Timeline = ({
   }, []);
 
   const itemAttrs = (item, index) => ({
-    style: { '--band-hue': bandForSection(item.category?.toLowerCase())?.hue || '#ff6b35' },
+    style: {
+      '--band-hue':
+        bandForSection(item.category?.toLowerCase())?.hue || '#ff6b35',
+    },
     'data-current': currentTitle === item.title ? 'true' : undefined,
     'data-category': item.category?.toLowerCase() || 'other',
     'data-title': item.title,
     'data-index': index,
     // The section's anchor goes on its first card that is showing
-    id: sortedData.findIndex((d) => d.category === item.category && isShown(d)) === index ? item.category?.toLowerCase() : undefined
+    id:
+      sortedData.findIndex(
+        (d) => d.category === item.category && isShown(d)
+      ) === index
+        ? item.category?.toLowerCase()
+        : undefined,
   });
 
-
   return (
-    <div className={`timeline ${lightMode ? 'timeline--light' : 'timeline--dark'} ${className}`} {...props}>
-      
+    <div
+      className={`timeline ${lightMode ? 'timeline--light' : 'timeline--dark'} ${className}`}
+      {...props}
+    >
       {/* Timeline content */}
       <div className="timeline__content">
         {/* Timeline line */}
         <div className="timeline__line" />
-        
+
         {/* Selected work, ahead of the bands. Its tiles say data-category="selected", so jumps to a card
             land on the card in its band, not on its copy here. */}
         {featured.length > 0 && activeFilters.length === 0 && (
-          <section className="timeline__selected" id="selected" aria-labelledby="selected-title">
+          <section
+            className="timeline__selected"
+            id="selected"
+            aria-labelledby="selected-title"
+          >
             <div className="timeline__selected-head">
               <h2 id="selected-title" className="timeline__selected-title">
                 <SelectedMark on className="timeline__selected-mark" />
                 Selected work
               </h2>
-              <a className="timeline__skip" href="#portfolio">Full portfolio</a>
+              <a className="timeline__skip" href="#portfolio">
+                Full portfolio
+              </a>
             </div>
-            <div className={`timeline__tiles lab ${lightMode ? 'lab--light' : 'lab--dark'}`}>
+            <div
+              className={`timeline__tiles lab ${lightMode ? 'lab--light' : 'lab--dark'}`}
+            >
               <TileGrid
                 openKey={openTile}
                 holdKey={nextTile}
@@ -195,13 +251,33 @@ const Timeline = ({
                 entries={featured.map(({ item, feature }) => ({
                   key: `selected:${item.title}`,
                   attrs: {
-                    style: { '--band-hue': bandForSection(item.category)?.hue || '#ff6b35' },
-                    'data-current': currentTitle === item.title && !openTile ? 'true' : undefined,
+                    style: {
+                      '--band-hue':
+                        bandForSection(item.category)?.hue || '#ff6b35',
+                    },
+                    'data-current':
+                      currentTitle === item.title && !openTile
+                        ? 'true'
+                        : undefined,
                     'data-category': 'selected',
-                    'data-title': item.title
+                    'data-title': item.title,
                   },
-                  tile: (toggle, open) => <FeatureCard feature={feature} lightMode={lightMode} open={open} onOpen={toggle} />,
-                  detail: () => <CardDetail item={item} subprojects={childrenOf[item.title]} tab picture={feature.moment !== 'robot'} />
+                  tile: (toggle, open) => (
+                    <FeatureCard
+                      feature={feature}
+                      lightMode={lightMode}
+                      open={open}
+                      onOpen={toggle}
+                    />
+                  ),
+                  detail: () => (
+                    <CardDetail
+                      item={item}
+                      subprojects={childrenOf[item.title]}
+                      tab
+                      picture={feature.moment !== 'robot'}
+                    />
+                  ),
                 }))}
               />
             </div>
@@ -215,45 +291,97 @@ const Timeline = ({
             segments.map((segment) => {
               if (segment.kind === 'lab') {
                 return (
-                  <div key="lab" className="timeline__item" data-category="lab" data-title="Lab" data-index={segment.index} id="lab">
-                    <LabShowcase items={labItems.filter(isShown)} revealed={revealed} lightMode={lightMode} />
-                    {showAllButton('lab', labItems.filter((c) => !isShown(c)).length)}
+                  <div
+                    key="lab"
+                    className="timeline__item"
+                    data-category="lab"
+                    data-title="Lab"
+                    data-index={segment.index}
+                    id="lab"
+                  >
+                    <LabShowcase
+                      items={labItems.filter(isShown)}
+                      revealed={revealed}
+                      lightMode={lightMode}
+                    />
+                    {showAllButton(
+                      'lab',
+                      labItems.filter((c) => !isShown(c)).length
+                    )}
                   </div>
                 );
               }
               if (segment.kind === 'tiles') {
                 return (
-                  <div key={`tiles-${segment.items[0].item.title}`} className={`timeline__tiles lab ${lightMode ? 'lab--light' : 'lab--dark'}`}>
+                  <div
+                    key={`tiles-${segment.items[0].item.title}`}
+                    className={`timeline__tiles lab ${lightMode ? 'lab--light' : 'lab--dark'}`}
+                  >
                     <TileGrid
                       openKey={openTile}
                       holdKey={nextTile}
                       onOpen={openTileNext}
                       onClose={closeTile}
-                      entries={segment.items.filter(({ item }) => isShown(item)).map(({ item, index }) => ({
-                        key: item.title,
-                        attrs: { ...itemAttrs(item, index), 'data-revealed': revealed(item) },
-                        tile: (toggle, open) => (
-                          <CardTile item={item} open={open} highlighted={highlights.timelineCards.includes(item.title)} onOpen={toggle} />
-                        ),
-                        detail: detailFor(item)
-                      }))}
+                      entries={segment.items
+                        .filter(({ item }) => isShown(item))
+                        .map(({ item, index }) => ({
+                          key: item.title,
+                          attrs: {
+                            ...itemAttrs(item, index),
+                            'data-revealed': revealed(item),
+                          },
+                          tile: (toggle, open) => (
+                            <CardTile
+                              item={item}
+                              open={open}
+                              highlighted={highlights.timelineCards.includes(
+                                item.title
+                              )}
+                              onOpen={toggle}
+                            />
+                          ),
+                          detail: detailFor(item),
+                        }))}
                     />
-                    {[...new Set(segment.items.map(({ item }) => item.category?.toLowerCase()))].map((id) => (
-                      <Fragment key={id}>{showAllButton(id, segment.items.filter(({ item }) => item.category?.toLowerCase() === id && !isShown(item)).length)}</Fragment>
+                    {[
+                      ...new Set(
+                        segment.items.map(({ item }) =>
+                          item.category?.toLowerCase()
+                        )
+                      ),
+                    ].map((id) => (
+                      <Fragment key={id}>
+                        {showAllButton(
+                          id,
+                          segment.items.filter(
+                            ({ item }) =>
+                              item.category?.toLowerCase() === id &&
+                              !isShown(item)
+                          ).length
+                        )}
+                      </Fragment>
                     ))}
                   </div>
                 );
               }
               const { roles } = segment;
               return (
-                <div key={segment.key} className="timeline__company" style={{ '--band-hue': bandForSection(roles[0].item.category)?.hue }}>
+                <div
+                  key={segment.key}
+                  className="timeline__company"
+                  style={{
+                    '--band-hue': bandForSection(roles[0].item.category)?.hue,
+                  }}
+                >
                   <CompanyCard
                     lightMode={lightMode}
                     childrenOf={childrenOf}
                     roles={roles.map(({ item, index }) => ({
                       item,
                       attrs: itemAttrs(item, index),
-                      highlighted: highlights.timelineCards.includes(item.title)
+                      highlighted: highlights.timelineCards.includes(
+                        item.title
+                      ),
                     }))}
                   />
                 </div>
@@ -270,4 +398,4 @@ const Timeline = ({
   );
 };
 
-export default Timeline; 
+export default Timeline;

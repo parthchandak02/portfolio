@@ -13,7 +13,7 @@ const ScrollTypewriterController = () => {
     if (!scrollContainer) return;
 
     const scrollTop = scrollContainer.scrollTop;
-    
+
     // If user has scrolled more than 100px, disable typewriter highlighting
     // If at the top (less than 100px), enable typewriter highlighting
     setUserActivity(scrollTop > 100);
@@ -25,7 +25,7 @@ const ScrollTypewriterController = () => {
 
     // Add scroll listener
     scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
-    
+
     // Check initial scroll position
     handleScroll();
 
@@ -39,4 +39,4 @@ const ScrollTypewriterController = () => {
   return null;
 };
 
-export default ScrollTypewriterController; 
+export default ScrollTypewriterController;

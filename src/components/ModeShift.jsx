@@ -2,7 +2,16 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { QUALITY } from '../hooks/quality';
-import { modeShift, shiftTime, wipeAt, SHATTER, VORTEX, CENTRE, TRIANGLE, smooth } from '../hooks/modeShift';
+import {
+  modeShift,
+  shiftTime,
+  wipeAt,
+  SHATTER,
+  VORTEX,
+  CENTRE,
+  TRIANGLE,
+  smooth,
+} from '../hooks/modeShift';
 
 // The 3D half of switching modes (see hooks/modeShift): the page's colour sweeping in a circle, the prism's
 // shards, the sparks the rainbow bursts into, and the light that gathers where the prism forms.
@@ -85,9 +94,17 @@ const rand = (a, b) => a + Math.random() * (b - a);
 
 // Break a triangle at random points along its longest edges, so the pieces are irregular, like real glass
 function fracture(a, b, c, depth, out) {
-  const area = Math.abs((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y)) / 2;
-  if (depth <= 0 || area < 0.035) { out.push([a, b, c]); return; }
-  const [p, q, r] = [[a, b, c], [b, c, a], [c, a, b]].sort((x, y) => y[0].distanceTo(y[1]) - x[0].distanceTo(x[1]))[0];
+  const area =
+    Math.abs((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y)) / 2;
+  if (depth <= 0 || area < 0.035) {
+    out.push([a, b, c]);
+    return;
+  }
+  const [p, q, r] = [
+    [a, b, c],
+    [b, c, a],
+    [c, a, b],
+  ].sort((x, y) => y[0].distanceTo(y[1]) - x[0].distanceTo(x[1]))[0];
   const m = new THREE.Vector2().lerpVectors(p, q, rand(0.3, 0.7));
   const next = depth - 1 - (Math.random() < 0.2 ? 1 : 0);
   fracture(p, m, r, next, out);
@@ -99,28 +116,60 @@ function shardGeometry() {
   const [a, b, c] = TRIANGLE.map(([x, y]) => new THREE.Vector2(x, y));
   const pieces = [];
   fracture(a, b, c, QUALITY.shards, pieces);
-  const pos = []; const nor = []; const edge = []; const cen = []; const rnd = []; const info = [];
+  const pos = [];
+  const nor = [];
+  const edge = [];
+  const cen = [];
+  const rnd = [];
+  const info = [];
   const H = 0.3;
   pieces.forEach(([p, q, r]) => {
-    const cx = (p.x + q.x + r.x) / 3; const cy = (p.y + q.y + r.y) / 3;
-    const ang = Math.atan2(cy - (CENTRE.y - 0.35), cx - CENTRE.x) + rand(-0.35, 0.35);
-    const sp = rand(3.5, 8.5) * (0.6 + 0.6 * Math.hypot(cx - CENTRE.x, cy - CENTRE.y) / 1.9);
-    const area = Math.abs((q.x - p.x) * (r.y - p.y) - (r.x - p.x) * (q.y - p.y)) / 2;
-    const seed = Math.random(); const spin = rand(-9, 9);
+    const cx = (p.x + q.x + r.x) / 3;
+    const cy = (p.y + q.y + r.y) / 3;
+    const ang =
+      Math.atan2(cy - (CENTRE.y - 0.35), cx - CENTRE.x) + rand(-0.35, 0.35);
+    const sp =
+      rand(3.5, 8.5) *
+      (0.6 + (0.6 * Math.hypot(cx - CENTRE.x, cy - CENTRE.y)) / 1.9);
+    const area =
+      Math.abs((q.x - p.x) * (r.y - p.y) - (r.x - p.x) * (q.y - p.y)) / 2;
+    const seed = Math.random();
+    const spin = rand(-9, 9);
     info.push({ cx, cy, ang, sp, area });
     // e marks which edges of a face to light: a component is 0 along the edge it draws
-    const tri = (v1, v2, v3, n, e) => [v1, v2, v3].forEach((v, i) => {
-      pos.push(v.x, v.y, v.z); nor.push(n.x, n.y, n.z); edge.push(...e[i]); cen.push(cx, cy, 0); rnd.push(ang, sp, seed, spin);
-    });
+    const tri = (v1, v2, v3, n, e) =>
+      [v1, v2, v3].forEach((v, i) => {
+        pos.push(v.x, v.y, v.z);
+        nor.push(n.x, n.y, n.z);
+        edge.push(...e[i]);
+        cen.push(cx, cy, 0);
+        rnd.push(ang, sp, seed, spin);
+      });
     const V = (v, z) => new THREE.Vector3(v.x, v.y, z);
-    const B = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+    const B = [
+      [1, 0, 0],
+      [0, 1, 0],
+      [0, 0, 1],
+    ];
     tri(V(p, H), V(q, H), V(r, H), new THREE.Vector3(0, 0, 1), B);
     tri(V(p, -H), V(r, -H), V(q, -H), new THREE.Vector3(0, 0, -1), B);
-    [[p, q], [q, r], [r, p]].forEach(([u, v]) => {
+    [
+      [p, q],
+      [q, r],
+      [r, p],
+    ].forEach(([u, v]) => {
       const n = new THREE.Vector3(v.y - u.y, u.x - v.x, 0).normalize();
       // a side as two triangles; the diagonal between them stays dark
-      tri(V(u, H), V(u, -H), V(v, -H), n, [[0, 1, 1], [0, 0, 1], [1, 0, 1]]);
-      tri(V(u, H), V(v, -H), V(v, H), n, [[1, 0, 1], [0, 1, 1], [0, 0, 1]]);
+      tri(V(u, H), V(u, -H), V(v, -H), n, [
+        [0, 1, 1],
+        [0, 0, 1],
+        [1, 0, 1],
+      ]);
+      tri(V(u, H), V(v, -H), V(v, H), n, [
+        [1, 0, 1],
+        [0, 1, 1],
+        [0, 0, 1],
+      ]);
     });
   });
   const g = new THREE.BufferGeometry();
@@ -135,60 +184,142 @@ function shardGeometry() {
 // Where a shard is, and how fast it is going, t seconds after the break (as the vertex shader moves it)
 const shardAt = (s, t) => {
   const k = (1 - Math.exp(-2.2 * t)) / 2.2;
-  return [s.cx + Math.cos(s.ang) * s.sp * k, s.cy + Math.sin(s.ang) * s.sp * k - 0.9 * t * t];
+  return [
+    s.cx + Math.cos(s.ang) * s.sp * k,
+    s.cy + Math.sin(s.ang) * s.sp * k - 0.9 * t * t,
+  ];
 };
-const shardVel = (s, t) => [Math.cos(s.ang) * s.sp * Math.exp(-2.2 * t), Math.sin(s.ang) * s.sp * Math.exp(-2.2 * t) - 1.8 * t];
+const shardVel = (s, t) => [
+  Math.cos(s.ang) * s.sp * Math.exp(-2.2 * t),
+  Math.sin(s.ang) * s.sp * Math.exp(-2.2 * t) - 1.8 * t,
+];
 
 // Mounted for good, so its shaders are compiled before the first switch; between switches (kind null) it is
 // hidden and does no work
 export const ModeShift = ({ kind = null, onDone }) => {
   const { viewport, gl, camera } = useThree();
-  const wipe = useMemo(() => ({
-    uWC: { value: new THREE.Vector2(CENTRE.x, CENTRE.y) }, uWR: { value: 0 }, uWIn: { value: 1 }, uWOut: { value: 0 }
-  }), []);
+  const wipe = useMemo(
+    () => ({
+      uWC: { value: new THREE.Vector2(CENTRE.x, CENTRE.y) },
+      uWR: { value: 0 },
+      uWIn: { value: 1 },
+      uWOut: { value: 0 },
+    }),
+    []
+  );
   const time = useMemo(() => ({ value: 0 }), []);
 
-  const bg = useMemo(() => new THREE.ShaderMaterial({
-    uniforms: { ...wipe, uView: { value: new THREE.Vector2() }, uCam: { value: new THREE.Vector2() }, uRing: { value: 0 }, uTime: time },
-    vertexShader: bgVert, fragmentShader: bgFrag, depthTest: false, depthWrite: false
-  }), [wipe, time]);
+  const bg = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: {
+          ...wipe,
+          uView: { value: new THREE.Vector2() },
+          uCam: { value: new THREE.Vector2() },
+          uRing: { value: 0 },
+          uTime: time,
+        },
+        vertexShader: bgVert,
+        fragmentShader: bgFrag,
+        depthTest: false,
+        depthWrite: false,
+      }),
+    [wipe, time]
+  );
 
   // The shard material lives as long as the scene, so its shader is compiled before the first switch; each
   // shatter breaks the glass afresh into a new geometry
-  const shardMaterial = useMemo(() => new THREE.ShaderMaterial({
-    uniforms: { ...wipe, uT: { value: -1 }, uEdge: { value: 0 }, uBody: { value: 0 } },
-    vertexShader: shardVert, fragmentShader: shardFrag, transparent: true, depthWrite: false, side: THREE.DoubleSide
-  }), [wipe]);
+  const shardMaterial = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: {
+          ...wipe,
+          uT: { value: -1 },
+          uEdge: { value: 0 },
+          uBody: { value: 0 },
+        },
+        vertexShader: shardVert,
+        fragmentShader: shardFrag,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      }),
+    [wipe]
+  );
   const shardMesh = useRef(null);
   const [firstShards] = useState(() => shardGeometry().g);
 
   const sparks = useMemo(() => {
     const g = new THREE.BufferGeometry();
-    const pos = new Float32Array(SPARKS * 3); const life = new Float32Array(SPARKS); const size = new Float32Array(SPARKS); const color = new Float32Array(SPARKS * 3);
+    const pos = new Float32Array(SPARKS * 3);
+    const life = new Float32Array(SPARKS);
+    const size = new Float32Array(SPARKS);
+    const color = new Float32Array(SPARKS * 3);
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     g.setAttribute('aLife', new THREE.BufferAttribute(life, 1));
     g.setAttribute('aSize', new THREE.BufferAttribute(size, 1));
     g.setAttribute('aColor', new THREE.BufferAttribute(color, 3));
-    const material = new THREE.ShaderMaterial({ uniforms: { ...wipe, uDpr: { value: 1 } }, vertexShader: sparkVert, fragmentShader: sparkFrag, transparent: true, depthWrite: false, depthTest: false });
-    return { g, material, pos, life, size, color, vel: new Float32Array(SPARKS * 3), age: new Float32Array(SPARKS), span: new Float32Array(SPARKS), next: 0 };
+    const material = new THREE.ShaderMaterial({
+      uniforms: { ...wipe, uDpr: { value: 1 } },
+      vertexShader: sparkVert,
+      fragmentShader: sparkFrag,
+      transparent: true,
+      depthWrite: false,
+      depthTest: false,
+    });
+    return {
+      g,
+      material,
+      pos,
+      life,
+      size,
+      color,
+      vel: new Float32Array(SPARKS * 3),
+      age: new Float32Array(SPARKS),
+      span: new Float32Array(SPARKS),
+      next: 0,
+    };
   }, [wipe]);
   const emit = (x, y, vx, vy, px, span, c) => {
-    const i = sparks.next; sparks.next = (sparks.next + 1) % SPARKS;
-    sparks.pos.set([x, y, 6], i * 3); sparks.vel.set([vx, vy, 0], i * 3);
-    sparks.age[i] = 0; sparks.span[i] = span; sparks.life[i] = 1; sparks.size[i] = px; sparks.color.set([c.r, c.g, c.b], i * 3);
+    const i = sparks.next;
+    sparks.next = (sparks.next + 1) % SPARKS;
+    sparks.pos.set([x, y, 6], i * 3);
+    sparks.vel.set([vx, vy, 0], i * 3);
+    sparks.age[i] = 0;
+    sparks.span[i] = span;
+    sparks.life[i] = 1;
+    sparks.size[i] = px;
+    sparks.color.set([c.r, c.g, c.b], i * 3);
   };
 
-  const glow = useMemo(() => new THREE.ShaderMaterial({
-    uniforms: { uO: { value: 0 } },
-    vertexShader: 'varying vec2 vU; void main(){ vU = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-    fragmentShader: glowFrag, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, toneMapped: false
-  }), []);
+  const glow = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: { uO: { value: 0 } },
+        vertexShader:
+          'varying vec2 vU; void main(){ vU = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+        fragmentShader: glowFrag,
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
+        blending: THREE.AdditiveBlending,
+        toneMapped: false,
+      }),
+    []
+  );
   const glowMesh = useRef(null);
 
-  useEffect(() => () => {
-    bg.dispose(); glow.dispose(); sparks.g.dispose(); sparks.material.dispose(); shardMaterial.dispose();
-    shardMesh.current?.geometry.dispose();
-  }, [bg, glow, sparks, shardMaterial]);
+  useEffect(
+    () => () => {
+      bg.dispose();
+      glow.dispose();
+      sparks.g.dispose();
+      sparks.material.dispose();
+      shardMaterial.dispose();
+      shardMesh.current?.geometry.dispose();
+    },
+    [bg, glow, sparks, shardMaterial]
+  );
 
   // Each switch starts clean
   const state = useRef({ broke: false, done: false });
@@ -196,7 +327,9 @@ export const ModeShift = ({ kind = null, onDone }) => {
     if (!kind) return;
     state.current = { broke: false, done: false };
     sparks.life.fill(0);
-    shardMaterial.uniforms.uT.value = -1; shardMaterial.uniforms.uEdge.value = 0; shardMaterial.uniforms.uBody.value = 0;
+    shardMaterial.uniforms.uT.value = -1;
+    shardMaterial.uniforms.uEdge.value = 0;
+    shardMaterial.uniforms.uBody.value = 0;
     bg.uniforms.uRing.value = 0;
     if (kind !== 'shatter' || !shardMesh.current) return;
     const { g, info } = shardGeometry();
@@ -209,7 +342,8 @@ export const ModeShift = ({ kind = null, onDone }) => {
     modeShift.spawns = Array.from({ length: SMALL }, (_, k) => {
       const sh = pool[Math.floor(((k + 0.5) * pool.length) / SMALL)];
       const when = SHATTER.BREAK + 0.42 + k * 0.025;
-      const at = shardAt(sh, when - SHATTER.BREAK); const vel = shardVel(sh, when - SHATTER.BREAK);
+      const at = shardAt(sh, when - SHATTER.BREAK);
+      const vel = shardVel(sh, when - SHATTER.BREAK);
       return { when, x: at[0], y: at[1], vx: vel[0], vy: vel[1] };
     });
   }, [kind, sparks, shardMaterial, bg]);
@@ -225,7 +359,8 @@ export const ModeShift = ({ kind = null, onDone }) => {
     bg.uniforms.uView.value.set(viewport.width, viewport.height);
     bg.uniforms.uCam.value.set(camera.position.x, camera.position.y);
     sparks.material.uniforms.uDpr.value = gl.getPixelRatio();
-    let glowAmt = 0; let glowSize = 2.4;
+    let glowAmt = 0;
+    let glowSize = 2.4;
 
     if (kind === 'shatter') {
       const u = shardMaterial.uniforms;
@@ -233,39 +368,76 @@ export const ModeShift = ({ kind = null, onDone }) => {
         // cracks of light run through the glass, flickering, as the beam overloads it
         const c = smooth(t / SHATTER.BREAK);
         u.uEdge.value = c * (0.75 + 0.25 * Math.sin(t * 90));
-        glowAmt = c * 1.2; glowSize = 2.4 * (1 + c * 1.6);
+        glowAmt = c * 1.2;
+        glowSize = 2.4 * (1 + c * 1.6);
       } else {
         const tb = t - SHATTER.BREAK;
         if (!state.current.broke) {
           state.current.broke = true;
-          u.uEdge.value = 1; u.uBody.value = 1;
+          u.uEdge.value = 1;
+          u.uBody.value = 1;
           // the rainbow bursts into sparks of its own colours, and the beam's last light flies on
           const beam = modeShift.beam;
           if (beam) {
             const reach = Math.hypot(viewport.width, viewport.height) * 0.55;
             for (let k = 0; k < 560; k++) {
-              const f = Math.random(); const a = beam.out + (f - 0.5) * 0.4; const d = rand(0.3, 1) * reach; const sp = rand(1.5, 5);
-              emit(beam.ox + Math.cos(a) * d, beam.oy + Math.sin(a) * d, Math.cos(a) * sp + rand(-1, 1), Math.sin(a) * sp + rand(-1, 1), rand(3, 7), rand(0.5, 1.1), colour.setHSL(0.8 * (1 - f), 1, 0.6));
+              const f = Math.random();
+              const a = beam.out + (f - 0.5) * 0.4;
+              const d = rand(0.3, 1) * reach;
+              const sp = rand(1.5, 5);
+              emit(
+                beam.ox + Math.cos(a) * d,
+                beam.oy + Math.sin(a) * d,
+                Math.cos(a) * sp + rand(-1, 1),
+                Math.sin(a) * sp + rand(-1, 1),
+                rand(3, 7),
+                rand(0.5, 1.1),
+                colour.setHSL(0.8 * (1 - f), 1, 0.6)
+              );
             }
-            const dx = beam.hx - beam.fx; const dy = beam.hy - beam.fy; const len = Math.hypot(dx, dy) || 1;
+            const dx = beam.hx - beam.fx;
+            const dy = beam.hy - beam.fy;
+            const len = Math.hypot(dx, dy) || 1;
             for (let k = 0; k < 180; k++) {
-              const f = Math.random(); const sp = rand(2, 6);
-              emit(beam.fx + dx * f, beam.fy + dy * f, (dx / len) * sp + rand(-0.8, 0.8), (dy / len) * sp + rand(-0.8, 0.8), rand(2, 5), rand(0.3, 0.8), colour.set('#ffffff'));
+              const f = Math.random();
+              const sp = rand(2, 6);
+              emit(
+                beam.fx + dx * f,
+                beam.fy + dy * f,
+                (dx / len) * sp + rand(-0.8, 0.8),
+                (dy / len) * sp + rand(-0.8, 0.8),
+                rand(2, 5),
+                rand(0.3, 0.8),
+                colour.set('#ffffff')
+              );
             }
           }
         }
         u.uT.value = tb;
-        glowAmt = Math.max(0, 3 * (1 - tb / 0.35)); glowSize = 2.4 * (2.6 + tb * 4);
+        glowAmt = Math.max(0, 3 * (1 - tb / 0.35));
+        glowSize = 2.4 * (2.6 + tb * 4);
         bg.uniforms.uRing.value = 1 - smooth(tb / SHATTER.WIPE);
       }
-      if (t > SHATTER.END && !state.current.done) { state.current.done = true; onDone(); }
+      if (t > SHATTER.END && !state.current.done) {
+        state.current.done = true;
+        onDone();
+      }
     } else {
       bg.uniforms.uRing.value = 0.8 * smooth((t - VORTEX.IRIS_AT) / 0.2);
       // the droplets gather into a point of light, which flashes as the prism forms
       const g = Math.min(1, modeShift.core / 500);
-      if (t < VORTEX.FORM) { glowAmt = smooth((t - 0.15) / 0.5) * (0.35 + g * 1.4); glowSize = 1.2 + g * 3; }
-      else { const k = t - VORTEX.FORM; glowAmt = 4 * Math.exp(-k * 6); glowSize = 2.4 + 9 * Math.exp(-k * 5); }
-      if (t > VORTEX.END && !state.current.done) { state.current.done = true; onDone(); }
+      if (t < VORTEX.FORM) {
+        glowAmt = smooth((t - 0.15) / 0.5) * (0.35 + g * 1.4);
+        glowSize = 1.2 + g * 3;
+      } else {
+        const k = t - VORTEX.FORM;
+        glowAmt = 4 * Math.exp(-k * 6);
+        glowSize = 2.4 + 9 * Math.exp(-k * 5);
+      }
+      if (t > VORTEX.END && !state.current.done) {
+        state.current.done = true;
+        onDone();
+      }
     }
 
     if (glowMesh.current) {
@@ -279,13 +451,20 @@ export const ModeShift = ({ kind = null, onDone }) => {
       if (sparks.life[i] <= 0) continue;
       sparks.age[i] += dt;
       const f = 1 - sparks.age[i] / sparks.span[i];
-      if (f <= 0) { sparks.life[i] = 0; continue; }
+      if (f <= 0) {
+        sparks.life[i] = 0;
+        continue;
+      }
       const ix = i * 3;
-      sparks.vel[ix] *= Math.exp(-dt * 2.4); sparks.vel[ix + 1] = sparks.vel[ix + 1] * Math.exp(-dt * 2.4) - viewport.height * 0.35 * dt;
-      sparks.pos[ix] += sparks.vel[ix] * dt; sparks.pos[ix + 1] += sparks.vel[ix + 1] * dt;
+      sparks.vel[ix] *= Math.exp(-dt * 2.4);
+      sparks.vel[ix + 1] =
+        sparks.vel[ix + 1] * Math.exp(-dt * 2.4) - viewport.height * 0.35 * dt;
+      sparks.pos[ix] += sparks.vel[ix] * dt;
+      sparks.pos[ix + 1] += sparks.vel[ix + 1] * dt;
       sparks.life[i] = f;
     }
-    for (const k of ['position', 'aLife', 'aSize', 'aColor']) sparks.g.attributes[k].needsUpdate = true;
+    for (const k of ['position', 'aLife', 'aSize', 'aColor'])
+      sparks.g.attributes[k].needsUpdate = true;
   });
 
   return (
@@ -293,9 +472,27 @@ export const ModeShift = ({ kind = null, onDone }) => {
       <mesh material={bg} frustumCulled={false} renderOrder={-100}>
         <planeGeometry args={[2, 2]} />
       </mesh>
-      <mesh ref={shardMesh} geometry={firstShards} material={shardMaterial} frustumCulled={false} renderOrder={12} visible={kind === 'shatter'} />
-      <points geometry={sparks.g} material={sparks.material} frustumCulled={false} renderOrder={14} />
-      <mesh ref={glowMesh} material={glow} position={[CENTRE.x, CENTRE.y, 8]} renderOrder={15} visible={false}>
+      <mesh
+        ref={shardMesh}
+        geometry={firstShards}
+        material={shardMaterial}
+        frustumCulled={false}
+        renderOrder={12}
+        visible={kind === 'shatter'}
+      />
+      <points
+        geometry={sparks.g}
+        material={sparks.material}
+        frustumCulled={false}
+        renderOrder={14}
+      />
+      <mesh
+        ref={glowMesh}
+        material={glow}
+        position={[CENTRE.x, CENTRE.y, 8]}
+        renderOrder={15}
+        visible={false}
+      >
         <planeGeometry />
       </mesh>
     </group>

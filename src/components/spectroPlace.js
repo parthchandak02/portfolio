@@ -7,7 +7,7 @@ const KNOTS = [
   [2023, 0.34],
   [2025, 0.62],
   [2026, 0.8],
-  [2027, 1]
+  [2027, 1],
 ];
 export const MIN_GAP = 3.5; // px between neighbouring lines
 export const EDGE = 4; // px kept free at each end of a track

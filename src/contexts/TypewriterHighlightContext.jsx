@@ -5,7 +5,7 @@ import { timelineData, getTypewriterData } from '../data/timelineData';
  * =============================================================================
  * TYPEWRITER HIGHLIGHT SYSTEM - FULLY INTEGRATED WITH TIMELINE DATA
  * =============================================================================
- * 
+ *
  * ✅ Typewriter data is now embedded directly in timeline cards
  * ✅ No more separate typewriter data structure
  * ✅ Single source of truth in timelineData.js
@@ -15,10 +15,10 @@ import { timelineData, getTypewriterData } from '../data/timelineData';
 // Create highlight mappings from embedded typewriter data in timeline cards
 const createHighlightMappings = () => {
   const mappings = {};
-  
+
   // Get all timeline cards that have typewriter data
-  const typewriterCards = timelineData.filter(item => item.typewriterTitle);
-  
+  const typewriterCards = timelineData.filter((item) => item.typewriterTitle);
+
   // Group cards by typewriter title
   const cardsByTitle = typewriterCards.reduce((acc, card) => {
     const title = card.typewriterTitle;
@@ -33,8 +33,10 @@ const createHighlightMappings = () => {
   Object.entries(cardsByTitle).forEach(([title, cards]) => {
     mappings[title] = {
       skills: cards[0].skills || [],
-      timelineCards: [...new Set(cards.map(card => card.parent || card.title))], // a project lights its role's card
-      sidebarCategories: [...new Set(cards.map(card => card.category))]
+      timelineCards: [
+        ...new Set(cards.map((card) => card.parent || card.title)),
+      ], // a project lights its role's card
+      sidebarCategories: [...new Set(cards.map((card) => card.category))],
     };
   });
 
@@ -56,7 +58,13 @@ export const TypewriterHighlightProvider = ({ children }) => {
     if (isUserActive || !currentPhrase) {
       return { skills: [], timelineCards: [], sidebarCategories: [] };
     }
-    return highlightMappings[currentPhrase] || { skills: [], timelineCards: [], sidebarCategories: [] };
+    return (
+      highlightMappings[currentPhrase] || {
+        skills: [],
+        timelineCards: [],
+        sidebarCategories: [],
+      }
+    );
   };
 
   // Update the current phrase (called by typewriter when phrase is complete)
@@ -71,10 +79,10 @@ export const TypewriterHighlightProvider = ({ children }) => {
 
   // Get typewriter data for the UITypewriter component (now using embedded data)
   const getTypewriterDataFromContext = () => getTypewriterData();
-  
+
   // Get full sentences for typing (generated from embedded data)
   const getFullSentences = () => {
-    return getTypewriterData().map(item => `${item.prefix} ${item.title}`);
+    return getTypewriterData().map((item) => `${item.prefix} ${item.title}`);
   };
 
   const value = {
@@ -85,7 +93,7 @@ export const TypewriterHighlightProvider = ({ children }) => {
     setUserActivity,
     highlightMappings,
     getTypewriterData: getTypewriterDataFromContext,
-    getFullSentences
+    getFullSentences,
   };
 
   return (
@@ -99,9 +107,11 @@ export const TypewriterHighlightProvider = ({ children }) => {
 export const useTypewriterHighlight = () => {
   const context = useContext(TypewriterHighlightContext);
   if (!context) {
-    throw new Error('useTypewriterHighlight must be used within a TypewriterHighlightProvider');
+    throw new Error(
+      'useTypewriterHighlight must be used within a TypewriterHighlightProvider'
+    );
   }
   return context;
 };
 
-// Removed unused default export 
+// Removed unused default export

@@ -7,12 +7,28 @@
 // the frame rate: changing it resizes every buffer, which blanks the canvas for a frame, and the switch
 // between modes, the one time frames run long, is exactly when that showed.
 
-const coarse = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
-const narrow = typeof window !== 'undefined' && Math.min(window.screen.width, window.screen.height) < 820;
+const coarse =
+  typeof window !== 'undefined' &&
+  window.matchMedia('(pointer: coarse)').matches;
+const narrow =
+  typeof window !== 'undefined' &&
+  Math.min(window.screen.width, window.screen.height) < 820;
 export const isPhone = coarse && narrow;
 
 const ratio = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
 
 export const QUALITY = isPhone
-  ? { dpr: Math.min(ratio, 1.5), msaa: 0, glassResolution: 384, glassSamples: 4, shards: 5 }
-  : { dpr: Math.min(ratio, 2), msaa: 4, glassResolution: 1024, glassSamples: 8, shards: 6 };
+  ? {
+      dpr: Math.min(ratio, 1.5),
+      msaa: 0,
+      glassResolution: 384,
+      glassSamples: 4,
+      shards: 5,
+    }
+  : {
+      dpr: Math.min(ratio, 2),
+      msaa: 4,
+      glassResolution: 1024,
+      glassSamples: 8,
+      shards: 6,
+    };

@@ -18,7 +18,11 @@ const note = (c, at, freq, { gain, decay, from = 1 }) => {
   soft.type = 'lowpass';
   soft.frequency.value = 4200;
   out.connect(soft).connect(c.destination);
-  [[1, 1], [2.76, 0.32], [5.4, 0.1]].forEach(([ratio, level], i) => {
+  [
+    [1, 1],
+    [2.76, 0.32],
+    [5.4, 0.1],
+  ].forEach(([ratio, level], i) => {
     const osc = c.createOscillator();
     const env = c.createGain();
     osc.type = 'sine';
@@ -36,7 +40,10 @@ const note = (c, at, freq, { gain, decay, from = 1 }) => {
 
 const SOUNDS = {
   // A clear note that lifts into place, and a fainter one above it
-  open: (c, t) => { note(c, t, 784, { gain: 0.05, decay: 0.9, from: 0.86 }); note(c, t + 0.07, 1175, { gain: 0.022, decay: 0.7, from: 0.92 }); },
+  open: (c, t) => {
+    note(c, t, 784, { gain: 0.05, decay: 0.9, from: 0.86 });
+    note(c, t + 0.07, 1175, { gain: 0.022, decay: 0.7, from: 0.92 });
+  },
   // One quick note, between the two
   switch: (c, t) => note(c, t, 988, { gain: 0.035, decay: 0.55, from: 0.9 }),
   // Lower and softer, settling down
@@ -45,20 +52,42 @@ const SOUNDS = {
 
 // The reader can turn them off (see SoundToggle), and the choice stays for their next visit
 const MUTED_KEY = 'pc-muted';
-let muted = (() => { try { return localStorage.getItem(MUTED_KEY) === '1'; } catch { return false; } })();
+let muted = (() => {
+  try {
+    return localStorage.getItem(MUTED_KEY) === '1';
+  } catch {
+    return false;
+  }
+})();
 export const isMuted = () => muted;
 export const setMuted = (m) => {
   muted = m;
-  try { localStorage.setItem(MUTED_KEY, m ? '1' : '0'); } catch { /* kept for this visit only */ }
+  try {
+    localStorage.setItem(MUTED_KEY, m ? '1' : '0');
+  } catch {
+    /* kept for this visit only */
+  }
 };
 
 // The same struck-glass note for the Selected work cards' own small moments: [[freq, delay in seconds], ...]
-const heard = () => !(typeof window === 'undefined' || document.hidden || muted || (navigator.userActivation && !navigator.userActivation.hasBeenActive));
-export const glassNotes = (notes, { gain = 0.03, decay = 0.6, from = 0.9 } = {}) => {
+const heard = () =>
+  !(
+    typeof window === 'undefined' ||
+    document.hidden ||
+    muted ||
+    (navigator.userActivation && !navigator.userActivation.hasBeenActive)
+  );
+export const glassNotes = (
+  notes,
+  { gain = 0.03, decay = 0.6, from = 0.9 } = {}
+) => {
   if (!heard()) return;
   const c = context();
   if (!c) return;
-  const play = () => notes.forEach(([freq, delay = 0]) => note(c, c.currentTime + 0.01 + delay, freq, { gain, decay, from }));
+  const play = () =>
+    notes.forEach(([freq, delay = 0]) =>
+      note(c, c.currentTime + 0.01 + delay, freq, { gain, decay, from })
+    );
   if (c.state === 'running') play();
   else c.resume().then(play, () => {});
 };
@@ -72,7 +101,12 @@ export const glassPad = () => {
   const out = c.createGain();
   out.gain.value = 0;
   out.connect(c.destination);
-  const oscillators = [[220, 'triangle', 0.2], [277.2, 'sine', 0.2], [329.6, 'sine', 0.2], [440, 'sine', 0.1]].map(([freq, type, level]) => {
+  const oscillators = [
+    [220, 'triangle', 0.2],
+    [277.2, 'sine', 0.2],
+    [329.6, 'sine', 0.2],
+    [440, 'sine', 0.1],
+  ].map(([freq, type, level]) => {
     const osc = c.createOscillator();
     const env = c.createGain();
     osc.type = type;
@@ -96,14 +130,23 @@ export const glassPad = () => {
 let pending = null;
 export const glassSound = (kind) => {
   if (typeof window === 'undefined' || document.hidden || muted) return;
-  if (!navigator.userActivation?.hasBeenActive && navigator.userActivation) return;
+  if (!navigator.userActivation?.hasBeenActive && navigator.userActivation)
+    return;
   // Gather what happens in the same moment, then sound it once
-  if (pending) { pending.add(kind); return; }
+  if (pending) {
+    pending.add(kind);
+    return;
+  }
   pending = new Set([kind]);
   setTimeout(() => {
     const kinds = pending;
     pending = null;
-    const which = kinds.has('switch') || (kinds.has('open') && kinds.has('close')) ? 'switch' : kinds.has('open') ? 'open' : 'close';
+    const which =
+      kinds.has('switch') || (kinds.has('open') && kinds.has('close'))
+        ? 'switch'
+        : kinds.has('open')
+          ? 'open'
+          : 'close';
     const c = context();
     if (!c) return;
     const play = () => SOUNDS[which](c, c.currentTime + 0.01);

@@ -4,14 +4,14 @@
   left: auto;
   transform: none;
   z-index: 16;
-  
+
   margin: var(--space-600) auto var(--space-500) auto;
-  
+
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-150);
-  
+
   max-width: 90vw;
   text-align: center;
   pointer-events: none;
@@ -25,22 +25,22 @@
   letter-spacing: 0.01em;
   line-height: 1.2;
   font-size: clamp(1.1rem, 2.8vw, 1.4rem);
-  
+
   text-align: center;
   white-space: nowrap;
   overflow: visible;
-  
-  text-shadow: 
+
+  text-shadow:
     0 1px 2px rgba(0, 0, 0, 0.3),
     0 2px 4px rgba(0, 0, 0, 0.2);
-  
+
   transition: var(--transition-standard);
-  
+
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 2px;
-  
+
   opacity: 0.9;
 }
 
@@ -54,12 +54,24 @@
 
 /* The role held now, under the greeting. Its space is held from the start, so nothing below moves when it appears. */
 .ui-typewriter-role {
-  margin: 0; font-family: var(--font-family-label); font-weight: 500; font-size: clamp(0.95rem, 1.6vw, 1.15rem);
-  letter-spacing: 0; opacity: 0.74;
+  margin: 0;
+  font-family: var(--font-family-label);
+  font-weight: 500;
+  font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+  letter-spacing: 0;
+  opacity: 0.74;
 }
-@keyframes ui-role-in { from { opacity: 0; filter: blur(6px); transform: translateY(-3px); } }
+@keyframes ui-role-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(-3px);
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
-  .ui-typewriter-role { animation: ui-role-in 0.8s cubic-bezier(0.32, 0.72, 0, 1) 1.4s both; }
+  .ui-typewriter-role {
+    animation: ui-role-in 0.8s cubic-bezier(0.32, 0.72, 0, 1) 1.4s both;
+  }
 }
 
 /* Cycling Professional Titles Typewriter - larger, cycles continuously */
@@ -70,17 +82,17 @@
   letter-spacing: 0.02em;
   line-height: 1.1;
   font-size: clamp(2rem, 4.5vw, 2.8rem);
-  
+
   text-align: center;
   white-space: nowrap;
   overflow: visible;
-  
-  text-shadow: 
+
+  text-shadow:
     0 1px 2px rgba(0, 0, 0, 0.3),
     0 2px 4px rgba(0, 0, 0, 0.2);
-  
+
   transition: var(--transition-standard);
-  
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -99,16 +111,20 @@
 
 /* Orange styling for title parts in dark mode */
 .ui-typewriter-cycling.ui-typewriter--dark .title-part {
-  color: #FF6B35 !important; /* Vibrant orange matching the prism spectrum */
+  color: #ff6b35 !important; /* Vibrant orange matching the prism spectrum */
   text-shadow: 0 0 8px rgba(255, 107, 53, 0.4) !important; /* Subtle orange glow */
-  filter: drop-shadow(0 2px 4px rgba(255, 107, 53, 0.1)); /* Subtle orange depth */
+  filter: drop-shadow(
+    0 2px 4px rgba(255, 107, 53, 0.1)
+  ); /* Subtle orange depth */
 }
 
 /* Orange styling for title parts in light mode */
 .ui-typewriter-cycling.ui-typewriter--light .title-part {
-  color: #E55A2B !important; /* Darker orange for better contrast on light backgrounds */
+  color: #e55a2b !important; /* Darker orange for better contrast on light backgrounds */
   text-shadow: 0 0 6px rgba(229, 90, 43, 0.2) !important; /* Lighter glow for light mode */
-  filter: drop-shadow(0 1px 2px rgba(229, 90, 43, 0.1)); /* Subtle orange shadow for light mode */
+  filter: drop-shadow(
+    0 1px 2px rgba(229, 90, 43, 0.1)
+  ); /* Subtle orange shadow for light mode */
 }
 
 /* Text container */
@@ -122,18 +138,18 @@
   display: inline-block;
   font-weight: 300;
   opacity: 0;
-  
+
   /* Cursor appearance */
   color: inherit;
   font-size: 0.9em;
   line-height: 1;
-  
+
   /* Animation */
   transition: opacity 0.1s ease;
-  
+
   /* Slight blur for glass effect */
   filter: blur(0.5px);
-  
+
   /* Positioning */
   margin-left: 1px;
   vertical-align: baseline;
@@ -152,12 +168,14 @@
 
 /* Cursor animations */
 @keyframes blink-cursor {
-  0%, 50% { 
-    opacity: 1; 
+  0%,
+  50% {
+    opacity: 1;
     filter: blur(0);
   }
-  51%, 100% { 
-    opacity: 0; 
+  51%,
+  100% {
+    opacity: 0;
     filter: blur(0.5px);
   }
 }
@@ -165,7 +183,7 @@
 /* Light mode styling */
 .ui-typewriter--light {
   color: #1a1a1a;
-  text-shadow: 
+  text-shadow:
     0 1px 2px rgba(255, 255, 255, 0.5),
     0 2px 4px rgba(255, 255, 255, 0.3);
 }
@@ -178,7 +196,7 @@
 /* Dark mode styling */
 .ui-typewriter--dark {
   color: #ffffff;
-  text-shadow: 
+  text-shadow:
     0 1px 2px rgba(0, 0, 0, 0.5),
     0 2px 4px rgba(0, 0, 0, 0.3);
 }
@@ -192,7 +210,7 @@
 .ui-typewriter-cycling.ui-typewriter--dark {
   /* Use normal text color for prefix, orange will be applied only to title-part */
   color: #ffffff;
-  text-shadow: 
+  text-shadow:
     0 1px 2px rgba(0, 0, 0, 0.5),
     0 2px 4px rgba(0, 0, 0, 0.3);
 }
@@ -200,7 +218,7 @@
 .ui-typewriter-cycling.ui-typewriter--light {
   /* Use normal text color for prefix, orange will be applied only to title-part */
   color: #1a1a1a;
-  text-shadow: 
+  text-shadow:
     0 1px 2px rgba(255, 255, 255, 0.5),
     0 2px 4px rgba(255, 255, 255, 0.3);
 }
@@ -241,16 +259,16 @@
     max-width: 95vw;
     gap: var(--space-100);
   }
-  
+
   .ui-typewriter-static {
     font-size: clamp(1rem, 3vw, 1.2rem);
   }
-  
+
   .ui-typewriter-cycling {
     font-size: clamp(1.6rem, 5vw, 2.2rem);
     gap: 1px;
   }
-  
+
   .ui-typewriter__cursor {
     font-size: 0.85em;
     margin-left: 0.5px;
@@ -264,17 +282,17 @@
     margin: calc(var(--space-400) + 134px) auto var(--space-300) auto;
     gap: var(--space-075);
   }
-  
+
   .ui-typewriter-static {
     font-size: clamp(0.9rem, 3.5vw, 1.1rem);
     opacity: 0.85;
   }
-  
+
   .ui-typewriter-cycling {
     font-size: clamp(1.4rem, 6vw, 2rem);
     letter-spacing: 0.01em;
   }
-  
+
   .ui-typewriter__cursor {
     font-size: 0.8em;
   }
@@ -287,16 +305,16 @@
     max-width: 70vw;
     gap: var(--space-200);
   }
-  
+
   .ui-typewriter-static {
     font-size: 1.6rem;
   }
-  
+
   .ui-typewriter-cycling {
     font-size: 3.2rem;
     gap: 3px;
   }
-  
+
   .ui-typewriter__cursor {
     font-size: 0.95em;
     margin-left: 2px;
@@ -310,15 +328,15 @@
     max-width: 60vw;
     gap: var(--space-250);
   }
-  
+
   .ui-typewriter-static {
     font-size: 1.8rem;
   }
-  
+
   .ui-typewriter-cycling {
     font-size: 3.8rem;
   }
-  
+
   .ui-typewriter__cursor {
     font-size: 1em;
   }
@@ -330,11 +348,11 @@
     margin: var(--space-250) auto var(--space-250) auto;
     gap: var(--space-075);
   }
-  
+
   .ui-typewriter-static {
     font-size: clamp(0.9rem, 2vw, 1.1rem);
   }
-  
+
   .ui-typewriter-cycling {
     font-size: clamp(1.4rem, 4vw, 1.8rem);
   }
@@ -352,10 +370,16 @@
   .ui-typewriter__cursor:not(.ui-typewriter__cursor--typing) {
     animation: simple-blink 1.5s linear infinite;
   }
-  
+
   @keyframes simple-blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
+    0%,
+    50% {
+      opacity: 1;
+    }
+    51%,
+    100% {
+      opacity: 0;
+    }
   }
 }
 
@@ -369,18 +393,34 @@
   background: linear-gradient(90deg, currentColor 0%, currentColor 100%);
   background-clip: text;
   -webkit-background-clip: text;
-} 
+}
 /* The name: the one display line of the hero (cook round 2) */
 .ui-typewriter-container .ui-typewriter-name {
-  margin: 0; font-family: var(--font-family-primary); font-weight: 800;
-  font-size: clamp(2.7rem, 11vw, 6.4rem); line-height: 0.98; letter-spacing: -0.035em;
-  white-space: nowrap; position: relative;
+  margin: 0;
+  font-family: var(--font-family-primary);
+  font-weight: 800;
+  font-size: clamp(2.7rem, 11vw, 6.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  position: relative;
 }
 /* The full name, invisible, holds the line's width and height; the typed name sits on top of it (cook round 6) */
-.ui-typewriter-name__hold { visibility: hidden; }
-.ui-typewriter-name__typed { position: absolute; inset: 0; text-align: center; }
+.ui-typewriter-name__hold {
+  visibility: hidden;
+}
+.ui-typewriter-name__typed {
+  position: absolute;
+  inset: 0;
+  text-align: center;
+}
 /* The cycling line steps down so the name leads */
-.ui-typewriter-container .ui-typewriter-cycling { font-size: clamp(1.35rem, 3.4vw, 2.5rem); margin-top: 0.35em; }
+.ui-typewriter-container .ui-typewriter-cycling {
+  font-size: clamp(1.35rem, 3.4vw, 2.5rem);
+  margin-top: 0.35em;
+}
 
 /* Light mode: the role line one step darker on the pearl page (cook round 6) */
-.ui-typewriter-role.ui-typewriter--light { opacity: 0.84; }
+.ui-typewriter-role.ui-typewriter--light {
+  opacity: 0.84;
+}

@@ -3,7 +3,8 @@
 const EVENT = 'prism-glow';
 
 export const glowPrism = (wave = 0) => {
-  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(EVENT, { detail: { wave } }));
+  if (typeof window !== 'undefined')
+    window.dispatchEvent(new CustomEvent(EVENT, { detail: { wave } }));
 };
 
 export const onPrismGlow = (handler) => {

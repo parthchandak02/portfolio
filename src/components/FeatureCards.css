@@ -1,141 +1,426 @@
 /* Selected work's large cards: the tiles' own glass at about a screen's height. Text is laid over whatever small
    moment the card holds, and the rest of the card stays quiet, so the scene still shows through. */
 .fcard {
-  aspect-ratio: auto; display: flex; flex-direction: column; justify-content: flex-end; gap: 20px;
+  aspect-ratio: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 20px;
   --pad: clamp(22px, 3vw, 32px);
-  min-height: clamp(420px, 66vh, 580px); padding: var(--pad);
+  min-height: clamp(420px, 66vh, 580px);
+  padding: var(--pad);
   container-type: inline-size; /* what's inside sizes to the card, which is half the width beside another */
-  box-sizing: border-box; cursor: default;
+  box-sizing: border-box;
+  cursor: default;
 }
 .fcard__open {
-  position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; padding: 0; border: 0; border-radius: inherit;
-  background: none; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
-.fcard__open:focus-visible { outline: 2px solid #ff6b35; outline-offset: -3px; }
+.fcard__open:focus-visible {
+  outline: 2px solid #ff6b35;
+  outline-offset: -3px;
+}
 
-.fcard__text { position: relative; z-index: 1; display: grid; gap: 8px; max-width: 34rem; pointer-events: none; }
-.fcard__kind { font-family: var(--font-family-label); font-weight: 500; font-size: 0.86rem; letter-spacing: 0; opacity: 0.72; }
-.fcard__name { margin: 0; font-family: var(--font-family-primary); font-weight: 800; font-size: clamp(1.75rem, 8cqi, 3.4rem); line-height: 1.04; letter-spacing: -0.02em; text-wrap: balance; }
-.fcard__line { margin: 0; font-size: clamp(0.9rem, 2.6cqi, 1.04rem); line-height: 1.5; opacity: 0.8; text-wrap: pretty; }
+.fcard__text {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+  max-width: 34rem;
+  pointer-events: none;
+}
+.fcard__kind {
+  font-family: var(--font-family-label);
+  font-weight: 500;
+  font-size: 0.86rem;
+  letter-spacing: 0;
+  opacity: 0.72;
+}
+.fcard__name {
+  margin: 0;
+  font-family: var(--font-family-primary);
+  font-weight: 800;
+  font-size: clamp(1.75rem, 8cqi, 3.4rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.fcard__line {
+  margin: 0;
+  font-size: clamp(0.9rem, 2.6cqi, 1.04rem);
+  line-height: 1.5;
+  opacity: 0.8;
+  text-wrap: pretty;
+}
 
 /* Text reads over the rainbow behind the glass: a soft shade from the text's own side, with no edge to it */
-.fcard::after { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1); }
+.fcard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1);
+}
 /* Opened, the shade goes, so nothing marks where the card ends and its details begin */
-.timeline__item[data-joined] .fcard::after { opacity: 0; }
-.fcard:not(.fcard--robot):not(.fcard--audio)::after { background: linear-gradient(to top, var(--fcard-shade), transparent 62%); }
-.fcard--robot::after, .fcard--audio::after { background: linear-gradient(to bottom, var(--fcard-shade), transparent 56%); }
-.lab--dark .fcard { --fcard-shade: rgba(0, 0, 0, 0.5); }
-.lab--light .fcard { --fcard-shade: rgba(255, 255, 255, 0.62); }
-.lab--dark .fcard__text { text-shadow: 0 1px 14px rgba(0, 0, 0, 0.6); }
-.lab--light .fcard__text { text-shadow: 0 1px 12px rgba(255, 255, 255, 0.8); }
+.timeline__item[data-joined] .fcard::after {
+  opacity: 0;
+}
+.fcard:not(.fcard--robot):not(.fcard--audio)::after {
+  background: linear-gradient(to top, var(--fcard-shade), transparent 62%);
+}
+.fcard--robot::after,
+.fcard--audio::after {
+  background: linear-gradient(to bottom, var(--fcard-shade), transparent 56%);
+}
+.lab--dark .fcard {
+  --fcard-shade: rgba(0, 0, 0, 0.5);
+}
+.lab--light .fcard {
+  --fcard-shade: rgba(255, 255, 255, 0.62);
+}
+.lab--dark .fcard__text {
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.6);
+}
+.lab--light .fcard__text {
+  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.8);
+}
 
 /* Controls sit above the card's own button */
-.fcard__swatch, .fcard__action { position: relative; z-index: 3; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.fcard__swatch:focus-visible, .fcard__action:focus-visible { outline: 2px solid #ff6b35; outline-offset: 2px; }
+.fcard__swatch,
+.fcard__action {
+  position: relative;
+  z-index: 3;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.fcard__swatch:focus-visible,
+.fcard__action:focus-visible {
+  outline: 2px solid #ff6b35;
+  outline-offset: 2px;
+}
 
 /* Find My Zoox: a soft light in the glass itself, from the top of the card */
 .fcard__glow {
-  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
   background:
-    radial-gradient(70% 62% at 58% 0%, color-mix(in srgb, var(--light) 62%, transparent), transparent 76%),
-    linear-gradient(color-mix(in srgb, var(--light) 9%, transparent), transparent 70%);
+    radial-gradient(
+      70% 62% at 58% 0%,
+      color-mix(in srgb, var(--light) 62%, transparent),
+      transparent 76%
+    ),
+    linear-gradient(
+      color-mix(in srgb, var(--light) 9%, transparent),
+      transparent 70%
+    );
   transition: background 0.5s ease;
 }
 .fcard__note {
-  position: absolute; top: calc(var(--pad) + 38px); right: var(--pad); z-index: 1;
-  font-family: var(--font-family-label); font-size: 0.7rem; opacity: 0.55; pointer-events: none;
+  position: absolute;
+  top: calc(var(--pad) + 38px);
+  right: var(--pad);
+  z-index: 1;
+  font-family: var(--font-family-label);
+  font-size: 0.7rem;
+  opacity: 0.55;
+  pointer-events: none;
 }
-.fcard__swatches { position: absolute; top: var(--pad); right: var(--pad); z-index: 3; display: flex; gap: 10px; }
+.fcard__swatches {
+  position: absolute;
+  top: var(--pad);
+  right: var(--pad);
+  z-index: 3;
+  display: flex;
+  gap: 10px;
+}
 .fcard__swatch {
-  width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; background: var(--swatch);
-  box-shadow: 0 0 0 0 transparent; transition: box-shadow 0.25s ease, transform 0.25s ease;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--swatch);
+  box-shadow: 0 0 0 0 transparent;
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
 }
-.fcard__swatch::after { content: ''; position: absolute; inset: -9px; border-radius: 50%; } /* a larger target for fingers */
-.fcard__swatch:hover { transform: scale(1.1); }
-.fcard__swatch[aria-pressed="true"] { box-shadow: 0 0 0 3px color-mix(in srgb, var(--swatch) 32%, transparent); }
+.fcard__swatch::after {
+  content: '';
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+} /* a larger target for fingers */
+.fcard__swatch:hover {
+  transform: scale(1.1);
+}
+.fcard__swatch[aria-pressed='true'] {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--swatch) 32%, transparent);
+}
 
 /* Centi-seed: text up top, the floor at the bottom */
-.fcard--robot { justify-content: flex-start; }
-.fcard__robot { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 0.5s ease; }
-.fcard__robot[data-ready] { opacity: 1; }
+.fcard--robot {
+  justify-content: flex-start;
+}
+.fcard__robot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.fcard__robot[data-ready] {
+  opacity: 1;
+}
 /* The floor, under the text: clicks there move the sun rather than open the details */
-.fcard__floor { position: absolute; left: 0; right: 0; bottom: 0; top: 42%; z-index: 3; cursor: crosshair; -webkit-tap-highlight-color: transparent; }
+.fcard__floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 42%;
+  z-index: 3;
+  cursor: crosshair;
+  -webkit-tap-highlight-color: transparent;
+}
 
 /* The audio patent */
-.fcard--audio { justify-content: space-between; }
-.fcard__audio { position: relative; z-index: 3; display: grid; gap: 14px; flex: 1; grid-template-rows: minmax(120px, 1fr) auto; pointer-events: none; }
-.fcard__wave { width: 100%; height: 100%; min-height: 0; display: block; }
-.fcard__audio-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.fcard__level { font-family: var(--font-family-numeric); font-size: 0.8rem; opacity: 0.72; }
-.fcard__actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.fcard__action {
-  min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; pointer-events: auto;
-  font-family: var(--font-family-label); font-weight: 600; font-size: 0.82rem; color: inherit;
-  background: rgba(255, 255, 255, 0.1); transition: background 0.2s ease;
+.fcard--audio {
+  justify-content: space-between;
 }
-.fcard__action:hover { background: rgba(255, 255, 255, 0.18); }
-.lab--light .fcard__action { background: rgba(20, 20, 24, 0.08); }
-.lab--light .fcard__action:hover { background: rgba(20, 20, 24, 0.15); }
+.fcard__audio {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  gap: 14px;
+  flex: 1;
+  grid-template-rows: minmax(120px, 1fr) auto;
+  pointer-events: none;
+}
+.fcard__wave {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: block;
+}
+.fcard__audio-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.fcard__level {
+  font-family: var(--font-family-numeric);
+  font-size: 0.8rem;
+  opacity: 0.72;
+}
+.fcard__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.fcard__action {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  pointer-events: auto;
+  font-family: var(--font-family-label);
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.1);
+  transition: background 0.2s ease;
+}
+.fcard__action:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+.lab--light .fcard__action {
+  background: rgba(20, 20, 24, 0.08);
+}
+.lab--light .fcard__action:hover {
+  background: rgba(20, 20, 24, 0.15);
+}
 
 /* CALarm: the app's own flip clock, near-black in both modes, as on a phone. It opens out of a small pill. */
 .fcard__clock {
-  position: absolute; top: var(--pad); right: var(--pad); z-index: 1;
-  display: flex; align-items: center; gap: 8px; padding: 14px;
-  border-radius: 20px; background: #0e0e11; color: #ff736b;
-  font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums;
+  position: absolute;
+  top: var(--pad);
+  right: var(--pad);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 20px;
+  background: #0e0e11;
+  color: #ff736b;
+  font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
   transform-origin: 100% 0;
-  transition: transform 0.7s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.7s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.4s ease;
+  transition:
+    transform 0.7s cubic-bezier(0.32, 0.72, 0, 1),
+    border-radius 0.7s cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 0.4s ease;
 }
-.fcard__clock i { font-style: normal; font-size: clamp(1.3rem, 5cqi, 2.4rem); }
+.fcard__clock i {
+  font-style: normal;
+  font-size: clamp(1.3rem, 5cqi, 2.4rem);
+}
 .fcard__flip {
-  position: relative; display: inline-flex; align-items: center; justify-content: center;
-  width: clamp(36px, 11cqi, 64px); height: clamp(50px, 15cqi, 86px); border-radius: 8px; background: #2a2a2e;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(36px, 11cqi, 64px);
+  height: clamp(50px, 15cqi, 86px);
+  border-radius: 8px;
+  background: #2a2a2e;
   font-size: clamp(1.6rem, 7.5cqi, 3.3rem);
 }
-.fcard__flip::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #0e0e11; }
-.fcard__clock.is-pill { transform: scale(0.26); border-radius: 60px; }
-@keyframes fcard-ring { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 115, 107, 0); } 30% { box-shadow: 0 0 42px 6px rgba(255, 115, 107, 0.42); } }
-.fcard__clock.is-ring { animation: fcard-ring 1.3s ease-in-out; }
+.fcard__flip::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: #0e0e11;
+}
+.fcard__clock.is-pill {
+  transform: scale(0.26);
+  border-radius: 60px;
+}
+@keyframes fcard-ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 115, 107, 0);
+  }
+  30% {
+    box-shadow: 0 0 42px 6px rgba(255, 115, 107, 0.42);
+  }
+}
+.fcard__clock.is-ring {
+  animation: fcard-ring 1.3s ease-in-out;
+}
 
 /* Where the full portfolio starts, after the last card */
 .fdoor {
-  display: flex; align-items: center; gap: 10px; margin: 44px 0 0; scroll-margin-top: 96px;
-  font-family: var(--font-family-primary); font-weight: 700; font-size: clamp(1.5rem, 3.2vw, 2.1rem); letter-spacing: -0.02em; line-height: 1.1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 44px 0 0;
+  scroll-margin-top: 96px;
+  font-family: var(--font-family-primary);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
-.fdoor--dark { color: rgba(255, 255, 255, 0.82); }
-.fdoor--light { color: rgba(20, 20, 24, 0.78); }
+.fdoor--dark {
+  color: rgba(255, 255, 255, 0.82);
+}
+.fdoor--light {
+  color: rgba(20, 20, 24, 0.78);
+}
 
 /* On a wide screen the four sit two by two, each about half a screen tall; an opened one's details span the row */
 @media (min-width: 900px) {
-  .fcard { min-height: clamp(360px, 46vh, 440px); }
+  .fcard {
+    min-height: clamp(360px, 46vh, 440px);
+  }
 }
 
 @media (max-width: 560px) {
-  .fcard { min-height: min(58vh, 460px); } /* cook round 4: was 74vh, a screen of gradient before the words */
-  .fcard__action { flex: 1; }
-  .fcard__actions { width: 100%; }
+  .fcard {
+    min-height: min(58vh, 460px);
+  } /* cook round 4: was 74vh, a screen of gradient before the words */
+  .fcard__action {
+    flex: 1;
+  }
+  .fcard__actions {
+    width: 100%;
+  }
 }
 
 /* Phone: the scene sits right behind the text, so the shade goes deeper (cook round 1) */
 @media (max-width: 560px) {
-  .lab--dark .fcard { --fcard-shade: rgba(0, 0, 0, 0.72); }
-  .lab--light .fcard { --fcard-shade: rgba(255, 255, 255, 0.8); }
+  .lab--dark .fcard {
+    --fcard-shade: rgba(0, 0, 0, 0.72);
+  }
+  .lab--light .fcard {
+    --fcard-shade: rgba(255, 255, 255, 0.8);
+  }
 }
 
 /* The meta (company, year) reads as a quiet line under the title, not a label above it (cook round 4) */
-.fcard__name { order: 1; }
-.fcard__kind { order: 2; margin-top: -2px; font-size: 0.82rem; opacity: 0.62; }
-.fcard__line { order: 3; }
+.fcard__name {
+  order: 1;
+}
+.fcard__kind {
+  order: 2;
+  margin-top: -2px;
+  font-size: 0.82rem;
+  opacity: 0.62;
+}
+.fcard__line {
+  order: 3;
+}
 
 /* Demos lit at rest (cook round 6): each card shows its moment before anyone touches it */
 /* Find My Zoox: the light already glows in its colour */
 .fcard__glow {
   background:
-    radial-gradient(64% 70% at 58% 0%, color-mix(in srgb, var(--light) 86%, transparent), transparent 78%),
-    radial-gradient(30% 22% at 58% 6%, color-mix(in srgb, var(--light) 70%, #fff), transparent 70%),
-    linear-gradient(color-mix(in srgb, var(--light) 16%, transparent), transparent 72%);
+    radial-gradient(
+      64% 70% at 58% 0%,
+      color-mix(in srgb, var(--light) 86%, transparent),
+      transparent 78%
+    ),
+    radial-gradient(
+      30% 22% at 58% 6%,
+      color-mix(in srgb, var(--light) 70%, #fff),
+      transparent 70%
+    ),
+    linear-gradient(
+      color-mix(in srgb, var(--light) 16%, transparent),
+      transparent 72%
+    );
 }
 /* CALarm: the clock is the picture, large and centred in the space above the words */
-.fcard--alarm .fcard__clock { left: 0; right: 0; width: fit-content; margin: 0 auto; top: calc(var(--pad) + 8px); transform-origin: 50% 0; padding: 18px; gap: 10px; border-radius: 24px; }
-.fcard--alarm .fcard__flip { width: clamp(48px, 15cqi, 88px); height: clamp(66px, 21cqi, 120px); font-size: clamp(2.2rem, 10.5cqi, 4.6rem); border-radius: 10px; }
-.fcard--alarm .fcard__clock i { font-size: clamp(1.8rem, 7cqi, 3.2rem); }
+.fcard--alarm .fcard__clock {
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin: 0 auto;
+  top: calc(var(--pad) + 8px);
+  transform-origin: 50% 0;
+  padding: 18px;
+  gap: 10px;
+  border-radius: 24px;
+}
+.fcard--alarm .fcard__flip {
+  width: clamp(48px, 15cqi, 88px);
+  height: clamp(66px, 21cqi, 120px);
+  font-size: clamp(2.2rem, 10.5cqi, 4.6rem);
+  border-radius: 10px;
+}
+.fcard--alarm .fcard__clock i {
+  font-size: clamp(1.8rem, 7cqi, 3.2rem);
+}

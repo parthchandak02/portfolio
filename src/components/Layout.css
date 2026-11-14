@@ -5,7 +5,7 @@
   height: 100vh;
   overflow: hidden;
   transition: background-color 0.3s ease;
-  
+
   /* CSS Custom Property for dynamic sidebar balancing */
   --left-sidebar-width: 117px; /* Will be updated by JavaScript */
 }
@@ -47,7 +47,6 @@
   display: none;
 }
 
-
 /* Mobile responsive behavior */
 @media (max-width: 1024px) {
   /* Left sidebar moves to top */
@@ -57,7 +56,9 @@
     top: var(--space-150);
     transform: translateX(-50%);
     width: auto;
-    max-width: calc(100vw - 140px); /* Reserve space for right buttons: 48px button + 20px margin + 72px safety = 140px total */
+    max-width: calc(
+      100vw - 140px
+    ); /* Reserve space for right buttons: 48px button + 20px margin + 72px safety = 140px total */
     max-height: none;
     overflow-y: visible;
   }
@@ -66,75 +67,153 @@
 @media (max-width: 768px) {
   .layout__left-sidebar {
     top: var(--space-100);
-    max-width: calc(100vw - 120px); /* Reserve space for right buttons on smaller screens: 44px button + 16px margin + 60px safety = 120px total */
+    max-width: calc(
+      100vw - 120px
+    ); /* Reserve space for right buttons on smaller screens: 44px button + 16px margin + 60px safety = 120px total */
   }
 }
 
 @media (max-width: 480px) {
   .layout__left-sidebar {
-    max-width: calc(100vw - 100px); /* Even more conservative spacing on very small screens to ensure no overlap */
+    max-width: calc(
+      100vw - 100px
+    ); /* Even more conservative spacing on very small screens to ensure no overlap */
   }
 }
 
 @media (max-width: 375px) {
   .layout__left-sidebar {
-    max-width: calc(100vw - 90px); /* Ultra-conservative spacing for very small phones like iPhone SE */
+    max-width: calc(
+      100vw - 90px
+    ); /* Ultra-conservative spacing for very small phones like iPhone SE */
   }
-} 
+}
 /* The light, lock and play buttons belong to the top screen; they step aside once reading starts */
 .layout__ui--reading .light-toggle,
 .layout__ui--reading .lock-toggle,
 .layout__ui--reading .play-mode-toggle {
-  opacity: 0; transform: translateX(12px); pointer-events: none; visibility: hidden;
+  opacity: 0;
+  transform: translateX(12px);
+  pointer-events: none;
+  visibility: hidden;
 }
 
 /* Each round button names what it does: on hover or keyboard focus, and briefly after the opening */
-.light-toggle, .lock-toggle, .play-mode-toggle { overflow: visible; }
+.light-toggle,
+.lock-toggle,
+.play-mode-toggle {
+  overflow: visible;
+}
 .ui-hint {
-  position: absolute; right: calc(100% + 10px); top: 50%;
-  transform: translate(8px, -50%); opacity: 0; pointer-events: none;
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translate(8px, -50%);
+  opacity: 0;
+  pointer-events: none;
   white-space: nowrap;
-  font-family: var(--font-family-primary); font-size: 0.8rem; font-weight: 500; line-height: 1.2; letter-spacing: 0.01em;
-  transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  font-family: var(--font-family-primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  transition:
+    opacity 0.25s ease,
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 /* Plain text, no pill; a soft shadow keeps it readable over the beam */
-.dark-mode .ui-hint { color: rgba(255, 255, 255, 0.78); text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9); }
-.light-mode .ui-hint { color: rgba(20, 20, 24, 0.72); text-shadow: 0 1px 8px rgba(255, 255, 255, 0.95); }
-@media (hover: hover) {
-  .light-toggle:hover > .ui-hint, .lock-toggle:hover > .ui-hint,
-  .play-mode-toggle:hover > .ui-hint { opacity: 1; transform: translate(0, -50%); }
+.dark-mode .ui-hint {
+  color: rgba(255, 255, 255, 0.78);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9);
 }
-.light-toggle:focus-visible > .ui-hint, .lock-toggle:focus-visible > .ui-hint,
-.play-mode-toggle:focus-visible > .ui-hint { opacity: 1; transform: translate(0, -50%); }
+.light-mode .ui-hint {
+  color: rgba(20, 20, 24, 0.72);
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.95);
+}
+@media (hover: hover) {
+  .light-toggle:hover > .ui-hint,
+  .lock-toggle:hover > .ui-hint,
+  .play-mode-toggle:hover > .ui-hint {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
+}
+.light-toggle:focus-visible > .ui-hint,
+.lock-toggle:focus-visible > .ui-hint,
+.play-mode-toggle:focus-visible > .ui-hint {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
 /* After the spark lands the labels cascade up from the button it hit */
-.layout__ui--hints .ui-hint { opacity: 1; transform: translate(0, -50%); }
-.layout__ui--hints .lock-toggle .ui-hint { transition-delay: 0.09s; }
-.layout__ui--hints .light-toggle .ui-hint { transition-delay: 0.18s; }
+.layout__ui--hints .ui-hint {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+.layout__ui--hints .lock-toggle .ui-hint {
+  transition-delay: 0.09s;
+}
+.layout__ui--hints .light-toggle .ui-hint {
+  transition-delay: 0.18s;
+}
 /* The playground: the prism alone. Everything steps away but the play button, whose label offers the way back. */
-.main-content-scroll { transition: opacity 0.4s ease, visibility 0.4s; }
+.main-content-scroll {
+  transition:
+    opacity 0.4s ease,
+    visibility 0.4s;
+}
 .layout__ui--play .main-content-scroll,
 .layout__ui--play .light-toggle,
 .layout__ui--play .lock-toggle,
-.layout__ui--play .spectro-toggle { opacity: 0; visibility: hidden; pointer-events: none; }
-.layout__ui--play .play-mode-toggle > .ui-hint { opacity: 1; transform: translate(0, -50%); }
+.layout__ui--play .spectro-toggle {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.layout__ui--play .play-mode-toggle > .ui-hint {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
 /* In the playground a drag anywhere steers the beam: no scrolling, no pull-to-refresh, no edge bounce,
    no text selection or long-press menu */
-html.is-playground, html.is-playground body {
-  touch-action: pinch-zoom; overscroll-behavior: none; overflow: hidden;
-  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+html.is-playground,
+html.is-playground body {
+  touch-action: pinch-zoom;
+  overscroll-behavior: none;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
-html.is-playground .play-mode-toggle { touch-action: manipulation; }
+html.is-playground .play-mode-toggle {
+  touch-action: manipulation;
+}
 
 /* Alone, the play button slides up into the top corner, where the light button was */
-.layout__ui--play .play-mode-toggle { translate: 0 -116px; }
-@media (max-width: 768px) { .layout__ui--play .play-mode-toggle { translate: 0 -104px; } }
+.layout__ui--play .play-mode-toggle {
+  translate: 0 -116px;
+}
+@media (max-width: 768px) {
+  .layout__ui--play .play-mode-toggle {
+    translate: 0 -104px;
+  }
+}
 
 /* At the very top of the page the play button's label stays up, so the prism's screen is easy to find */
-.layout__ui--top .play-mode-toggle > .ui-hint { opacity: 1; transform: translate(0, -50%); }
-@media (max-width: 768px) { .ui-hint { font-size: 0.75rem; right: calc(100% + 8px); } }
+.layout__ui--top .play-mode-toggle > .ui-hint {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+@media (max-width: 768px) {
+  .ui-hint {
+    font-size: 0.75rem;
+    right: calc(100% + 8px);
+  }
+}
 /* On a phone the hero sits right beside the buttons, so no labels come up after the opening */
 @media (max-width: 768px) {
   .layout__ui--hints .light-toggle .ui-hint,
   .layout__ui--hints .lock-toggle .ui-hint,
-  .layout__ui--hints:not(.layout__ui--play) .play-mode-toggle .ui-hint { opacity: 0; }
+  .layout__ui--hints:not(.layout__ui--play) .play-mode-toggle .ui-hint {
+    opacity: 0;
+  }
 }

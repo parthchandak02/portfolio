@@ -1,112 +1,329 @@
 /* Cards as tiles (see CardTile): two styles with one size and one layout, so a grid lines up whatever its mix.
    The glass, border and focus ring come from .lab-tile. */
-.timeline__tiles .lab__grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-.ctile {
-  width: 100%; padding: 0; font: inherit; text-align: left;
-  aspect-ratio: auto; min-height: 204px; /* room for a three line title under the logo (cook round 6) */
-  display: flex; flex-direction: column;
+.timeline__tiles .lab__grid {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
-.ctile__img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
-.ctile__text { margin-top: auto; display: grid; gap: 3px; padding: 0 14px 13px; min-width: 0; }
+.ctile {
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  aspect-ratio: auto;
+  min-height: 204px; /* room for a three line title under the logo (cook round 6) */
+  display: flex;
+  flex-direction: column;
+}
+.ctile__img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ctile__text {
+  margin-top: auto;
+  display: grid;
+  gap: 3px;
+  padding: 0 14px 13px;
+  min-width: 0;
+}
 /* A long title wraps onto up to three whole lines, breaking only between words (cook round 6) */
 .ctile__name {
-  font-size: 0.94rem; font-weight: 600; line-height: 1.3;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-  overflow-wrap: normal; word-break: normal; hyphens: manual; text-wrap: pretty;
+  font-size: 0.94rem;
+  font-weight: 600;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: manual;
+  text-wrap: pretty;
 }
 .ctile__meta {
-  font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: var(--font-family-numeric);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   /* The date and place come in on hover, keyboard focus or once opened; the corner year stands in for them */
-  opacity: 0; filter: blur(6px); transform: translateY(-3px);
-  transition: opacity 0.45s cubic-bezier(0.32, 0.72, 0, 1), filter 0.45s cubic-bezier(0.32, 0.72, 0, 1), transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(-3px);
+  transition:
+    opacity 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+    filter 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+    transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
 }
-.ctile:focus-visible .ctile__meta, .ctile.is-open .ctile__meta { opacity: 0.72; filter: none; transform: none; }
-@media (hover: hover) { .ctile:hover .ctile__meta { opacity: 0.72; filter: none; transform: none; } }
-.ctile__note { font-size: 0.74rem; opacity: 0.72; }
+.ctile:focus-visible .ctile__meta,
+.ctile.is-open .ctile__meta {
+  opacity: 0.72;
+  filter: none;
+  transform: none;
+}
+@media (hover: hover) {
+  .ctile:hover .ctile__meta {
+    opacity: 0.72;
+    filter: none;
+    transform: none;
+  }
+}
+.ctile__note {
+  font-size: 0.74rem;
+  opacity: 0.72;
+}
 .ctile__year {
-  position: absolute; top: 14px; right: 14px; z-index: 1;
-  font-family: var(--font-family-numeric); font-variant-numeric: tabular-nums; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
+  font-family: var(--font-family-numeric);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   opacity: 0.72; /* the same on every tile (cook round 6) */
 }
-.ctile--photo .ctile__year { text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); }
-.ctile__year--beside { right: 46px; top: 16px; }
-.ctile .ctile__top { padding-right: 52px; }
+.ctile--photo .ctile__year {
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+.ctile__year--beside {
+  right: 46px;
+  top: 16px;
+}
+.ctile .ctile__top {
+  padding-right: 52px;
+}
 
 /* Photo tile: the picture fills it edge to edge, shaded at the foot so the title reads */
-.ctile--photo { color: #fff; }
-.ctile--photo .ctile__img { transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.ctile--photo {
+  color: #fff;
+}
+.ctile--photo .ctile__img {
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 .ctile--photo::before {
-  content: ""; position: absolute; inset: 0; z-index: -1;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.86) 0%, rgba(0, 0, 0, 0.42) 42%, rgba(0, 0, 0, 0) 70%);
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.86) 0%,
+    rgba(0, 0, 0, 0.42) 42%,
+    rgba(0, 0, 0, 0) 70%
+  );
 }
-.ctile--photo .ctile__name { text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5); }
-.ctile--photo .ctile__logo { filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.45)); }
+.ctile--photo .ctile__name {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+.ctile--photo .ctile__logo {
+  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.45));
+}
 .ctile__play {
-  position: absolute; top: 10px; right: 10px;
-  display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5); color: #fff;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
 }
-@media (hover: hover) { .ctile--photo:hover .ctile__img { transform: scale(1.04); } }
+@media (hover: hover) {
+  .ctile--photo:hover .ctile__img {
+    transform: scale(1.04);
+  }
+}
 
 /* Info tile: any picture is a soft ghost behind, which gives way once opened, for the details show it */
-.ctile--info .ctile__img { opacity: 0.18; filter: blur(5px) saturate(1.1); transform: scale(1.08); transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1); }
-.ctile--info.is-open .ctile__img { opacity: 0; }
-.ctile--info .ctile__name { -webkit-line-clamp: 3; }
-.ctile__top { display: flex; align-items: center; gap: 11px; padding: 13px 14px 0; min-width: 0; }
-.ctile__logo { height: 40px; width: auto; max-width: 128px; object-fit: contain; flex: none; opacity: 0.9; }
+.ctile--info .ctile__img {
+  opacity: 0.18;
+  filter: blur(5px) saturate(1.1);
+  transform: scale(1.08);
+  transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.ctile--info.is-open .ctile__img {
+  opacity: 0;
+}
+.ctile--info .ctile__name {
+  -webkit-line-clamp: 3;
+}
+.ctile__top {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 14px 0;
+  min-width: 0;
+}
+.ctile__logo {
+  height: 40px;
+  width: auto;
+  max-width: 128px;
+  object-fit: contain;
+  flex: none;
+  opacity: 0.9;
+}
 .ctile__venue {
-  font-family: var(--font-family-label); font-weight: 600; font-size: 0.8rem; letter-spacing: 0;
-  color: var(--hue, #ff9a3d); line-height: 1.35;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-width: 0;
+  font-family: var(--font-family-label);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0;
+  color: var(--hue, #ff9a3d);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-width: 0;
 }
 .lab--light .ctile--info .ctile__logo,
-.lab--light .ctile--veiled:not(.is-open):not(:focus-visible) .ctile__logo { filter: invert(1) brightness(0.8); }
-@media (hover: hover) { .lab--light .ctile--veiled:hover .ctile__logo { filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.45)); } }
-.lab--light .ctile--info .ctile__venue { color: color-mix(in srgb, var(--hue, #ff9a3d) 62%, #000); }
+.lab--light .ctile--veiled:not(.is-open):not(:focus-visible) .ctile__logo {
+  filter: invert(1) brightness(0.8);
+}
+@media (hover: hover) {
+  .lab--light .ctile--veiled:hover .ctile__logo {
+    filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.45));
+  }
+}
+.lab--light .ctile--info .ctile__venue {
+  color: color-mix(in srgb, var(--hue, #ff9a3d) 62%, #000);
+}
 
 /* Phones: square tiles, two across, with room for one more line of title */
 @media (max-width: 560px) {
-  .timeline__tiles .lab__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .ctile { min-height: 0; aspect-ratio: 1; }
-  .ctile__top { padding: 11px 12px 0; flex-wrap: wrap; row-gap: 6px; } /* a name too long to sit beside the logo goes under it */
-  .ctile__venue { max-width: 100%; }
-  .ctile__text { padding: 0 12px 11px; }
-  .ctile__name { font-size: 0.86rem; -webkit-line-clamp: 3; }
-  .ctile--info .ctile__name { -webkit-line-clamp: 4; }
-  .ctile__logo { height: 28px; max-width: 88px; }
+  .timeline__tiles .lab__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .ctile {
+    min-height: 0;
+    aspect-ratio: 1;
+  }
+  .ctile__top {
+    padding: 11px 12px 0;
+    flex-wrap: wrap;
+    row-gap: 6px;
+  } /* a name too long to sit beside the logo goes under it */
+  .ctile__venue {
+    max-width: 100%;
+  }
+  .ctile__text {
+    padding: 0 12px 11px;
+  }
+  .ctile__name {
+    font-size: 0.86rem;
+    -webkit-line-clamp: 3;
+  }
+  .ctile--info .ctile__name {
+    -webkit-line-clamp: 4;
+  }
+  .ctile__logo {
+    height: 28px;
+    max-width: 88px;
+  }
 }
-@media (prefers-reduced-motion: reduce) { .ctile__img, .ctile__meta { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .ctile__img,
+  .ctile__meta {
+    transition: none;
+  }
+}
 
 /* The tile whose card the typewriter names: a touch of orange in its glass, with no edge */
-.ctile.is-highlighted { box-shadow: inset 0 0 0 100vmax rgba(255, 107, 53, 0.12), var(--glass-shadow-base); }
+.ctile.is-highlighted {
+  box-shadow:
+    inset 0 0 0 100vmax rgba(255, 107, 53, 0.12),
+    var(--glass-shadow-base);
+}
 
 /* A veiled photo tile: at rest it's the same frosted glass as every card, its picture only a soft ghost behind,
    like the Lab's tiles; the glass clears and the picture comes into focus on hover, keyboard focus, or once
    opened */
 .ctile--veiled .ctile__img {
-  opacity: 0.22; filter: blur(10px) saturate(1.2); transform: scale(1.1);
-  transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1), filter 0.64s cubic-bezier(0.32, 0.72, 0, 1), transform 0.64s cubic-bezier(0.32, 0.72, 0, 1);
+  opacity: 0.22;
+  filter: blur(10px) saturate(1.2);
+  transform: scale(1.1);
+  transition:
+    opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1),
+    filter 0.64s cubic-bezier(0.32, 0.72, 0, 1),
+    transform 0.64s cubic-bezier(0.32, 0.72, 0, 1);
 }
-.ctile--veiled::before { opacity: 0.45; transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1); }
-.ctile--veiled .ctile__name, .ctile--veiled .ctile__year { transition: color 0.45s ease, text-shadow 0.45s ease; }
-.ctile--veiled.is-open .ctile__img, .ctile--veiled:focus-visible .ctile__img { opacity: 1; filter: none; transform: scale(1.02); }
-.ctile--veiled.is-open::before, .ctile--veiled:focus-visible::before { opacity: 1; }
+.ctile--veiled::before {
+  opacity: 0.45;
+  transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.ctile--veiled .ctile__name,
+.ctile--veiled .ctile__year {
+  transition:
+    color 0.45s ease,
+    text-shadow 0.45s ease;
+}
+.ctile--veiled.is-open .ctile__img,
+.ctile--veiled:focus-visible .ctile__img {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.02);
+}
+.ctile--veiled.is-open::before,
+.ctile--veiled:focus-visible::before {
+  opacity: 1;
+}
 @media (hover: hover) {
-  .ctile--veiled:hover .ctile__img { opacity: 1; filter: none; transform: scale(1.02); }
-  .ctile--veiled:hover::before { opacity: 1; }
+  .ctile--veiled:hover .ctile__img {
+    opacity: 1;
+    filter: none;
+    transform: scale(1.02);
+  }
+  .ctile--veiled:hover::before {
+    opacity: 1;
+  }
 }
 /* Light glass: dark text while frosted, white once the picture shows */
-.lab--light .ctile--veiled.is-open, .lab--light .ctile--veiled:focus-visible { color: #fff; }
-.lab--light .ctile--veiled:not(.is-open):not(:focus-visible) { color: rgba(20, 20, 24, 0.92); }
-.lab--light .ctile--veiled:not(.is-open):not(:focus-visible)::before { opacity: 0; }
-.lab--light .ctile--veiled:not(.is-open):not(:focus-visible):not(:hover) .ctile__img { opacity: 0.16; }
-.lab--light .ctile--veiled:not(.is-open):not(:focus-visible) :is(.ctile__name, .ctile__year) { text-shadow: none; }
-@media (hover: hover) {
-  .lab--light .ctile--veiled:hover { color: #fff; }
-  .lab--light .ctile--veiled:hover::before { opacity: 1; }
-  .lab--light .ctile--veiled:hover :is(.ctile__name, .ctile__year) { text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5); }
+.lab--light .ctile--veiled.is-open,
+.lab--light .ctile--veiled:focus-visible {
+  color: #fff;
 }
-@media (prefers-reduced-motion: reduce) { .ctile--veiled .ctile__img, .ctile--veiled::before { transition: none; } }
+.lab--light .ctile--veiled:not(.is-open):not(:focus-visible) {
+  color: rgba(20, 20, 24, 0.92);
+}
+.lab--light .ctile--veiled:not(.is-open):not(:focus-visible)::before {
+  opacity: 0;
+}
+.lab--light
+  .ctile--veiled:not(.is-open):not(:focus-visible):not(:hover)
+  .ctile__img {
+  opacity: 0.16;
+}
+.lab--light
+  .ctile--veiled:not(.is-open):not(:focus-visible)
+  :is(.ctile__name, .ctile__year) {
+  text-shadow: none;
+}
+@media (hover: hover) {
+  .lab--light .ctile--veiled:hover {
+    color: #fff;
+  }
+  .lab--light .ctile--veiled:hover::before {
+    opacity: 1;
+  }
+  .lab--light .ctile--veiled:hover :is(.ctile__name, .ctile__year) {
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ctile--veiled .ctile__img,
+  .ctile--veiled::before {
+    transition: none;
+  }
+}
 
 /* Opened, the tile is the tab that heads its details: its whole title shows */
-.ctile.is-open .ctile__name { -webkit-line-clamp: 5; }
+.ctile.is-open .ctile__name {
+  -webkit-line-clamp: 5;
+}

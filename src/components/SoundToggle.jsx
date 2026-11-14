@@ -23,7 +23,9 @@ const SoundToggle = ({ away = false }) => {
       inert={away}
     >
       {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-      <span className="ui-hint" aria-hidden="true">{label}</span>
+      <span className="ui-hint" aria-hidden="true">
+        {label}
+      </span>
     </button>
   );
 };

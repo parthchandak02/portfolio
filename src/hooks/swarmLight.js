@@ -3,7 +3,8 @@
 // strip can hold the swarm until there is somewhere to show it.
 export const swarmLight = {
   pills: [],
-  ready: false
+  ready: false,
 };
 
-if (import.meta.env?.DEV && typeof window !== 'undefined') window.__swarmLight = swarmLight;
+if (import.meta.env?.DEV && typeof window !== 'undefined')
+  window.__swarmLight = swarmLight;

@@ -36,29 +36,57 @@ const Media = ({ item, compact = false, chip = false }) => {
   }
   if (chip) {
     return (
-      <button type="button" className="cdetail__link cdetail__watch" onClick={(e) => { e.stopPropagation(); setPlaying(true); }}>
-        <Play size={12} fill="currentColor" aria-hidden="true" /> Watch the video
+      <button
+        type="button"
+        className="cdetail__link cdetail__watch"
+        onClick={(e) => {
+          e.stopPropagation();
+          setPlaying(true);
+        }}
+      >
+        <Play size={12} fill="currentColor" aria-hidden="true" /> Watch the
+        video
       </button>
     );
   }
   const picture = (
     <>
-      <img className="cdetail__glow" src={src} alt="" aria-hidden="true" loading="lazy" />
-      <img className="cdetail__img" src={src} alt={item.video ? '' : item.title} loading="lazy" />
+      <img
+        className="cdetail__glow"
+        src={src}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+      />
+      <img
+        className="cdetail__img"
+        src={src}
+        alt={item.video ? '' : item.title}
+        loading="lazy"
+      />
     </>
   );
   return item.video ? (
     <button
       type="button"
       className={`cdetail__media cdetail__media--video${compact ? ' cdetail__media--compact' : ''}`}
-      onClick={(e) => { e.stopPropagation(); setPlaying(true); }}
+      onClick={(e) => {
+        e.stopPropagation();
+        setPlaying(true);
+      }}
       aria-label={`Play video: ${item.video.title}`}
     >
       {picture}
-      <span className="cdetail__play"><Play size={compact ? 16 : 20} fill="currentColor" /></span>
+      <span className="cdetail__play">
+        <Play size={compact ? 16 : 20} fill="currentColor" />
+      </span>
     </button>
   ) : (
-    <figure className={`cdetail__media${compact ? ' cdetail__media--compact' : ''}`}>{picture}</figure>
+    <figure
+      className={`cdetail__media${compact ? ' cdetail__media--compact' : ''}`}
+    >
+      {picture}
+    </figure>
   );
 };
 
@@ -68,7 +96,12 @@ const Tags = ({ skills }) => (
     {skills.slice(0, 3).map((s) => {
       const name = typeof s === 'string' ? s : s.name;
       const Icon = typeof s === 'string' ? iconMap[s] : s.component;
-      return <li key={name} className="cdetail__tag">{Icon && <Icon size={13} aria-hidden="true" />}{name}</li>;
+      return (
+        <li key={name} className="cdetail__tag">
+          {Icon && <Icon size={13} aria-hidden="true" />}
+          {name}
+        </li>
+      );
     })}
   </ul>
 );
@@ -79,12 +112,22 @@ const Tags = ({ skills }) => (
  * `tab`: under a tile's tab, which already shows the picture, organisation, title and date, so the details carry
  * on from it with only what's new. `picture`: a tab that doesn't show the card's picture, so the details do.
  */
-const CardDetail = ({ item, subprojects = [], head: withHead = true, tab = false, picture = false }) => {
+const CardDetail = ({
+  item,
+  subprojects = [],
+  head: withHead = true,
+  tab = false,
+  picture = false,
+}) => {
   const head = withHead && !tab;
   const venue = item.volume ? item.volume.split(',')[0] : item.company;
-  const volumeRest = item.volume ? item.volume.split(',').slice(1).join(',').trim() : null;
+  const volumeRest = item.volume
+    ? item.volume.split(',').slice(1).join(',').trim()
+    : null;
   const place = item.location && item.location !== venue ? item.location : null;
-  const meta = tab ? [] : [head ? item.date : null, place, volumeRest].filter(Boolean);
+  const meta = tab
+    ? []
+    : [head ? item.date : null, place, volumeRest].filter(Boolean);
   const logo = typeof item.companyLogo === 'string' ? item.companyLogo : null;
   // A tab already shows the card's picture, unless it's an info tile, where the picture is only a faint ghost
   const pictured = tab && item.tile !== 'info' && !picture;
@@ -96,18 +139,37 @@ const CardDetail = ({ item, subprojects = [], head: withHead = true, tab = false
       <div className="cdetail__text">
         {head && (venue || logo) && (
           <div className="cdetail__eyebrow">
-            {logo && <img className="cdetail__logo" src={logo} alt="" aria-hidden="true" />}
+            {logo && (
+              <img
+                className="cdetail__logo"
+                src={logo}
+                alt=""
+                aria-hidden="true"
+              />
+            )}
             {venue && <span>{venue}</span>}
           </div>
         )}
         {head && <h3 className="cdetail__title">{item.title}</h3>}
         {meta.length > 0 && (
-          <p className="cdetail__meta">{meta.map((m, i) => <span key={i}>{m}</span>)}</p>
+          <p className="cdetail__meta">
+            {meta.map((m, i) => (
+              <span key={i}>{m}</span>
+            ))}
+          </p>
         )}
-        {item.description && <p className="cdetail__desc">{item.description}</p>}
+        {item.description && (
+          <p className="cdetail__desc">{item.description}</p>
+        )}
         {pictured && item.video && <Media item={item} chip />}
         {item.url && (
-          <a className="cdetail__link" href={item.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+          <a
+            className="cdetail__link"
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
             {urlText(item.url)} <ExternalLink size={13} aria-hidden="true" />
           </a>
         )}

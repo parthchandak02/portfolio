@@ -1,4 +1,11 @@
-import { lazy, startTransition, Suspense, useEffect, useState, useMemo } from 'react';
+import {
+  lazy,
+  startTransition,
+  Suspense,
+  useEffect,
+  useState,
+  useMemo,
+} from 'react';
 import './styles.css';
 import Layout from './components/Layout';
 // GlassNavigation removed - replaced with white space placeholder
@@ -13,7 +20,9 @@ import UITypewriter from './components/UITypewriter';
 import useLightMode from './hooks/useLightMode';
 import { switchMode } from './hooks/modeShift';
 import useGlobalMouse from './hooks/useGlobalMouse';
-import useScrollHighlight, { scrollCardToLine } from './hooks/useScrollHighlight';
+import useScrollHighlight, {
+  scrollCardToLine,
+} from './hooks/useScrollHighlight';
 import { timelineData } from './data/timelineData';
 import { bandForSection } from './data/spectrum';
 import { TypewriterHighlightProvider } from './contexts/TypewriterHighlightContext';
@@ -44,7 +53,7 @@ const markVisited = () => {
 
 /**
  * Main App component - Clean, modular structure following React 2024 best practices
- * 
+ *
  * Features:
  * - Modular component structure
  * - Separation of concerns (UI, 3D, logic)
@@ -59,16 +68,18 @@ export default function App() {
   const { lightMode, toggleLightMode } = useLightMode(false);
   // Single source of truth for all mouse state
   const { isLocked, toggleLock, viewportPosition } = useGlobalMouse();
-  
+
   // Play mode state - toggle between interactive mode and resume reading mode.
   // First visit: play mode. Returning visitors, and anyone arriving on a #section link, get the record.
-  const [isPlayMode, setIsPlayMode] = useState(() => !isReturningVisitor() && !window.location.hash);
+  const [isPlayMode, setIsPlayMode] = useState(
+    () => !isReturningVisitor() && !window.location.hash
+  );
   const togglePlayMode = () => {
     const newPlayMode = !isPlayMode;
     setIsPlayMode(newPlayMode);
     // The playground and the way back both start from the top of the page
     document.querySelector('.main-content-scroll')?.scrollTo({ top: 0 });
-    
+
     if (newPlayMode) {
       // Entering play mode: automatically unlock the light beam for better UX
       if (isLocked) {
@@ -81,7 +92,7 @@ export default function App() {
       }
     }
   };
-  
+
   // The playground is a true play mode: every drag, by mouse or finger, steers the beam, and only its
   // button leads back. The page's own gestures (scrolling, pull-to-refresh, the bounce at the edge, a long
   // press's menu) are switched off while it is up, so a swipe across the screen never fights the beam.
@@ -91,7 +102,8 @@ export default function App() {
     root.classList.add('is-playground');
     // One finger steers; two can still pinch to zoom, which some people need to read
     const hold = (e) => {
-      if (e.touches.length < 2 && !e.target.closest?.('.play-mode-toggle')) e.preventDefault();
+      if (e.touches.length < 2 && !e.target.closest?.('.play-mode-toggle'))
+        e.preventDefault();
     };
     document.addEventListener('touchmove', hold, { passive: false });
     return () => {
@@ -113,7 +125,11 @@ export default function App() {
 
   // Get unique categories for filter buttons (excluding 'all')
   const categories = useMemo(() => {
-    return [...new Set(timelineData.map(item => item.category?.toLowerCase()).filter(Boolean))];
+    return [
+      ...new Set(
+        timelineData.map((item) => item.category?.toLowerCase()).filter(Boolean)
+      ),
+    ];
   }, []);
 
   // Resume mode starts with the beam locked, matching what the toggle does at runtime
@@ -142,12 +158,17 @@ export default function App() {
     }
     // Measure once the web fonts are in: text set in a fallback font has other heights and the jump lands off
     let cancelled = false;
-    const timer = setTimeout(() => document.fonts.ready.then(() => {
-      const target = document.getElementById(hash);
-      const scroller = document.querySelector('.main-content-scroll');
-      // The section's first card lands mid-screen, on the reading line, so it is the one lit
-      if (!cancelled && target && scroller) scrollCardToLine(target, scroller);
-    }), 150);
+    const timer = setTimeout(
+      () =>
+        document.fonts.ready.then(() => {
+          const target = document.getElementById(hash);
+          const scroller = document.querySelector('.main-content-scroll');
+          // The section's first card lands mid-screen, on the reading line, so it is the one lit
+          if (!cancelled && target && scroller)
+            scrollCardToLine(target, scroller);
+        }),
+      150
+    );
     return () => {
       cancelled = true;
       clearTimeout(timer);
@@ -178,23 +199,22 @@ export default function App() {
 
   // ?perf turns on a frame recorder for checking the site on a real device (see hooks/perfLog)
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).has('perf')) import('./hooks/perfLog').then((m) => m.startPerfLog());
+    if (new URLSearchParams(window.location.search).has('perf'))
+      import('./hooks/perfLog').then((m) => m.startPerfLog());
   }, []);
 
   // The prism shatters into bubbles, or the bubbles collapse into the prism (see hooks/modeShift). The page
   // changes while it is faded out, rendered in slices so the scene keeps its frames.
-  const flipMode = () => switchMode(!lightMode, () => {
-    paintMode(!lightMode);
-    startTransition(toggleLightMode);
-  });
+  const flipMode = () =>
+    switchMode(!lightMode, () => {
+      paintMode(!lightMode);
+      startTransition(toggleLightMode);
+    });
 
   return (
     <TypewriterHighlightProvider>
       <ScrollTypewriterController />
-      <Layout 
-        lightMode={lightMode}
-        darkMode={!lightMode}
-      >
+      <Layout lightMode={lightMode} darkMode={!lightMode}>
         {/* 3D Canvas Background */}
         <Suspense fallback={null}>
           <Canvas3D
@@ -206,39 +226,59 @@ export default function App() {
             focusHue={litBand?.hue ?? null}
           />
         </Suspense>
-        
+
         {/* One contact button, always on screen */}
         <ContactButton lightMode={lightMode} away={isPlayMode} />
         <SoundToggle away={isPlayMode} />
 
         {/* UI Overlay Layer */}
-        <div className={`layout__ui${handedOver ? ' layout__ui--reading' : ''}${atTop ? ' layout__ui--top' : ''}${isPlayMode ? ' layout__ui--play' : ''}`}>
+        <div
+          className={`layout__ui${handedOver ? ' layout__ui--reading' : ''}${atTop ? ' layout__ui--top' : ''}${isPlayMode ? ' layout__ui--play' : ''}`}
+        >
           {/* Fixed UI Components */}
           <LightToggle lightMode={lightMode} onToggle={flipMode} />
-          <LockToggle isLocked={isLocked} onToggle={toggleLock} lightMode={lightMode} />
-          <PlayModeToggle isPlayMode={isPlayMode} onToggle={togglePlayMode} lightMode={lightMode} />
-          {!isPlayMode && <BandBar category={visibleCategory} title={visibleTitle} lightMode={lightMode} />}
-          
+          <LockToggle
+            isLocked={isLocked}
+            onToggle={toggleLock}
+            lightMode={lightMode}
+          />
+          <PlayModeToggle
+            isPlayMode={isPlayMode}
+            onToggle={togglePlayMode}
+            lightMode={lightMode}
+          />
+          {!isPlayMode && (
+            <BandBar
+              category={visibleCategory}
+              title={visibleTitle}
+              lightMode={lightMode}
+            />
+          )}
+
           {/* Main Content Area - Typewriter always shows, other content conditional */}
           <div className="main-content-scroll">
             {/* Typewriter that always shows regardless of play mode */}
             <UITypewriter lightMode={lightMode} />
 
             {/* Record spectrograph - visible in both modes */}
-            <Spectrograph lightMode={lightMode} handedOver={handedOver} onBand={setFocusBand} />
-            
+            <Spectrograph
+              lightMode={lightMode}
+              handedOver={handedOver}
+              onBand={setFocusBand}
+            />
+
             {/* Resume content - Hidden in play mode */}
             {!isPlayMode && (
               <>
                 {/* Empty space container to showcase prism/rainbow effects */}
                 {/* Empty space to show the prism and rainbow; shorter on a phone, so Selected work peeks in (styles.css) */}
                 <div className="navigation-placeholder" aria-hidden="true" />
-                <Timeline 
-                 data={timelineData}
-                 lightMode={lightMode}
-                 currentTitle={handedOver ? visibleTitle : null}
-                 className="timeline-in-scroll"
-               />
+                <Timeline
+                  data={timelineData}
+                  lightMode={lightMode}
+                  currentTitle={handedOver ? visibleTitle : null}
+                  className="timeline-in-scroll"
+                />
               </>
             )}
           </div>

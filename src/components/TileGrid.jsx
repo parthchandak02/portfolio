@@ -1,7 +1,12 @@
 import { Fragment, useLayoutEffect, useRef, useState } from 'react';
 import { animate } from 'motion';
 import Molten from './Molten';
-import { CLOSE_MS, GLASS_EASE_ARRAY, OPEN_MS, reducedMotion } from '../hooks/glassMotion';
+import {
+  CLOSE_MS,
+  GLASS_EASE_ARRAY,
+  OPEN_MS,
+  reducedMotion,
+} from '../hooks/glassMotion';
 
 // How many columns a grid is laid out in right now (its columns follow the width), and the gap between its rows
 const useLayout = (ref) => {
@@ -11,7 +16,10 @@ const useLayout = (ref) => {
     if (!grid) return undefined;
     const measure = () => {
       const css = getComputedStyle(grid);
-      const cols = Math.max(1, css.gridTemplateColumns.split(' ').filter(Boolean).length);
+      const cols = Math.max(
+        1,
+        css.gridTemplateColumns.split(' ').filter(Boolean).length
+      );
       const gap = parseFloat(css.rowGap) || 0;
       setLayout((l) => (l.cols === cols && l.gap === gap ? l : { cols, gap }));
     };
@@ -54,7 +62,10 @@ const outline = (necks, foot, yb, b, L, R, oy) => {
   // and back along the bottom. A neck's top is where the glass runs on into its tile: the edge skips it.
   const clip = [`M${L} ${Y(b - r)}`];
   const edge = [`M${L} ${Y(b - r)}`];
-  const both = (...c) => { clip.push(...c); edge.push(...c); };
+  const both = (...c) => {
+    clip.push(...c);
+    edge.push(...c);
+  };
   let x = L; // how far along the top it has come
   necks.forEach((n, i) => {
     const room = n.x0 - x;
@@ -65,12 +76,19 @@ const outline = (necks, foot, yb, b, L, R, oy) => {
         const rl = Math.min(r, room - fl);
         both(`L${L} ${Y(yb + rl)}`, `Q${L} ${Y(yb)} ${L + rl} ${Y(yb)}`);
       }
-      both(`L${n.x0 - fl} ${Y(yb)}`, `Q${n.x0} ${Y(yb)} ${n.x0} ${Y(yb - fl)}`, `L${n.x0} ${Y(foot)}`);
+      both(
+        `L${n.x0 - fl} ${Y(yb)}`,
+        `Q${n.x0} ${Y(yb)} ${n.x0} ${Y(yb - fl)}`,
+        `L${n.x0} ${Y(foot)}`
+      );
     }
     clip.push(`L${n.x1} ${Y(foot)}`);
     edge.push(`M${n.x1} ${Y(foot)}`);
     const next = i < necks.length - 1 ? necks[i + 1].x0 : R;
-    if (n.x1 > R - 1) { x = R; return; }
+    if (n.x1 > R - 1) {
+      x = R;
+      return;
+    }
     const fr = Math.min(F, h, (next - n.x1) / 2);
     both(`L${n.x1} ${Y(yb - fr)}`, `Q${n.x1} ${Y(yb)} ${n.x1 + fr} ${Y(yb)}`);
     x = n.x1 + fr;
@@ -79,7 +97,12 @@ const outline = (necks, foot, yb, b, L, R, oy) => {
     const rr = Math.min(r, R - x);
     both(`L${R - rr} ${Y(yb)}`, `Q${R} ${Y(yb)} ${R} ${Y(yb + rr)}`);
   }
-  both(`L${R} ${Y(b - r)}`, `Q${R} ${Y(b)} ${R - r} ${Y(b)}`, `L${L + r} ${Y(b)}`, `Q${L} ${Y(b)} ${L} ${Y(b - r)}`);
+  both(
+    `L${R} ${Y(b - r)}`,
+    `Q${R} ${Y(b)} ${R - r} ${Y(b)}`,
+    `L${L + r} ${Y(b)}`,
+    `Q${L} ${Y(b)} ${L} ${Y(b - r)}`
+  );
   clip.push('Z');
   return { clip: clip.join(' '), edge: edge.join(' ') };
 };
@@ -131,7 +154,17 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
       const k = spread.current;
       const lo = Math.min(...necks.map((n) => n.x0));
       const hi = Math.max(...necks.map((n) => n.x1));
-      const out = necks.length ? outline(necks, foot, foot + gap, b, lo * (1 - k), hi + (W - hi) * k, top) : null;
+      const out = necks.length
+        ? outline(
+            necks,
+            foot,
+            foot + gap,
+            b,
+            lo * (1 - k),
+            hi + (W - hi) * k,
+            top
+          )
+        : null;
       const clip = [];
       const line = [];
       const f = foot - top;
@@ -144,11 +177,22 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
         line.push(`M${x0} ${f} ${side}`);
         if (n.x0 > x0 + 0.5) line.push(`M${x0} ${f} L${n.x0} ${f}`);
         if (n.x1 < x1 - 0.5) line.push(`M${n.x1} ${f} L${x1} ${f}`);
-        shape.current.style.setProperty('--tab-hue', t.style.getPropertyValue('--band-hue'));
+        shape.current.style.setProperty(
+          '--tab-hue',
+          t.style.getPropertyValue('--band-hue')
+        );
       });
-      if (out) { clip.push(out.clip); line.push(out.edge); }
-      const box = { top: `${top}px`, height: `${Math.max(0, Math.max(b, caps.length ? foot : top) - top)}px` };
-      Object.assign(shape.current.style, box, { clipPath: clip.length ? `path("${clip.join(' ')}")` : 'path("M0 0")' });
+      if (out) {
+        clip.push(out.clip);
+        line.push(out.edge);
+      }
+      const box = {
+        top: `${top}px`,
+        height: `${Math.max(0, Math.max(b, caps.length ? foot : top) - top)}px`,
+      };
+      Object.assign(shape.current.style, box, {
+        clipPath: clip.length ? `path("${clip.join(' ')}")` : 'path("M0 0")',
+      });
       Object.assign(edge.current.ownerSVGElement.style, box);
       edge.current.setAttribute('d', line.join(' '));
     };
@@ -158,7 +202,10 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
     const fresh = Object.keys(start).length === 0;
     if (!(tile in start)) start[tile] = 0;
     const step = (v) => {
-      Object.keys(start).forEach((i) => { joins.current[i] = start[i] + ((Number(i) === tile ? 1 : 0) - start[i]) * v; });
+      Object.keys(start).forEach((i) => {
+        joins.current[i] =
+          start[i] + ((Number(i) === tile ? 1 : 0) - start[i]) * v;
+      });
       draw();
     };
     let run;
@@ -166,11 +213,18 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
     if (fresh || !open || reducedMotion()) {
       if (open) step(1);
     } else {
-      run = animate(0, 1, { duration: OPEN_MS / 1000, ease: GLASS_EASE_ARRAY, onUpdate: step });
+      run = animate(0, 1, {
+        duration: OPEN_MS / 1000,
+        ease: GLASS_EASE_ARRAY,
+        onUpdate: step,
+      });
       run.then(() => {
         if (!live) return;
         Object.keys(joins.current).forEach((i) => {
-          if (Number(i) !== tile) { delete joins.current[i]; tileEl(i)?.removeAttribute('data-joined'); }
+          if (Number(i) !== tile) {
+            delete joins.current[i];
+            tileEl(i)?.removeAttribute('data-joined');
+          }
         });
         draw();
       });
@@ -178,15 +232,23 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
     draw();
     const ro = new ResizeObserver(draw);
     ro.observe(g);
-    return () => { live = false; ro.disconnect(); run?.stop(); };
+    return () => {
+      live = false;
+      ro.disconnect();
+      run?.stop();
+    };
   }, [grid, row, tile, gap, open]);
 
   // Leaving the page, every tile it joined has its own glass whole again
-  useLayoutEffect(() => () => {
-    grid.current?.querySelectorAll('[data-joined]').forEach((el) => {
-      if (el.closest('.tile-grid') === grid.current) el.removeAttribute('data-joined');
-    });
-  }, [grid]);
+  useLayoutEffect(
+    () => () => {
+      grid.current?.querySelectorAll('[data-joined]').forEach((el) => {
+        if (el.closest('.tile-grid') === grid.current)
+          el.removeAttribute('data-joined');
+      });
+    },
+    [grid]
+  );
 
   // Pour out and spread as it opens, gather back in and up into the tile as it closes
   useLayoutEffect(() => {
@@ -198,7 +260,10 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
     const run = animate(spread.current, open ? 1 : 0, {
       duration: (open ? OPEN_MS : CLOSE_MS) / 1000,
       ease: open ? [0.5, 0, 0.1, 1] : [0.4, 0, 0.2, 1],
-      onUpdate: (v) => { spread.current = v; redraw.current?.(); },
+      onUpdate: (v) => {
+        spread.current = v;
+        redraw.current?.();
+      },
       onComplete: () => redraw.current?.(),
     });
     return () => run.stop();
@@ -207,7 +272,9 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
   return (
     <>
       <span ref={shape} className="tab-glass" aria-hidden="true" />
-      <svg className="tab-glass__edge" aria-hidden="true"><path ref={edge} /></svg>
+      <svg className="tab-glass__edge" aria-hidden="true">
+        <path ref={edge} />
+      </svg>
     </>
   );
 };
@@ -228,7 +295,10 @@ const TileGrid = ({ entries, openKey, holdKey = null, onOpen, onClose }) => {
   // Each row's details remember the tile they last showed, so they can melt away showing it, until they close
   const shown = useRef({});
   const laidOut = useRef(cols);
-  if (laidOut.current !== cols) { laidOut.current = cols; shown.current = {}; }
+  if (laidOut.current !== cols) {
+    laidOut.current = cols;
+    shown.current = {};
+  }
   if (at >= 0) shown.current[row] = at;
   const [, settle] = useState(0);
   const openRow = useRef(row);
@@ -244,19 +314,26 @@ const TileGrid = ({ entries, openKey, holdKey = null, onOpen, onClose }) => {
   const drawers = useRef({});
   const held = at >= 0 ? at : entries.findIndex((e) => e.key === holdKey);
   useLayoutEffect(() => {
-    const el = held >= 0 && grid.current?.querySelector(`[data-tile="${held}"]`);
+    const el =
+      held >= 0 && grid.current?.querySelector(`[data-tile="${held}"]`);
     if (!el) return undefined;
-    const scroller = el.closest('.main-content-scroll') || document.scrollingElement;
+    const scroller =
+      el.closest('.main-content-scroll') || document.scrollingElement;
     // Where the tile sits in the scrolled content, so the reader's own scrolling is left alone
     const at0 = () => el.getBoundingClientRect().top + scroller.scrollTop;
     let top = at0();
     const end = performance.now() + Math.max(OPEN_MS, CLOSE_MS) + 80;
     const hold = () => {
       const drift = at0() - top;
-      if (Math.abs(drift) > 0.5) { scroller.scrollBy({ top: drift, behavior: 'instant' }); top += drift; }
+      if (Math.abs(drift) > 0.5) {
+        scroller.scrollBy({ top: drift, behavior: 'instant' });
+        top += drift;
+      }
     };
     // Corrected as the content changes size, after layout and before it paints, so the tile never visibly moves
-    const ro = new ResizeObserver(() => { if (performance.now() < end) hold(); });
+    const ro = new ResizeObserver(() => {
+      if (performance.now() < end) hold();
+    });
     [...scroller.children].forEach((c) => ro.observe(c));
     // Then as much of the details as fits comes into view, but never so much that the tile goes up under the bar
     const reveal = () => {
@@ -266,18 +343,33 @@ const TileGrid = ({ entries, openKey, holdKey = null, onOpen, onClose }) => {
       const below = d.getBoundingClientRect().bottom - (view.bottom - 24);
       const room = el.getBoundingClientRect().top - (view.top + 96);
       const by = Math.min(below, room);
-      if (by > 1) scroller.scrollBy({ top: by, behavior: reducedMotion() ? 'auto' : 'smooth' });
+      if (by > 1)
+        scroller.scrollBy({
+          top: by,
+          behavior: reducedMotion() ? 'auto' : 'smooth',
+        });
     };
     const t = at >= 0 && setTimeout(reveal, Math.max(OPEN_MS, CLOSE_MS) + 120);
     const stop = setTimeout(() => ro.disconnect(), end - performance.now());
-    return () => { ro.disconnect(); clearTimeout(t); clearTimeout(stop); };
+    return () => {
+      ro.disconnect();
+      clearTimeout(t);
+      clearTimeout(stop);
+    };
   }, [held, at, row]);
 
   const rows = Object.entries(shown.current).filter(([, i]) => entries[i]);
   return (
     <div className="lab__grid tile-grid" ref={grid}>
       {rows.map(([r, i]) => (
-        <TabGlass key={`glass-${r}`} grid={grid} row={Number(r)} tile={i} gap={gap} open={Number(r) === row} />
+        <TabGlass
+          key={`glass-${r}`}
+          grid={grid}
+          row={Number(r)}
+          tile={i}
+          gap={gap}
+          open={Number(r) === row}
+        />
       ))}
       {entries.map((e, i) => {
         const r = Math.floor(i / cols);
@@ -286,7 +378,11 @@ const TileGrid = ({ entries, openKey, holdKey = null, onOpen, onClose }) => {
         const entry = last != null ? entries[last] : null;
         return (
           <Fragment key={e.key}>
-            <div {...e.attrs} data-tile={i} className={`timeline__item${i === at ? ' is-open' : ''}`}>
+            <div
+              {...e.attrs}
+              data-tile={i}
+              className={`timeline__item${i === at ? ' is-open' : ''}`}
+            >
               {e.tile(() => (i === at ? onClose() : onOpen(e.key)), i === at)}
             </div>
             {rowEnd && entry && (
@@ -294,13 +390,21 @@ const TileGrid = ({ entries, openKey, holdKey = null, onOpen, onClose }) => {
                 open={r === row}
                 contentKey={entry.key}
                 className="tile-drawer"
-                style={{ '--band-hue': entry.attrs.style?.['--band-hue'], '--gap': `${gap}px` }}
+                style={{
+                  '--band-hue': entry.attrs.style?.['--band-hue'],
+                  '--gap': `${gap}px`,
+                }}
                 role="region"
                 aria-label="Details"
                 data-row={r}
                 onClosed={() => closed(r)}
               >
-                <div className="tile-drawer__inner" ref={(el) => { drawers.current[r] = el; }}>
+                <div
+                  className="tile-drawer__inner"
+                  ref={(el) => {
+                    drawers.current[r] = el;
+                  }}
+                >
                   {entry.detail()}
                 </div>
               </Molten>
