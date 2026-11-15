@@ -122,7 +122,7 @@ const Molten = ({
     });
     ro.observe(i);
     return () => ro.disconnect();
-  }, [open, mounted]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, mounted]);
 
   // Close: melt back to nothing, then leave
   useLayoutEffect(() => {

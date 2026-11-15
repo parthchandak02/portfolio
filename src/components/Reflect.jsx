@@ -51,7 +51,6 @@ export const Reflect = forwardRef(
     let intersect = null;
     let intersects = [];
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const api = useMemo(
       () => ({
         number: 0,
@@ -82,7 +81,6 @@ export const Reflect = forwardRef(
           // eslint-disable-next-line no-constant-condition
           while (true) {
             api.raycaster.set(vStart, vDir);
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             intersect = api.raycaster.intersectObjects(api.objects, false)[0];
             if (api.number < bounce && intersect && intersect.face) {
               //intersects.push({ point: intersect.point.clone(), direction: vDir.clone(), object: intersect.object });
@@ -174,7 +172,6 @@ export const Reflect = forwardRef(
     useLayoutEffect(() => void api.setRay(_start, _end), [..._start, ..._end]);
     useImperativeHandle(fRef, () => api, [api]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useLayoutEffect(() => {
       // Collect all objects that fulfill the criteria
       api.objects = [];

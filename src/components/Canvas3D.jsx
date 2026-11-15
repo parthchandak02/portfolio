@@ -1,12 +1,4 @@
-// eslint-disable-next-line no-unused-vars
-import React, {
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer, LUT } from '@react-three/postprocessing';

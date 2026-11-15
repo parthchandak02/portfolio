@@ -95,8 +95,6 @@ const Timeline = ({
     };
     window.addEventListener('pc-show-card', onShow);
     return () => window.removeEventListener('pc-show-card', onShow);
-    // previewOf only reads static data
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
   const showAllButton = (id, hidden) =>
     hidden > 0 && (

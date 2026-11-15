@@ -470,8 +470,6 @@ const Spectrograph = ({ lightMode = false, handedOver = false, onBand }) => {
       };
       rafRef.current = requestAnimationFrame(frame);
       pillsRef.current = pills;
-      // stopSwarm only touches refs
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [stageRef, showHints]
   );
