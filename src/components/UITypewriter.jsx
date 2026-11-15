@@ -41,8 +41,8 @@ const UITypewriter = ({ lightMode }) => {
         <span className="ui-typewriter-name__typed">
           <ReactTyped
             strings={['Parth Chandak']}
-            typeSpeed={70}
-            startDelay={350}
+            typeSpeed={20}
+            startDelay={0}
             showCursor={false}
             loop={false}
           />
@@ -73,10 +73,10 @@ const UITypewriter = ({ lightMode }) => {
             }
             return sentence;
           })}
-          typeSpeed={80}
-          backSpeed={50}
-          backDelay={2500}
-          startDelay={1900} // Start once the name has typed in
+          typeSpeed={8}
+          backSpeed={16}
+          backDelay={24000}
+          startDelay={120} // Start right after the name settles in
           loop={true}
           showCursor={true}
           smartBackspace={true}

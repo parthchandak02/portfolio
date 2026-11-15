@@ -146,11 +146,11 @@ const Track = ({
 // The opening: the record arrives split into its eight lanes, holds a moment, then folds into one strip.
 // A swarm of the strip's own colours then carries the fold to the button that undoes it, so the control
 // explains itself.
-const INTRO_HOLD = 1100; // ms the lanes stay open; the draw-in finishes inside it. Start-up work adds ~0.5 s in practice
-const FOLD_MS = 1150; // ms for the fold to finish, matching the collapse transitions in Spectrograph.css
-const SWARM_WAVE = 520; // ms for the lift-off to travel from the strip's left end to its right
-const SWARM_CAP = 3200; // ms after which any pill still in the air is let go
-const HINT_MS = 2600; // ms the button labels stay up after the first pills land
+const INTRO_HOLD = 580; // ms the lanes stay open; the draw-in finishes inside it.
+const FOLD_MS = 640; // ms for the fold to finish, matching the collapse transitions in Spectrograph.css
+const SWARM_WAVE = 360; // ms for the lift-off to travel from the strip's left end to its right
+const SWARM_CAP = 1400; // ms after which any pill still in the air is let go
+const HINT_MS = 350; // ms the button labels stay up after the first pills land
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' &&

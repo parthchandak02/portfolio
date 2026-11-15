@@ -19,7 +19,7 @@ const HIPS = [
   [1.55, -1],
 ]; // along the body, and which side
 const STRIDE = 1.5; // how far a foot sweeps, front to back
-const SPEED = 2.5; // units a second
+const SPEED = 4.2; // units a second
 const smooth = (t) => t * t * (3 - 2 * t);
 const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
 
@@ -173,7 +173,7 @@ const studio = (renderer, lightMode) => {
     m.lookAt(0, 0, 0);
     scene.add(m);
   };
-  const glow = lightMode ? 1.2 : 5;
+  const glow = lightMode ? 1.5 : 6.2;
   panel(new THREE.Color(0xfff0d8).multiplyScalar(glow * 1.6), 8, 8, 2, 11, 6);
   panel(new THREE.Color(0xbcd4ff).multiplyScalar(glow * 0.5), 6, 10, -11, 3, 4);
   [
@@ -252,9 +252,9 @@ export const createCentiSeed = (
     depthWrite: false,
   });
   const edgeLine = new THREE.LineBasicMaterial({
-    color: 0xffffff,
+    color: 0xdde7f4,
     transparent: true,
-    opacity: 0.6,
+    opacity: 0.36,
   });
   const black = new THREE.MeshStandardMaterial({
     color: 0x17181b,
@@ -442,9 +442,9 @@ export const createCentiSeed = (
     env?.dispose();
     env = studio(renderer, light);
     scene.environment = env;
-    edgeLine.color.set(light ? 0x6f8094 : 0xffffff);
-    edgeLine.opacity = light ? 0.75 : 0.6;
-    acrylic.opacity = light ? 0.3 : 0.2;
+    edgeLine.color.set(light ? 0x4e5d70 : 0xffffff);
+    edgeLine.opacity = light ? 0.88 : 0.86;
+    acrylic.opacity = light ? 0.38 : 0.28;
     pool.visible = !light;
     shadow.material.opacity = light ? 0.34 : 1;
   };
@@ -498,7 +498,7 @@ export const createCentiSeed = (
   const draw = () => renderer.render(scene, camera);
 
   const tick = (now) => {
-    const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
+    const dt = Math.min(0.15, (now - last) / 1000 || 0.016);
     last = now;
     sunShown += (sunX - sunShown) * Math.min(1, dt * 5);
     let busy = Math.abs(sunX - sunShown) > 0.02;
@@ -519,7 +519,7 @@ export const createCentiSeed = (
       state = 'rest';
     }
     if (state === 'growing') {
-      grow = Math.min(1, grow + dt / 1.6);
+      grow = Math.min(1, grow + dt / 0.85);
       if (grow === 1) state = 'rest';
       busy = true;
     }
@@ -540,14 +540,14 @@ export const createCentiSeed = (
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     // The robot keeps one size on the screen (about 170 px long, smaller on a phone) however wide the card is
-    const robotPx = clamp(w * 0.36, 170, 300);
+    const robotPx = clamp(w * 0.36, 170, 270);
     const unitsTall = (h / robotPx) * 7.4;
     const distance =
       unitsTall / 2 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     const tilt = 0.17; // looking a little down at it
     const mid = unitsTall * (floor - 0.5); // how far above the floor line the camera looks
     camera.position.set(
-      2.2,
+      0.35,
       mid + Math.sin(tilt) * distance,
       Math.cos(tilt) * distance
     );
@@ -570,18 +570,18 @@ export const createCentiSeed = (
   canvas.addEventListener('webglcontextlost', onLost);
 
   return {
-    /** It walks in from the left, to the sun in the middle, and its plant grows */
+    /** It walks in from just left of center to the sun in the middle, and its plant grows */
     walkIn() {
       cancelAnimationFrame(frame);
       frame = 0;
-      x = -halfWidth - 6;
+      x = -1.1;
       target = 0;
       sunX = 0;
       sunShown = 0;
       heading = 0;
       aim = 0;
       travelled = 0;
-      grow = 0.12;
+      grow = 0.6;
       state = 'walking';
       go();
     },
@@ -602,8 +602,8 @@ export const createCentiSeed = (
       draw();
     },
     follow(at) {
-      if (state === 'growing') return;
-      const reach = Math.max(1, halfWidth - 4.5);
+      if (state === 'walking' || state === 'growing') return;
+      const reach = Math.max(1, halfWidth - 4.8) * 0.65;
       sunX = clamp((at - 0.5) * 2 * halfWidth, -reach, reach);
       target = sunX;
       if (Math.abs(target - x) > 0.6) {

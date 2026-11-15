@@ -156,19 +156,18 @@ export default function App() {
       togglePlayMode();
       return;
     }
-    // Measure once the web fonts are in: text set in a fallback font has other heights and the jump lands off
     let cancelled = false;
-    const timer = setTimeout(
-      () =>
-        document.fonts.ready.then(() => {
-          const target = document.getElementById(hash);
-          const scroller = document.querySelector('.main-content-scroll');
-          // The section's first card lands mid-screen, on the reading line, so it is the one lit
-          if (!cancelled && target && scroller)
-            scrollCardToLine(target, scroller);
-        }),
-      150
-    );
+    const align = () => {
+      const target = document.getElementById(hash);
+      const scroller = document.querySelector('.main-content-scroll');
+      if (!cancelled && target && scroller)
+        scrollCardToLine(target, scroller, 'auto');
+    };
+    requestAnimationFrame(align);
+    document.fonts.ready.then(() => {
+      if (!cancelled) requestAnimationFrame(align);
+    });
+    const timer = setTimeout(align, 150);
     return () => {
       cancelled = true;
       clearTimeout(timer);
@@ -227,9 +226,19 @@ export default function App() {
           />
         </Suspense>
 
+        {/* Quiet full-bleed backdrop veil once reading begins, softening the raw 3D beam behind cards */}
+        <div
+          className={`scroll-veil${handedOver ? ' is-active' : ''} ${lightMode ? 'scroll-veil--light' : 'scroll-veil--dark'}`}
+          aria-hidden="true"
+        />
+
         {/* One contact button, always on screen */}
-        <ContactButton lightMode={lightMode} away={isPlayMode} />
-        <SoundToggle away={isPlayMode} />
+        <ContactButton
+          lightMode={lightMode}
+          away={isPlayMode}
+          reading={handedOver}
+        />
+        <SoundToggle away={isPlayMode} reading={handedOver} />
 
         {/* UI Overlay Layer */}
         <div

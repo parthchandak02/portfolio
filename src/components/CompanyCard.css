@@ -30,9 +30,8 @@
 .company__name {
   font-family: var(--font-family-label);
   font-weight: 600;
-  font-size: 0.74rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.01em;
   color: var(--band-hue, #e4dccf);
 }
 .company--light .company__name {

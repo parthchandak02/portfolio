@@ -111,20 +111,14 @@
 
 /* Orange styling for title parts in dark mode */
 .ui-typewriter-cycling.ui-typewriter--dark .title-part {
-  color: #ff6b35 !important; /* Vibrant orange matching the prism spectrum */
-  text-shadow: 0 0 8px rgba(255, 107, 53, 0.4) !important; /* Subtle orange glow */
-  filter: drop-shadow(
-    0 2px 4px rgba(255, 107, 53, 0.1)
-  ); /* Subtle orange depth */
+  color: #ff6b35 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45) !important;
 }
 
 /* Orange styling for title parts in light mode */
 .ui-typewriter-cycling.ui-typewriter--light .title-part {
-  color: #e55a2b !important; /* Darker orange for better contrast on light backgrounds */
-  text-shadow: 0 0 6px rgba(229, 90, 43, 0.2) !important; /* Lighter glow for light mode */
-  filter: drop-shadow(
-    0 1px 2px rgba(229, 90, 43, 0.1)
-  ); /* Subtle orange shadow for light mode */
+  color: #dc4c1d !important;
+  text-shadow: none !important;
 }
 
 /* Text container */
@@ -188,9 +182,11 @@
     0 2px 4px rgba(255, 255, 255, 0.3);
 }
 
-.ui-typewriter--light .ui-typewriter__cursor {
-  color: #2a2a2a;
-  text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+.ui-typewriter--light .ui-typewriter__cursor,
+.ui-typewriter--light .typed-cursor {
+  color: #202228;
+  opacity: 0.78;
+  text-shadow: none;
 }
 
 /* Dark mode styling */
@@ -254,9 +250,8 @@
 
 @media (max-width: 768px) {
   .ui-typewriter-container {
-    /* Adjust for smaller left sidebar height on smaller screens */
-    margin: calc(var(--space-500) + 65px) auto var(--space-400) auto;
-    max-width: 95vw;
+    margin: 72px auto var(--space-250) auto;
+    max-width: calc(100vw - 128px);
     gap: var(--space-100);
   }
 
@@ -265,7 +260,7 @@
   }
 
   .ui-typewriter-cycling {
-    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    font-size: clamp(1.4rem, 5vw, 2.2rem);
     gap: 1px;
   }
 
@@ -275,12 +270,22 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 560px) {
   .ui-typewriter-container {
-    /* On a phone the headline starts below the column of round buttons, so a long role like
-       "Creative Technologist" never runs under them */
-    margin: calc(var(--space-400) + 134px) auto var(--space-300) auto;
+    margin: 74px auto var(--space-150) auto;
+    max-width: calc(100vw - 132px);
     gap: var(--space-075);
+  }
+
+  .ui-typewriter-container .ui-typewriter-name {
+    font-size: clamp(1.9rem, 8.2vw, 6.4rem);
+  }
+
+  .ui-typewriter-role {
+    font-size: 0.9rem;
+    line-height: 1.3;
+    white-space: normal;
+    text-wrap: balance;
   }
 
   .ui-typewriter-static {
@@ -289,7 +294,7 @@
   }
 
   .ui-typewriter-cycling {
-    font-size: clamp(1.4rem, 6vw, 2rem);
+    font-size: clamp(1.18rem, 4.7vw, 1.75rem);
     letter-spacing: 0.01em;
   }
 
@@ -301,9 +306,9 @@
 /* Large screens */
 @media (min-width: 1024px) {
   .ui-typewriter-container {
-    margin: var(--space-800) auto var(--space-600) auto;
+    margin: var(--space-300) auto var(--space-250) auto;
     max-width: 70vw;
-    gap: var(--space-200);
+    gap: var(--space-150);
   }
 
   .ui-typewriter-static {
@@ -324,9 +329,9 @@
 /* Extra large screens */
 @media (min-width: 1440px) {
   .ui-typewriter-container {
-    margin: var(--space-1000) auto var(--space-800) auto;
+    margin: var(--space-400) auto var(--space-300) auto;
     max-width: 60vw;
-    gap: var(--space-250);
+    gap: var(--space-150);
   }
 
   .ui-typewriter-static {
@@ -399,9 +404,9 @@
   margin: 0;
   font-family: var(--font-family-primary);
   font-weight: 800;
-  font-size: clamp(2.7rem, 11vw, 6.4rem);
-  line-height: 0.98;
-  letter-spacing: -0.035em;
+  font-size: clamp(2.45rem, 10.5vw, 6.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.024em;
   white-space: nowrap;
   position: relative;
 }
@@ -420,7 +425,26 @@
   margin-top: 0.35em;
 }
 
-/* Light mode: the role line one step darker on the pearl page (cook round 6) */
+/* Light mode: subtle pearl crispness without creating an oval smudge behind the role line */
+.ui-typewriter--light {
+  text-shadow: 0 1px 4px rgba(244, 245, 247, 0.55);
+}
 .ui-typewriter-role.ui-typewriter--light {
-  opacity: 0.84;
+  opacity: 0.9;
+  text-shadow: none;
+}
+
+@media (max-width: 560px) {
+  .ui-typewriter-container {
+    margin: 68px auto var(--space-100) auto;
+    max-width: calc(100vw - 124px);
+  }
+  .ui-typewriter-container .ui-typewriter-name {
+    font-size: clamp(1.85rem, 8vw, 2.3rem);
+  }
+  .ui-typewriter-container .ui-typewriter-cycling {
+    font-size: clamp(0.95rem, 3.8vw, 1.12rem);
+    letter-spacing: -0.005em;
+    margin-top: 0.25em;
+  }
 }

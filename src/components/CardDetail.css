@@ -29,9 +29,8 @@
   min-width: 0;
   font-family: var(--font-family-label);
   font-weight: 600;
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.01em;
   color: var(--band-hue, #ff9a3d);
 }
 .cdetail__eyebrow span {

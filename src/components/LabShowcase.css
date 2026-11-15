@@ -47,9 +47,9 @@
   outline-offset: 3px;
 }
 
-/* Every screenshot gets one shared grade so the set reads as one: a little darker and steadier, so the bright
-   white UI shots sit with the dark art (cook round 6). It is scaled up from its foot, which crops off the strip
-   of tiny UI text most shots carry along the top, like a clock or a temperature, and keeps the picture itself. */
+/* Every screenshot gets one shared grade and clean focal crop so baked-in HUD/description strips at top
+   and bottom edges never fight the tile title. Portrait screenshots (420x616) crop top & bottom text strips;
+   landscape screenshots keep tighter scale and targeted horizontal framing. */
 .lab-tile__img {
   position: absolute;
   inset: 0;
@@ -58,23 +58,61 @@
   object-fit: cover;
   object-position: 50% 50%;
   opacity: 1;
-  filter: brightness(0.95) contrast(1.05) saturate(1.08); /* round 7: lighter grade, the white shots were going milky */
-  transform: scale(1.18);
-  transform-origin: 50% 100%;
+  filter: brightness(0.92) contrast(1.06) saturate(1.08);
+  transform: scale(1.54);
+  transform-origin: 50% 48%;
   transition:
     opacity 0.6s ease,
     filter 0.6s ease,
     transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-/* A wide shot shows its most telling part in a tall tile (cook round 6) */
+.lab-tile__img[src$='/echo.png'] {
+  transform: scale(1.66);
+  transform-origin: 50% 52%;
+  filter: brightness(1.36) contrast(1.22) saturate(1.15);
+}
+.lab-tile__img[src$='/orbiter.png'] {
+  object-position: 50% 48%;
+  transform: scale(1.68);
+  transform-origin: 50% 48%;
+  filter: brightness(1.36) contrast(1.22) saturate(1.15);
+}
+.lab-tile__img[src$='/tide.png'],
+.lab-tile__img[src$='/eurusd.png'] {
+  transform: scale(1.16);
+  transform-origin: 50% 44%;
+}
+.lab-tile__img[src$='/wc26.png'] {
+  object-position: 54% 58%;
+  transform: scale(1.52);
+  transform-origin: 54% 58%;
+}
+.lab-tile__img[src$='/inkwell.png'] {
+  object-position: 86% 62%;
+  transform: scale(1.75);
+  transform-origin: 86% 62%;
+  filter: brightness(0.42) contrast(1.38) saturate(1.35);
+}
+.lab-tile__img[src$='/aeris.png'] {
+  object-position: 62% 38%;
+  transform: scale(1.85);
+  transform-origin: 62% 38%;
+  filter: invert(0.92) hue-rotate(180deg) brightness(0.9) contrast(1.1);
+}
 .lab-tile__img[src$='/jobwright.png'] {
-  object-position: 86% 50%;
+  object-position: 75% 48%;
+  transform: scale(1.08);
+  transform-origin: 75% 48%;
+  filter: invert(0.91) hue-rotate(180deg) brightness(1.06) contrast(1.2);
+}
+.lab-tile__img[src$='/atmos.png'] {
+  filter: brightness(0.76) contrast(1.12) saturate(1.06);
 }
 .lab--light .lab-tile__img {
   filter: brightness(0.94) contrast(1.04) saturate(1.06);
 }
 
-/* The project name resting low, with just enough shade under it to read */
+/* The project name resting low, with strong obsidian fog under it so titles always read clearly */
 .lab-tile__fog {
   position: absolute;
   inset: 0;
@@ -85,16 +123,16 @@
   gap: 2px;
   padding: 14px;
   border-radius: inherit;
-  /* A soft shade along the top too (cook round 6; the all-over veil came out in round 7, it greyed the white shots) */
   background:
     linear-gradient(
       to top,
-      rgba(0, 0, 0, 0.86) 0%,
-      rgba(0, 0, 0, 0.42) 30%,
-      rgba(0, 0, 0, 0) 54%
+      rgba(6, 7, 11, 0.99) 0%,
+      rgba(6, 7, 11, 0.96) 32%,
+      rgba(6, 7, 11, 0.72) 52%,
+      rgba(6, 7, 11, 0) 72%
     ),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0) 18%);
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+    linear-gradient(to bottom, rgba(6, 7, 11, 0.28) 0%, rgba(6, 7, 11, 0) 18%);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.65);
   transition: opacity 0.6s ease;
 }
 .lab--light .lab-tile {
@@ -105,9 +143,9 @@
   background:
     linear-gradient(
       to top,
-      rgba(255, 255, 255, 0.92) 0%,
-      rgba(255, 255, 255, 0.5) 30%,
-      rgba(255, 255, 255, 0) 54%
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.64) 28%,
+      rgba(255, 255, 255, 0) 56%
     ),
     linear-gradient(
       to bottom,
@@ -116,21 +154,25 @@
     );
   text-shadow: 0 1px 8px rgba(255, 255, 255, 0.7);
 }
-/* The caption: the same place on every tile, large enough to read; the tag wraps to a second line rather than
-   being cut off (cook round 6) */
 .lab-tile__name {
   font-size: 1.08rem;
   font-weight: 700;
-  letter-spacing: 0.01em;
-  line-height: 1.25;
+  letter-spacing: 0.005em;
+  line-height: 1.24;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .lab-tile__tag {
-  font-size: 0.84rem;
+  font-size: 0.875rem;
   line-height: 1.3;
-  opacity: 0.92;
+  height: 2.6em;
+  min-height: 2.6em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: 0.9;
   text-wrap: balance;
 }
 
@@ -147,8 +189,8 @@
   padding: 44px 14px 14px;
   background: linear-gradient(
     to top,
-    rgba(8, 8, 10, 0.94) 0%,
-    rgba(8, 8, 10, 0.7) 55%,
+    rgba(8, 8, 10, 0.95) 0%,
+    rgba(8, 8, 10, 0.74) 55%,
     transparent 100%
   );
   opacity: 0;
@@ -159,9 +201,9 @@
   pointer-events: none;
 }
 .lab-tile__desc {
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   line-height: 1.4;
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(255, 255, 255, 0.88);
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -172,7 +214,7 @@
   align-items: center;
   gap: 3px;
   margin-top: 2px;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #ff8a5c;
 }
@@ -186,7 +228,7 @@
 .lab-tile:focus-visible .lab-tile__img {
   opacity: 1;
   filter: none;
-  transform: scale(1.13);
+  transform: scale(1.36);
 }
 .lab-tile.is-open .lab-tile__reveal,
 .lab-tile:focus-visible .lab-tile__reveal {
@@ -207,7 +249,7 @@
   .lab-tile:hover .lab-tile__img {
     opacity: 1;
     filter: none;
-    transform: scale(1.13);
+    transform: scale(1.36);
   }
   .lab-tile:hover .lab-tile__reveal {
     opacity: 1;
@@ -242,7 +284,9 @@
    opaque surface, still lightly frosted, so the rainbow behind the page only tints them and every word reads
    cleanly. Selected work keeps its clear glass. Opened details share the tiles' glass through these values. */
 .timeline__items .lab--dark {
-  --glass-bg-base: rgba(15, 15, 19, 0.86);
+  --glass-bg-base: rgba(14, 15, 21, 0.88);
+  --glass-border-base: rgba(255, 255, 255, 0.11);
+  --glass-border-hover: rgba(255, 255, 255, 0.24);
 }
 .timeline__items .lab--light {
   --glass-bg-base: rgba(250, 250, 252, 0.88);

@@ -27,7 +27,7 @@
   box-shadow: 0 0 calc(var(--d) * 0.9) rgba(255, 255, 255, 0.75);
 }
 .light-mode .selected-mark > i {
-  background: #8a8e96;
+  background: #4c515c;
 }
 /* On a light page light can't outshine the paper, so a picked diamond turns to ink instead */
 .light-mode .selected-mark.is-on > i {

@@ -4,7 +4,7 @@ import { glassNotes, glassPad } from '../hooks/glassSound';
 import SelectedMark from './SelectedMark';
 import './FeatureCards.css';
 
-// Calls back once, the first time most of the card is on screen. Each moment plays only then, once per visit.
+// Calls back once, the first time part of the card is on screen. Each moment plays only then, once per visit.
 const useFirstSight = (ref, onSight) => {
   const fn = useRef(onSight);
   fn.current = onSight;
@@ -17,7 +17,7 @@ const useFirstSight = (ref, onSight) => {
         io.disconnect();
         fn.current();
       },
-      { threshold: 0.55 }
+      { threshold: 0.25 }
     );
     io.observe(el);
     return () => io.disconnect();
@@ -63,11 +63,11 @@ const SWATCHES = [
   },
 ];
 const PULSE = [
-  { opacity: 0 },
+  { opacity: 0.25 },
   { opacity: 1, offset: 0.2 },
-  { opacity: 0.3, offset: 0.4 },
+  { opacity: 0.4, offset: 0.4 },
   { opacity: 1, offset: 0.6 },
-  { opacity: 0.3, offset: 0.8 },
+  { opacity: 0.4, offset: 0.8 },
   { opacity: 1 },
 ];
 
@@ -76,10 +76,12 @@ const PULSE = [
 const LightMoment = ({ card }) => {
   const [hue, setHue] = useState(SWATCHES[0]);
   const glow = useRef(null);
+  const beacon = useRef(null);
   const call = (swatch) => {
     glassNotes(swatch.notes, { gain: 0.035, decay: 0.8 });
     if (reducedMotion()) return;
     glow.current?.animate(PULSE, { duration: 1500, easing: 'ease-in-out' });
+    beacon.current?.animate(PULSE, { duration: 1500, easing: 'ease-in-out' });
   };
   useFirstSight(card, () => call(SWATCHES[0]));
   return (
@@ -90,24 +92,34 @@ const LightMoment = ({ card }) => {
         style={{ '--light': hue.hue }}
         aria-hidden="true"
       />
-      <span className="fcard__note">
-        Example light and chime, not the real ones
+      <span
+        ref={beacon}
+        className="fcard__beacon"
+        style={{ '--light': hue.hue }}
+        aria-hidden="true"
+      >
+        <i />
+        <i />
+        <i />
       </span>
-      <div className="fcard__swatches" role="group" aria-label="Try a color">
-        {SWATCHES.map((s) => (
-          <button
-            key={s.name}
-            type="button"
-            className="fcard__swatch"
-            style={{ '--swatch': s.hue }}
-            aria-label={s.name}
-            aria-pressed={hue === s}
-            onClick={() => {
-              setHue(s);
-              call(s);
-            }}
-          />
-        ))}
+      <div className="fcard__light-bar">
+        <span className="fcard__note">Simulated light and chime</span>
+        <div className="fcard__swatches" role="group" aria-label="Try a color">
+          {SWATCHES.map((s) => (
+            <button
+              key={s.name}
+              type="button"
+              className="fcard__swatch"
+              style={{ '--swatch': s.hue }}
+              aria-label={s.name}
+              aria-pressed={hue === s}
+              onClick={() => {
+                setHue(s);
+                call(s);
+              }}
+            />
+          ))}
+        </div>
       </div>
     </>
   );
@@ -135,12 +147,16 @@ const RobotMoment = ({ card, lightMode }) => {
         import('./centiSeedRobot').then(({ createCentiSeed }) => {
           if (!live) return;
           try {
-            robot.current = createCentiSeed(el, { lightMode: light.current });
+            robot.current = createCentiSeed(el, {
+              lightMode: light.current,
+              floor: 0.78,
+            });
           } catch {
             return;
           } // no WebGL: the card still reads without it
           el.dataset.ready = '';
           if (seen.current) start();
+          else robot.current.rest();
         });
       },
       { rootMargin: '400px 0px' }
@@ -164,8 +180,15 @@ const RobotMoment = ({ card, lightMode }) => {
 
   useEffect(() => {
     const el = card.current;
+    const mountedAt = performance.now();
     const move = (e) => {
-      if (!robot.current || e.pointerType === 'touch') return;
+      if (
+        !robot.current ||
+        performance.now() - mountedAt < 1500 ||
+        e.pointerType === 'touch' ||
+        (!e.movementX && !e.movementY)
+      )
+        return;
       const r = el.getBoundingClientRect();
       robot.current.follow((e.clientX - r.left) / r.width);
     };
@@ -184,6 +207,12 @@ const RobotMoment = ({ card, lightMode }) => {
     <>
       <canvas ref={canvas} className="fcard__robot" aria-hidden="true" />
       <span className="fcard__floor" onClick={tap} aria-hidden="true" />
+      <div className="fcard__cue-bar" aria-hidden="true">
+        <span className="fcard__note">Click or tap the floor to move sun</span>
+        <span className="fcard__reticle">
+          <i />
+        </span>
+      </div>
     </>
   );
 };
@@ -328,14 +357,16 @@ const AudioMoment = ({ card, lightMode }) => {
         <span className="fcard__actions">
           <button
             type="button"
-            className="fcard__action"
+            className={`fcard__action${mode === 'nav' ? ' is-active' : ''}`}
+            aria-pressed={mode === 'nav'}
             onClick={() => hear('nav')}
           >
             Navigation prompt
           </button>
           <button
             type="button"
-            className="fcard__action"
+            className={`fcard__action${mode === 'urgent' ? ' is-active' : ''}`}
+            aria-pressed={mode === 'urgent'}
             onClick={() => hear('urgent')}
           >
             Urgent alert
@@ -361,12 +392,10 @@ const AlarmMoment = ({ card }) => {
   useFirstSight(card, () => {
     if (reducedMotion()) return;
     const at = (ms, fn) => timers.current.push(setTimeout(fn, ms));
-    setPhase('pill');
-    setDigits(['0', '03']);
-    at(800, () => setPhase('open'));
-    at(1500, () => setDigits(['0', '02']));
-    at(2200, () => setDigits(['0', '01']));
-    at(2900, () => {
+    setPhase('open');
+    setDigits(['0', '02']);
+    at(280, () => setDigits(['0', '01']));
+    at(580, () => {
       setDigits(['0', '00']);
       setPhase('ring');
       glassNotes(
@@ -377,7 +406,7 @@ const AlarmMoment = ({ card }) => {
         { gain: 0.04, decay: 0.4, from: 1 }
       );
     });
-    at(4300, () => {
+    at(1150, () => {
       setPhase('rest');
       setDigits(clockNow());
     });
@@ -399,12 +428,18 @@ const AlarmMoment = ({ card }) => {
   }, []);
   const [h, m] = digits;
   return (
-    <span className={`fcard__clock is-${phase}`} aria-hidden="true">
-      <span className="fcard__flip">{h}</span>
-      <i>:</i>
-      <span className="fcard__flip">{m[0]}</span>
-      <span className="fcard__flip">{m[1]}</span>
-    </span>
+    <div className="fcard__alarm-wrap" aria-hidden="true">
+      <span className="fcard__alarm-pill">
+        <span className="fcard__alarm-dot" />
+        Calendar alarm · Overrides Silent
+      </span>
+      <span className={`fcard__clock is-${phase}`}>
+        <span className="fcard__flip">{h}</span>
+        <i>:</i>
+        <span className="fcard__flip">{m[0]}</span>
+        <span className="fcard__flip">{m[1]}</span>
+      </span>
+    </div>
   );
 };
 

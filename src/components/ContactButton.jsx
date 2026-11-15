@@ -52,7 +52,11 @@ const prefersReducedMotion = reducedMotion;
  * panel: the button's own glass flows out into the card, like a phone's Dynamic Island, and the links
  * condense out of a blur one after another. Closing flows the same glass back into the circle.
  */
-const ContactButton = ({ lightMode = false, away = false }) => {
+const ContactButton = ({
+  lightMode = false,
+  away = false,
+  reading = false,
+}) => {
   const [open, setOpen] = useState(false);
   const shellRef = useRef(null);
   const cardRef = useRef(null);
@@ -157,7 +161,7 @@ const ContactButton = ({ lightMode = false, away = false }) => {
 
   return (
     <div
-      className={`contact ${lightMode ? 'contact--light' : 'contact--dark'}${away ? ' contact--away' : ''}`}
+      className={`contact ${lightMode ? 'contact--light' : 'contact--dark'}${away ? ' contact--away' : ''}${reading ? ' contact--reading' : ''}`}
       inert={away}
     >
       <div ref={shellRef} className={`contact__shell${open ? ' is-open' : ''}`}>

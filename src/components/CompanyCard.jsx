@@ -76,9 +76,7 @@ const CompanyCard = ({ roles, childrenOf = {}, lightMode = false }) => {
                 <span className="company__role-text">
                   <span className="company__role-title">{item.title}</span>
                   <span className="company__role-date">
-                    {[item.date.replace(' - ', ' – '), length]
-                      .filter(Boolean)
-                      .join(' · ')}
+                    {[item.date, length].filter(Boolean).join(' · ')}
                   </span>
                 </span>
                 <ChevronDown

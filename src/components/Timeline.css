@@ -127,14 +127,14 @@
   align-items: center;
   justify-content: center;
   margin: 14px auto 0;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 20px;
   border: 0;
   border-radius: 999px;
   cursor: pointer;
   font-family: var(--font-family-label);
   font-weight: 600;
-  font-size: 0.82rem;
+  font-size: 0.875rem;
   background: var(--glass-bg-base);
   -webkit-backdrop-filter: var(--glass-blur-subtle);
   backdrop-filter: var(--glass-blur-subtle);
@@ -142,10 +142,10 @@
   transition: background 0.25s ease;
 }
 .timeline__more--dark {
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(255, 255, 255, 0.88);
 }
 .timeline__more--light {
-  color: rgba(20, 20, 24, 0.86);
+  color: rgba(20, 20, 24, 0.88);
 }
 .timeline__more--dark:hover {
   background: rgba(44, 44, 50, 0.92);
@@ -174,7 +174,7 @@
 
 /* Selected work, ahead of the bands */
 .timeline__selected {
-  margin-bottom: 56px;
+  margin-bottom: 52px;
 }
 .timeline__selected-title {
   display: flex;
@@ -183,15 +183,15 @@
   margin: 0;
   font-family: var(--font-family-primary);
   font-weight: 700;
-  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
 .timeline--dark .timeline__selected-title {
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.94);
 }
 .timeline--light .timeline__selected-title {
-  color: rgba(20, 20, 24, 0.78);
+  color: rgba(20, 20, 24, 0.92);
 }
 .timeline__selected-mark {
   --d: 8px;
@@ -201,7 +201,20 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin: 0 0 16px;
+  margin: 0 0 12px;
+}
+.timeline--dark .timeline__selected-head {
+  text-shadow:
+    0 2px 16px rgba(0, 0, 0, 0.96),
+    0 0 8px rgba(0, 0, 0, 0.8);
+}
+.timeline--light .timeline__selected-head {
+  text-shadow:
+    0 2px 14px rgba(244, 245, 247, 0.96),
+    0 0 10px rgba(244, 245, 247, 0.9);
+}
+.timeline__items > .lab {
+  margin-bottom: 44px;
 }
 .timeline__skip {
   display: inline-flex;
@@ -211,15 +224,19 @@
   font-weight: 600;
   font-size: 0.9rem;
   color: inherit;
-  opacity: 0.82;
+  opacity: 0.78;
   text-decoration: underline;
   text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
-  transition: opacity 0.2s ease;
+  text-decoration-color: color-mix(in srgb, currentColor 34%, transparent);
+  text-underline-offset: 5px;
+  transition:
+    opacity 0.2s ease,
+    text-decoration-color 0.2s ease;
 }
 .timeline__skip:hover,
 .timeline__skip:focus-visible {
   opacity: 1;
+  text-decoration-color: currentColor;
 }
 .timeline--dark .timeline__skip {
   color: #fff;
@@ -230,13 +247,13 @@
 .timeline__selected .lab__grid,
 .timeline__selected .timeline__tiles .lab__grid {
   grid-template-columns: minmax(0, 1fr);
-  gap: 20px;
+  gap: 16px;
 }
 @media (min-width: 900px) {
   .timeline__selected .lab__grid,
   .timeline__selected .timeline__tiles .lab__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+    gap: 14px;
   }
 }
 .timeline__tiles .timeline__item {
@@ -449,10 +466,20 @@
 }
 /* The card whose line is lit on the band bar: its glass takes on a little of the band's colour, with no edge */
 .timeline__item[data-current] > .timeline-card,
-.timeline__item[data-current] > .lab-tile {
+.timeline__item[data-current] > .lab-tile:not(.fcard) {
   box-shadow:
     inset 0 0 0 100vmax color-mix(in srgb, var(--band-hue) 12%, transparent),
     var(--glass-shadow-base);
+}
+.timeline__item[data-current] > .fcard {
+  box-shadow:
+    inset 0 0 0 100vmax color-mix(in srgb, var(--band-hue) 3%, transparent),
+    var(--glass-shadow-base);
+  border-color: color-mix(
+    in srgb,
+    var(--band-hue) 28%,
+    rgba(255, 255, 255, 0.12)
+  );
 }
 
 /* Wide screens: the work gets the room (cook round 1) */

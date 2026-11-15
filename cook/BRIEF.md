@@ -16,3 +16,14 @@ Deliverable: approved stills, then the working build on main.
 Permissions: commit yes on branch cook/2026-11-13; push to main (auto deploys) only after Parth approves stills and the 3D checklist passes.
 Judges: 2 fresh subagents per round.
 Parth's words: "Let's do a cook on the portfolio now." Answers: Light 3h, whole page, I find refs, push to main.
+
+## Decisions
+
+- 2026-11-15 03:03 UTC: Resumed cook run on branch `cook/ui-polish` (portfolio, base `main`).
+- Size: light, hard cap 2 hours from 03:01 UTC (ends by 05:01 UTC).
+- Bar: keep 99 similarity target against R01 to R05 (equivalent to 9/10 per dimension); default slop ban list plus repo rules (CLAUDE.md, docs/3d-debugging.md, docs/content.md; prism, beam, bubbles and spectrograph stay as site identity).
+- Shots: S01 to S04 at 390x844 and 1440x900 (dark and light), served on 127.0.0.1:8839.
+- Critics: 2 fresh read-only subagent critics per round.
+- Permissions: commit each round on `cook/ui-polish`, push branch and open PR to `main`; no deploy, no publish, no prod data, `.env` or secrets. Parth is not watching per round (no pings).
+- Dependencies: untouched (issue #12 handles astro).
+- Writing: no em dashes or en dashes anywhere.

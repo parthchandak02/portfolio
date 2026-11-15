@@ -14,7 +14,7 @@ import {
 } from '../src/hooks/scrollReading.js';
 
 const view = { top: 0, bottom: 900, height: 900 };
-const line = readingLineFromRect(view); // 505
+const line = readingLineFromRect(view); // 518
 
 const card = (over = {}) => ({
   category: 'research',
@@ -115,8 +115,14 @@ test('a gap names the closest card that is actually on screen', () => {
   assert.equal(named([above, below]).title, 'Below');
 
   // The same distance keeps the earlier card.
-  const twin = card({ title: 'Twin', top: 810, bottom: 910, height: 100 });
   const first = card({ title: 'First', top: 100, bottom: 200, height: 100 });
+  const twinTop = 2 * line - 150 - 50; // centre as far below the line as First's is above
+  const twin = card({
+    title: 'Twin',
+    top: twinTop,
+    bottom: twinTop + 100,
+    height: 100,
+  });
   assert.equal(named([first, twin]).title, 'First');
 
   // 15% of the card on screen is not enough; just over 15% is.
@@ -218,6 +224,35 @@ test('Selected work keeps the bar in the gaps around its cards', () => {
     named([elsewhere], { selected: { top: line, bottom: 800 } }).category,
     'media'
   );
+});
+
+test('landed at the top of Selected work, the bar names its first card', () => {
+  const firstCard = card({
+    category: 'selected',
+    title: 'Find My Zoox',
+    top: 200,
+    bottom: 400,
+    left: 0,
+  });
+  const secondRow = card({
+    category: 'selected',
+    title: 'Second row',
+    top: 420,
+    bottom: 620,
+    left: 0,
+  });
+  const items = [firstCard, secondRow];
+
+  // The block's top is still just under the bar: the first card is named, not the one on the line.
+  const landed = { top: view.top + BAR_CLEARANCE - 24, bottom: 900 };
+  assert.deepEqual(named(items, { selected: landed }), {
+    category: 'selected',
+    title: 'Find My Zoox',
+  });
+
+  // Scrolled further, the card on the line is named again.
+  const scrolled = { top: view.top + BAR_CLEARANCE - 25, bottom: 900 };
+  assert.equal(named(items, { selected: scrolled }).title, 'Second row');
 });
 
 test('a jump lands each tile on the share of the row the bar will name', () => {

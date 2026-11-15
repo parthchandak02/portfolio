@@ -140,6 +140,14 @@
   --color-highlight-active-bg: var(--color-highlight-active-bg-light);
   --color-highlight-active-border: var(--color-highlight-active-border-light);
   --color-highlight-active-shadow: var(--color-highlight-active-shadow-light);
+  --glass-bg-base: rgba(255, 255, 255, 0.72);
+  --glass-bg-hover: rgba(255, 255, 255, 0.92);
+  --glass-border-base: rgba(15, 23, 42, 0.08);
+  --glass-border-hover: rgba(15, 23, 42, 0.16);
+  --glass-shadow-base:
+    0 2px 10px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.03);
+  --glass-shadow-hover:
+    0 6px 20px rgba(15, 23, 42, 0.07), 0 2px 4px rgba(15, 23, 42, 0.04);
 }
 
 .dark-mode {
@@ -209,6 +217,10 @@
     var(--glass-shadow-hover),
     0 8px 25px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.light-mode .glass-interactive:hover {
+  box-shadow: var(--glass-shadow-hover);
 }
 
 .glass-interactive:active {
@@ -424,7 +436,7 @@ textarea {
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: var(--space-500) var(--space-1000) var(--space-800) var(--space-1000);
+  padding: var(--space-300) var(--space-1000) var(--space-800) var(--space-1000);
   width: 100%;
   max-width: 75rem; /* 1200px */
 
@@ -507,8 +519,35 @@ html.is-shifting * {
   transition: none !important;
 }
 
-/* Room under the hero for the prism and rainbow. On a phone it is shorter, so the top of Selected work peeks
-   in under the prism and the screen reads as the start of something (cook round 6) */
+/* Calm full-bleed backdrop behind cards once reading starts, keeping a soft ambient glow without harsh beams */
+.scroll-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.scroll-veil.is-active {
+  opacity: 1;
+}
+.scroll-veil--dark {
+  background: radial-gradient(
+    ellipse 88% 68% at 50% 46%,
+    rgba(5, 6, 9, 0.985),
+    rgba(3, 4, 6, 0.996)
+  );
+}
+.scroll-veil--light {
+  background: radial-gradient(
+    ellipse 85% 65% at 50% 45%,
+    rgba(244, 245, 247, 0.84),
+    rgba(244, 245, 247, 0.96)
+  );
+}
+
+/* Room under the hero for the prism and rainbow. On a phone it clears the prism apex cleanly before
+   Selected work enters at the bottom of the screen. */
 .navigation-placeholder {
   width: 100%;
   height: 400px;
@@ -517,8 +556,9 @@ html.is-shifting * {
 }
 @media (max-width: 560px) {
   .navigation-placeholder {
-    height: 96px;
+    flex: none;
+    height: 410px;
     min-height: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
 }
