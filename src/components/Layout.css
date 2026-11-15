@@ -198,11 +198,7 @@ html.is-playground .play-mode-toggle {
   }
 }
 
-/* At the very top of the page on wider screens, the play button's label stays up */
-.layout__ui--top .play-mode-toggle > .ui-hint {
-  opacity: 1;
-  transform: translate(0, -50%);
-}
+/* Play button label shows on hover, keyboard focus, and inside the prism playground */
 @media (max-width: 768px) {
   .ui-hint {
     font-size: 0.75rem;

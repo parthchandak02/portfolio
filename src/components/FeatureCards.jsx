@@ -178,7 +178,12 @@ const RobotMoment = ({ card, lightMode }) => {
   useEffect(() => {
     const el = card.current;
     const move = (e) => {
-      if (!robot.current || e.pointerType === 'touch') return;
+      if (
+        !robot.current ||
+        e.pointerType === 'touch' ||
+        (e.movementX === 0 && e.movementY === 0)
+      )
+        return;
       const r = el.getBoundingClientRect();
       robot.current.follow((e.clientX - r.left) / r.width);
     };
@@ -197,6 +202,12 @@ const RobotMoment = ({ card, lightMode }) => {
     <>
       <canvas ref={canvas} className="fcard__robot" aria-hidden="true" />
       <span className="fcard__floor" onClick={tap} aria-hidden="true" />
+      <div className="fcard__cue-bar" aria-hidden="true">
+        <span className="fcard__note">Click or tap the floor to move sun</span>
+        <span className="fcard__reticle">
+          <i />
+        </span>
+      </div>
     </>
   );
 };
@@ -412,12 +423,18 @@ const AlarmMoment = ({ card }) => {
   }, []);
   const [h, m] = digits;
   return (
-    <span className={`fcard__clock is-${phase}`} aria-hidden="true">
-      <span className="fcard__flip">{h}</span>
-      <i>:</i>
-      <span className="fcard__flip">{m[0]}</span>
-      <span className="fcard__flip">{m[1]}</span>
-    </span>
+    <div className="fcard__alarm-wrap" aria-hidden="true">
+      <span className="fcard__alarm-pill">
+        <span className="fcard__alarm-dot" />
+        Calendar alarm · Overrides Silent
+      </span>
+      <span className={`fcard__clock is-${phase}`}>
+        <span className="fcard__flip">{h}</span>
+        <i>:</i>
+        <span className="fcard__flip">{m[0]}</span>
+        <span className="fcard__flip">{m[1]}</span>
+      </span>
+    </div>
   );
 };
 

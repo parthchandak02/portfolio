@@ -442,9 +442,9 @@ export const createCentiSeed = (
     env?.dispose();
     env = studio(renderer, light);
     scene.environment = env;
-    edgeLine.color.set(light ? 0x5c6b7e : 0xffffff);
-    edgeLine.opacity = light ? 0.86 : 0.82;
-    acrylic.opacity = light ? 0.34 : 0.25;
+    edgeLine.color.set(light ? 0x4e5d70 : 0xffffff);
+    edgeLine.opacity = light ? 0.88 : 0.86;
+    acrylic.opacity = light ? 0.38 : 0.28;
     pool.visible = !light;
     shadow.material.opacity = light ? 0.34 : 1;
   };
@@ -547,7 +547,7 @@ export const createCentiSeed = (
     const tilt = 0.17; // looking a little down at it
     const mid = unitsTall * (floor - 0.5); // how far above the floor line the camera looks
     camera.position.set(
-      1.6,
+      0.35,
       mid + Math.sin(tilt) * distance,
       Math.cos(tilt) * distance
     );
@@ -570,18 +570,18 @@ export const createCentiSeed = (
   canvas.addEventListener('webglcontextlost', onLost);
 
   return {
-    /** It walks in from the left, to the sun in the middle, and its plant grows */
+    /** It walks in from just left of center to the sun in the middle, and its plant grows */
     walkIn() {
       cancelAnimationFrame(frame);
       frame = 0;
-      x = -2.0;
+      x = -1.1;
       target = 0;
       sunX = 0;
       sunShown = 0;
       heading = 0;
       aim = 0;
       travelled = 0;
-      grow = 0.45;
+      grow = 0.6;
       state = 'walking';
       go();
     },
@@ -602,8 +602,8 @@ export const createCentiSeed = (
       draw();
     },
     follow(at) {
-      if (state === 'growing') return;
-      const reach = Math.max(1, halfWidth - 4.5);
+      if (state === 'walking' || state === 'growing') return;
+      const reach = Math.max(1, halfWidth - 4.8) * 0.65;
       sunX = clamp((at - 0.5) * 2 * halfWidth, -reach, reach);
       target = sunX;
       if (Math.abs(target - x) > 0.6) {

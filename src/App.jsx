@@ -156,19 +156,18 @@ export default function App() {
       togglePlayMode();
       return;
     }
-    // Measure once the web fonts are in: text set in a fallback font has other heights and the jump lands off
     let cancelled = false;
-    const timer = setTimeout(
-      () =>
-        document.fonts.ready.then(() => {
-          const target = document.getElementById(hash);
-          const scroller = document.querySelector('.main-content-scroll');
-          // The section's first card lands mid-screen, on the reading line, so it is the one lit
-          if (!cancelled && target && scroller)
-            scrollCardToLine(target, scroller, 'auto');
-        }),
-      150
-    );
+    const align = () => {
+      const target = document.getElementById(hash);
+      const scroller = document.querySelector('.main-content-scroll');
+      if (!cancelled && target && scroller)
+        scrollCardToLine(target, scroller, 'auto');
+    };
+    requestAnimationFrame(align);
+    document.fonts.ready.then(() => {
+      if (!cancelled) requestAnimationFrame(align);
+    });
+    const timer = setTimeout(align, 150);
     return () => {
       cancelled = true;
       clearTimeout(timer);

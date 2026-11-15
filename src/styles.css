@@ -424,7 +424,7 @@ textarea {
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: var(--space-500) var(--space-1000) var(--space-800) var(--space-1000);
+  padding: var(--space-300) var(--space-1000) var(--space-800) var(--space-1000);
   width: 100%;
   max-width: 75rem; /* 1200px */
 
@@ -522,8 +522,8 @@ html.is-shifting * {
 .scroll-veil--dark {
   background: radial-gradient(
     ellipse 88% 68% at 50% 46%,
-    rgba(6, 7, 10, 0.86),
-    rgba(4, 5, 8, 0.96)
+    rgba(5, 6, 9, 0.94),
+    rgba(3, 4, 6, 0.98)
   );
 }
 .scroll-veil--light {
@@ -544,8 +544,8 @@ html.is-shifting * {
 }
 @media (max-width: 560px) {
   .navigation-placeholder {
-    height: 310px;
+    height: 515px;
     min-height: 0;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
   }
 }

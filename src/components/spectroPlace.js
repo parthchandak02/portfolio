@@ -30,7 +30,8 @@ export const warp = (t) => {
 export const place = (entries, width) => {
   const sorted = [...entries].sort((a, b) => a.item.t - b.item.t);
   const room = Math.max(0, width - EDGE * 2);
-  const gap = Math.min(MIN_GAP, room / Math.max(1, sorted.length - 1));
+  const targetGap = width < 520 ? 2.1 : MIN_GAP;
+  const gap = Math.min(targetGap, room / Math.max(1, sorted.length - 1));
   const pos = sorted.map((e) => EDGE + warp(e.item.t) * room);
   for (let i = 1; i < pos.length; i += 1) {
     if (pos[i] < pos[i - 1] + gap) pos[i] = pos[i - 1] + gap;

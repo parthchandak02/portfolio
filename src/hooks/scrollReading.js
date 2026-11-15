@@ -7,7 +7,7 @@ export const STICK_AT = 43;
 
 // The card you are on is the one in the middle of what you can see: between the band bar (with its veil)
 // and the bottom of the screen.
-export const BAR_CLEARANCE = 110;
+export const BAR_CLEARANCE = 136;
 
 export const readingLineFromRect = (rect) =>
   (rect.top + BAR_CLEARANCE + rect.bottom) / 2;

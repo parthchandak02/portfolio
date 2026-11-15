@@ -173,12 +173,11 @@ const BandBar = ({ category, title, lightMode = false }) => {
       ? Array.from(strip.querySelectorAll('.spectro__line[data-band]'))
       : [];
     if (!layer || !track || !stripLines.length) return undefined;
-    // A jump from far down the page (a link, a restored scroll) has nothing on screen to morph from
+    // A jump (a hash link, a restored scroll) where the strip is already above the viewport shows ticks at once
     const stage = strip
       .querySelector('.spectro__stage')
       .getBoundingClientRect();
-    if (stage.bottom < -window.innerHeight || stage.top > window.innerHeight)
-      return undefined;
+    if (stage.bottom < 0 || stage.top > window.innerHeight) return undefined;
 
     const trackRect = track.getBoundingClientRect();
     // The bar's ticks are as tall as the strip's lines, so lines only move and fade on the way, never resize
@@ -288,6 +287,10 @@ const BandBar = ({ category, title, lightMode = false }) => {
   const [column, setColumn] = useState(null);
   useEffect(() => {
     const measure = () => {
+      if (window.innerWidth <= 1024) {
+        setColumn(null);
+        return;
+      }
       const items = document.querySelector('.timeline__items');
       if (!items) return;
       const r = items.getBoundingClientRect();
@@ -318,13 +321,13 @@ const BandBar = ({ category, title, lightMode = false }) => {
     const nav = navRef.current;
     if (!scroller || !nav) return undefined;
 
-    const ramp = window.innerWidth <= 1024 ? 44 : 56;
+    const ramp = window.innerWidth <= 1024 ? 26 : 34;
     let frame = 0;
     let touched = new Set();
 
     const apply = () => {
       frame = 0;
-      const cutoff = nav.getBoundingClientRect().bottom + 6;
+      const cutoff = nav.getBoundingClientRect().bottom + 2;
       const els = Array.from(scroller.querySelectorAll(FADE_SELECTOR));
       const rects = els.map((el) => el.getBoundingClientRect()); // read everything before writing
       const next = new Set();

@@ -212,7 +212,8 @@
 }
 @media (max-width: 560px) {
   .bandbar {
-    right: 120px;
+    left: 14px;
+    right: 126px;
   }
 }
 

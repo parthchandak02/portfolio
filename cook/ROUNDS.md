@@ -361,5 +361,40 @@ Top remaining gaps (both critics):
 5. `S03` Lab card title baselines still bounce (name floats above 2-line vs 1-line subtitle, though aligned at card bottom, visual baseline shifts), plus edge text leaks in `aeris`, `wc26`, `jobwright`, and blur on `inkwell` / `2025`.
 6. Right-rail permanent labels (`Light mode`, `Play with prism` only) asymmetric vs Lock/Chevron buttons (`S01-1440`, `S04-1440`).
 
+---
+
+## Round 11
+
+Time: 03:31 to 03:44 UTC (2026-11-15)
+Stills: `cook/stills/r11/` | Side by side: `cook/compare/r11/`
+
+Changes:
+- Fixed mobile sticky `BandBar` column sizing (`BandBar.jsx`, `BandBar.css`) so inline desktop coordinates do not override `right: 126px`, keeping top-right `SoundToggle` and `ContactButton` cleanly separated; skipped strip-to-bar morph when `#hash` jumps past the hero strip; raised `BAR_CLEARANCE` to `136px` (`useScrollHighlight.js`) and ran instant hash alignment on load (`App.jsx`) so `Selected work` clears `BandBar`'s fade ramp at full white contrast.
+- Darkened `.scroll-veil--dark` (`styles.css`), adjusted mobile `.navigation-placeholder` (`515px`) and responsive `.ui-typewriter-container` padding/font clamp (`UITypewriter.css`) for mobile hero breathing room.
+- Restored mobile `.spectro` year cadence (`spectroPlace.js`), shortened intro/fold timings (`Spectrograph.jsx`, `Spectrograph.css`), and hid resting `.play-mode-toggle > .ui-hint` on mobile hero (`Layout.css`).
+- Recentered `Centi-seed` camera/walk-in (`centiSeedRobot.js`) and added floor cue + amber reticle, added `"Calendar alarm · Overrides Silent"` pill + higher-contrast flip digits (`FeatureCards.jsx`, `FeatureCards.css`), and toned `Audio prioritization` active card wash (`Timeline.css`).
+- Equalized `.lab-tile__tag` height (`2.6em`), deepened bottom fog scrims, tuned `wc26`/`aeris`/`jobwright`/`inkwell` crops (`LabShowcase.css`), and bumped mobile `.ctile__name` to `0.875rem` while muting `.ctile--veiled` resting thumbnails (`CardTile.css`).
+
+Scores, eyeballed: mean of 2 fresh subagent critics (Critic A, Critic B), strict craft bar vs `cook/refs/R01` to `R05`:
+
+| Shot | Layout | Type | Color | Components | Polish | Mean | vs r10 |
+|---|---|---|---|---|---|---|---|
+| S01 | 74 | 79 | 77 | 77 | 71 | 75.6 | -1.4 |
+| S02 | 80 | 85 | 84 | 78 | 76 | 80.5 | +1.5 |
+| S03 | 76 | 83 | 80 | 77 | 72 | 77.1 | +0.1 |
+| S04 | 73 | 78 | 80 | 77 | 71 | 75.5 | -1.5 |
+
+Measured (`shoot.mjs` & `color_check.py`):
+- All 8 stills (`S01`-`S04` at `390x844` and `1440x900`): overflow **none**, taps under 44px **0** (on all 4 mobile shots), text nodes under 14px **0** (on all 4 mobile shots).
+- `color_check` mean saturation / brightness deltas: S01 `+0.259 / -0.097`, S02 `+0.297 / +0.501`, S03 `-0.201 / +0.891`, S04 `+0.222 / -0.036`.
+
+Top remaining gaps (both critics):
+1. `S03-390` top-right hero buttons (`lock`, `prism`, `chevron`) still mid-fade (~0.35 opacity) overlapping `aeris` tile.
+2. `S02-1440` `Centi-seed` robot clipped on left edge while spotlight pool sits center-right; mobile leaf touches cue text.
+3. `S01-390` & `S04-390` `"Selected work"` + `"Full portfolio"` sit across prism apex / bubble rim; typing still caught mid-word (`Creative Techno|` / `Protot|`) with soft orange glow.
+4. Left-edge stray horizontal hairline behind card rows (`S02-1440`, `S03-1440`, `S03-390`); faint white oval halo behind light-mode role (`S04-1440`).
+5. `CALarm` `0 : 0 0` reads like placeholder zero state; `BandBar` mobile track stops abruptly mid-header; `aeris`/`jobwright`/`inkwell` cropped edge text/blur and missing logos on 2026 peek cards; right-rail hover label appears on single button after click.
+
+
 
 

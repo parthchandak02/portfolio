@@ -266,6 +266,39 @@
   cursor: crosshair;
   -webkit-tap-highlight-color: transparent;
 }
+.fcard__cue-bar {
+  position: relative;
+  z-index: 2;
+  order: 2;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  pointer-events: none;
+}
+.fcard__reticle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, #ffd898 48%, transparent);
+  background: radial-gradient(
+    circle,
+    rgba(255, 214, 150, 0.24),
+    transparent 72%
+  );
+}
+.fcard__reticle i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffd898;
+  box-shadow: 0 0 8px rgba(255, 214, 150, 0.8);
+}
 
 /* The audio patent */
 .fcard__audio {
@@ -325,21 +358,67 @@
   background: rgba(20, 20, 24, 0.15);
 }
 
-/* CALarm: the app's own flip clock, centered cleanly below the header */
-.fcard__clock {
+/* CALarm: calendar trigger pill + flip clock, framed symmetrically */
+.fcard__alarm-wrap {
   position: relative;
   z-index: 1;
   order: 2;
+  margin: auto 0 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+.fcard__alarm-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -16px 12%;
+  z-index: -1;
+  background: radial-gradient(
+    55% 65% at 50% 58%,
+    rgba(255, 115, 107, 0.18),
+    transparent 76%
+  );
+  pointer-events: none;
+}
+.fcard__alarm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-family: var(--font-family-label);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.lab--light .fcard__alarm-pill {
+  color: rgba(20, 20, 24, 0.78);
+  background: rgba(20, 20, 24, 0.06);
+  border-color: rgba(20, 20, 24, 0.11);
+}
+.fcard__alarm-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff7e74;
+  box-shadow: 0 0 8px rgba(255, 126, 116, 0.75);
+}
+.fcard__clock {
+  position: relative;
   width: fit-content;
-  margin: auto auto 4px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 14px;
-  border-radius: 18px;
+  padding: 10px 14px;
+  border-radius: 16px;
   background: #13141b;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.44);
-  color: #ff8278;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.48);
+  color: #ff948a;
   font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
   font-variant-numeric: tabular-nums;
   transform-origin: 50% 50%;
@@ -350,18 +429,19 @@
 }
 .fcard__clock i {
   font-style: normal;
-  font-size: clamp(1.5rem, 6cqi, 2.5rem);
+  font-size: clamp(1.5rem, 6cqi, 2.3rem);
 }
 .fcard__flip {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: clamp(46px, 13cqi, 72px);
-  height: clamp(62px, 17cqi, 96px);
+  width: clamp(48px, 13cqi, 68px);
+  height: clamp(60px, 15cqi, 84px);
   border-radius: 10px;
   background: #23252e;
-  font-size: clamp(2rem, 8.8cqi, 3.6rem);
+  font-size: clamp(2rem, 8.2cqi, 3.2rem);
+  font-weight: 600;
 }
 .fcard__flip::after {
   content: '';
@@ -379,11 +459,11 @@
 @keyframes fcard-ring {
   0%,
   100% {
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.44);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.48);
   }
   30% {
     box-shadow:
-      0 12px 28px rgba(0, 0, 0, 0.44),
+      0 12px 28px rgba(0, 0, 0, 0.48),
       0 0 38px 6px rgba(255, 115, 107, 0.46);
   }
 }

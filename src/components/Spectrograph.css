@@ -6,8 +6,8 @@
   pointer-events: auto;
   width: 100%;
   max-width: 880px;
-  margin: 0 auto var(--space-400) auto;
-  padding: var(--space-100) 0 var(--space-200);
+  margin: 0 auto var(--space-250) auto;
+  padding: var(--space-100) 0 var(--space-150);
   display: grid;
   gap: var(--space-100);
   font-family: var(--font-family-primary);

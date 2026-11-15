@@ -217,7 +217,7 @@
     padding: 0 12px 11px;
   }
   .ctile__name {
-    font-size: 0.86rem;
+    font-size: 0.875rem;
     -webkit-line-clamp: 3;
   }
   .ctile--info .ctile__name {
@@ -246,9 +246,9 @@
    like the Lab's tiles; the glass clears and the picture comes into focus on hover, keyboard focus, or once
    opened */
 .ctile--veiled .ctile__img {
-  opacity: 0.22;
-  filter: blur(10px) saturate(1.2);
-  transform: scale(1.1);
+  opacity: 0.14;
+  filter: blur(4px) grayscale(0.35);
+  transform: scale(1.06);
   transition:
     opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1),
     filter 0.64s cubic-bezier(0.32, 0.72, 0, 1),

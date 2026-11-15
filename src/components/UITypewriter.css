@@ -310,9 +310,9 @@
 /* Large screens */
 @media (min-width: 1024px) {
   .ui-typewriter-container {
-    margin: var(--space-800) auto var(--space-600) auto;
+    margin: var(--space-300) auto var(--space-250) auto;
     max-width: 70vw;
-    gap: var(--space-200);
+    gap: var(--space-150);
   }
 
   .ui-typewriter-static {
@@ -333,9 +333,9 @@
 /* Extra large screens */
 @media (min-width: 1440px) {
   .ui-typewriter-container {
-    margin: var(--space-1000) auto var(--space-800) auto;
+    margin: var(--space-400) auto var(--space-300) auto;
     max-width: 60vw;
-    gap: var(--space-250);
+    gap: var(--space-150);
   }
 
   .ui-typewriter-static {
@@ -440,11 +440,16 @@
 }
 
 @media (max-width: 560px) {
+  .ui-typewriter-container {
+    margin: 68px auto var(--space-100) auto;
+    max-width: calc(100vw - 116px);
+  }
   .ui-typewriter-container .ui-typewriter-name {
     font-size: clamp(1.85rem, 8vw, 2.3rem);
   }
   .ui-typewriter-container .ui-typewriter-cycling {
-    font-size: clamp(1.25rem, 5.4vw, 1.55rem);
+    font-size: clamp(0.98rem, 4.1vw, 1.18rem);
+    letter-spacing: -0.005em;
     margin-top: 0.25em;
   }
 }
