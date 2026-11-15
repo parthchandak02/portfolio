@@ -1,6 +1,7 @@
 import { Fragment, useLayoutEffect, useRef, useState } from 'react';
 import { animate } from 'motion';
 import Molten from './Molten';
+import { resolveShownRows, syncShownRows } from './tileGridRows';
 import {
   CLOSE_MS,
   GLASS_EASE_ARRAY,
@@ -290,16 +291,22 @@ const TabGlass = ({ grid, row, tile, gap, open }) => {
 const TileGrid = ({ entries, openKey, holdKey = null, onOpen, onClose }) => {
   const grid = useRef(null);
   const { cols, gap } = useLayout(grid);
-  const at = entries.findIndex((e) => e.key === openKey);
-  const row = at < 0 ? -1 : Math.floor(at / cols);
-  // Each row's details remember the tile they last showed, so they can melt away showing it, until they close
+  // Each row's details remember the tile key they last showed, so they can melt away showing it, until they close
   const shown = useRef({});
   const laidOut = useRef(cols);
-  if (laidOut.current !== cols) {
-    laidOut.current = cols;
-    shown.current = {};
-  }
-  if (at >= 0) shown.current[row] = at;
+  const {
+    shown: nextShown,
+    openIndex: at,
+    openRow: row,
+  } = syncShownRows({
+    shown: shown.current,
+    entries,
+    openKey,
+    cols,
+    prevCols: laidOut.current,
+  });
+  laidOut.current = cols;
+  shown.current = nextShown;
   const [, settle] = useState(0);
   const openRow = useRef(row);
   openRow.current = row;
@@ -358,24 +365,23 @@ const TileGrid = ({ entries, openKey, holdKey = null, onOpen, onClose }) => {
     };
   }, [held, at, row]);
 
-  const rows = Object.entries(shown.current).filter(([, i]) => entries[i]);
+  const { rows, byRow } = resolveShownRows(shown.current, entries);
   return (
     <div className="lab__grid tile-grid" ref={grid}>
-      {rows.map(([r, i]) => (
+      {rows.map(({ row: r, index: i }) => (
         <TabGlass
           key={`glass-${r}`}
           grid={grid}
-          row={Number(r)}
+          row={r}
           tile={i}
           gap={gap}
-          open={Number(r) === row}
+          open={r === row}
         />
       ))}
       {entries.map((e, i) => {
         const r = Math.floor(i / cols);
         const rowEnd = i === Math.min(entries.length - 1, (r + 1) * cols - 1);
-        const last = shown.current[r];
-        const entry = last != null ? entries[last] : null;
+        const entry = byRow[r]?.entry ?? null;
         return (
           <Fragment key={e.key}>
             <div
