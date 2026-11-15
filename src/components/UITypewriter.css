@@ -182,9 +182,11 @@
     0 2px 4px rgba(255, 255, 255, 0.3);
 }
 
-.ui-typewriter--light .ui-typewriter__cursor {
-  color: #2a2a2a;
-  text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+.ui-typewriter--light .ui-typewriter__cursor,
+.ui-typewriter--light .typed-cursor {
+  color: #202228;
+  opacity: 0.78;
+  text-shadow: none;
 }
 
 /* Dark mode styling */
@@ -292,7 +294,7 @@
   }
 
   .ui-typewriter-cycling {
-    font-size: clamp(1.35rem, 5.6vw, 2rem);
+    font-size: clamp(1.18rem, 4.7vw, 1.75rem);
     letter-spacing: 0.01em;
   }
 

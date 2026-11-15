@@ -70,7 +70,7 @@ body:has(.contact__shell.is-open) .sound-toggle {
 @media (max-width: 560px) {
   .sound-toggle {
     top: calc(16px + env(safe-area-inset-top, 0px));
-    left: calc(16px + 44px + 8px + env(safe-area-inset-left, 0px));
+    left: calc(16px + env(safe-area-inset-left, 0px));
     right: auto;
     bottom: auto;
   }

@@ -69,12 +69,13 @@
 .lab-tile__img[src$='/echo.png'] {
   transform: scale(1.66);
   transform-origin: 50% 52%;
-  filter: brightness(1.06) contrast(1.14) saturate(1.12);
+  filter: brightness(1.36) contrast(1.22) saturate(1.15);
 }
 .lab-tile__img[src$='/orbiter.png'] {
-  transform: scale(1.16);
-  transform-origin: 50% 44%;
-  filter: brightness(1.08) contrast(1.14) saturate(1.1);
+  object-position: 50% 48%;
+  transform: scale(1.68);
+  transform-origin: 50% 48%;
+  filter: brightness(1.36) contrast(1.22) saturate(1.15);
 }
 .lab-tile__img[src$='/tide.png'],
 .lab-tile__img[src$='/eurusd.png'] {
@@ -87,25 +88,25 @@
   transform-origin: 54% 58%;
 }
 .lab-tile__img[src$='/inkwell.png'] {
-  object-position: 50% 48%;
-  transform: scale(1.36);
-  transform-origin: 50% 48%;
-  filter: brightness(0.76) contrast(1.38) saturate(1.35);
+  object-position: 86% 62%;
+  transform: scale(1.75);
+  transform-origin: 86% 62%;
+  filter: brightness(0.42) contrast(1.38) saturate(1.35);
 }
 .lab-tile__img[src$='/aeris.png'] {
-  object-position: 36% 42%;
-  transform: scale(1.68);
-  transform-origin: 36% 42%;
-  filter: brightness(0.62) contrast(1.16) saturate(1.12);
+  object-position: 62% 38%;
+  transform: scale(1.85);
+  transform-origin: 62% 38%;
+  filter: invert(0.92) hue-rotate(180deg) brightness(0.9) contrast(1.1);
 }
 .lab-tile__img[src$='/jobwright.png'] {
-  object-position: 50% 44%;
-  transform: scale(1.48);
-  transform-origin: 50% 44%;
-  filter: brightness(0.56) contrast(1.16) saturate(1.06);
+  object-position: 75% 48%;
+  transform: scale(1.08);
+  transform-origin: 75% 48%;
+  filter: invert(0.91) hue-rotate(180deg) brightness(1.06) contrast(1.2);
 }
 .lab-tile__img[src$='/atmos.png'] {
-  filter: brightness(0.8) contrast(1.1) saturate(1.06);
+  filter: brightness(0.76) contrast(1.12) saturate(1.06);
 }
 .lab--light .lab-tile__img {
   filter: brightness(0.94) contrast(1.04) saturate(1.06);
@@ -126,9 +127,9 @@
     linear-gradient(
       to top,
       rgba(6, 7, 11, 0.99) 0%,
-      rgba(6, 7, 11, 0.94) 28%,
-      rgba(6, 7, 11, 0.56) 48%,
-      rgba(6, 7, 11, 0) 68%
+      rgba(6, 7, 11, 0.96) 32%,
+      rgba(6, 7, 11, 0.72) 52%,
+      rgba(6, 7, 11, 0) 72%
     ),
     linear-gradient(to bottom, rgba(6, 7, 11, 0.28) 0%, rgba(6, 7, 11, 0) 18%);
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.65);

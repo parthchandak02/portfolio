@@ -22,7 +22,8 @@
   object-fit: cover;
 }
 .ctile__text {
-  margin-top: auto;
+  margin-top: 14px;
+  margin-bottom: auto;
   display: grid;
   gap: 3px;
   padding: 0 14px 13px;
@@ -85,7 +86,8 @@
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  opacity: 0.76; /* the same on every tile (cook round 6) */
+  opacity: 0.88;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85);
 }
 .ctile--photo .ctile__year {
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
@@ -143,13 +145,17 @@
 
 /* Info tile: any picture is a soft ghost behind, which gives way once opened, for the details show it */
 .ctile--info .ctile__img {
-  opacity: 0.1;
-  filter: blur(3px) saturate(0.75);
-  transform: scale(1.06);
+  opacity: 0.16;
+  filter: saturate(0.85) brightness(0.85);
+  transform: scale(1.04);
   transition: opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .ctile--info.is-open .ctile__img {
   opacity: 0;
+}
+.ctile--info .ctile__text {
+  margin-top: 16px;
+  margin-bottom: auto;
 }
 .ctile--info .ctile__name {
   -webkit-line-clamp: 3;
@@ -247,8 +253,8 @@
    opened */
 .ctile--veiled .ctile__img {
   opacity: 0.14;
-  filter: blur(4px) grayscale(0.35);
-  transform: scale(1.06);
+  filter: grayscale(0.35) brightness(0.68);
+  transform: scale(1.04);
   transition:
     opacity 0.64s cubic-bezier(0.32, 0.72, 0, 1),
     filter 0.64s cubic-bezier(0.32, 0.72, 0, 1),

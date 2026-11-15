@@ -149,7 +149,7 @@ const RobotMoment = ({ card, lightMode }) => {
           try {
             robot.current = createCentiSeed(el, {
               lightMode: light.current,
-              floor: 0.85,
+              floor: 0.78,
             });
           } catch {
             return;
@@ -392,12 +392,10 @@ const AlarmMoment = ({ card }) => {
   useFirstSight(card, () => {
     if (reducedMotion()) return;
     const at = (ms, fn) => timers.current.push(setTimeout(fn, ms));
-    setPhase('pill');
-    setDigits(['0', '03']);
-    at(300, () => setPhase('open'));
-    at(700, () => setDigits(['0', '02']));
-    at(1100, () => setDigits(['0', '01']));
-    at(1500, () => {
+    setPhase('open');
+    setDigits(['0', '02']);
+    at(280, () => setDigits(['0', '01']));
+    at(580, () => {
       setDigits(['0', '00']);
       setPhase('ring');
       glassNotes(
@@ -408,7 +406,7 @@ const AlarmMoment = ({ card }) => {
         { gain: 0.04, decay: 0.4, from: 1 }
       );
     });
-    at(2500, () => {
+    at(1150, () => {
       setPhase('rest');
       setDigits(clockNow());
     });

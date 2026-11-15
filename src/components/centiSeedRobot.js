@@ -252,9 +252,9 @@ export const createCentiSeed = (
     depthWrite: false,
   });
   const edgeLine = new THREE.LineBasicMaterial({
-    color: 0xffffff,
+    color: 0xdde7f4,
     transparent: true,
-    opacity: 0.6,
+    opacity: 0.36,
   });
   const black = new THREE.MeshStandardMaterial({
     color: 0x17181b,

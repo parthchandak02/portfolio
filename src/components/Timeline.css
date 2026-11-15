@@ -224,15 +224,19 @@
   font-weight: 600;
   font-size: 0.9rem;
   color: inherit;
-  opacity: 0.86;
+  opacity: 0.78;
   text-decoration: underline;
   text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
-  transition: opacity 0.2s ease;
+  text-decoration-color: color-mix(in srgb, currentColor 34%, transparent);
+  text-underline-offset: 5px;
+  transition:
+    opacity 0.2s ease,
+    text-decoration-color 0.2s ease;
 }
 .timeline__skip:hover,
 .timeline__skip:focus-visible {
   opacity: 1;
+  text-decoration-color: currentColor;
 }
 .timeline--dark .timeline__skip {
   color: #fff;

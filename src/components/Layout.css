@@ -93,14 +93,11 @@
 .layout__ui--reading .lock-toggle,
 .layout__ui--reading .play-mode-toggle,
 .layout__ui--reading .spectro-toggle {
-  opacity: 0;
+  opacity: 0 !important;
   transform: translateX(12px);
-  pointer-events: none;
-  visibility: hidden;
-  transition:
-    opacity 0.12s ease,
-    transform 0.12s ease,
-    visibility 0.12s;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: none !important;
 }
 
 /* Each round button names what it does: on keyboard focus, and in the prism playground */

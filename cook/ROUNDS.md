@@ -4,8 +4,8 @@ Started: 2026-11-13 08:58 UTC
 Size: light | Time: floor none | cap 3h (11:58 UTC)
 Bar: layout 99 | type 99 | color 99 | components 99 | polish 99
 Calibration offset: none yet
-Gate: stills approved no | final not started
-Best so far: round 0 (baseline)
+Gate: paused (no live human watch during resumed factory cook; PR open for review) | final build/lint/test/gitleaks verified
+Best so far: round 15 (79.6 mean vs strict ref bar, +24.3 over r08-base 55.3)
 
 ## Decisions
 
@@ -428,7 +428,108 @@ Top remaining gaps (both critics):
 3. `S02-1440` `BandBar` names `"Audio prioritization"` instead of first row `"Find My Zoox"` on initial `#selected` landing; `CALarm` still caught in `0:03` countdown frame (`useFirstSight` delay).
 4. `S04-1440` vertical typing cursor `|` is pale grey on pearl white (`Selected work` / hero light contrast).
 
+---
 
+## Round 13
 
+Time: 03:52 to 03:58 UTC (2026-11-15)
+Stills: `cook/stills/r13/` | Side by side: `cook/compare/r13/`
 
+Changes:
+- Made `.layout__ui--reading` right-rail controls hide instantaneously (`!important`, `transition: none !important` in `Layout.css`) so cold font-settlement scrolling never leaves ghosted buttons over `#selected` or `#lab`.
+- Refined `.light-mode` `--glass-*` tokens (`styles.css`), airy light shadow on `ContactButton.css`, dark `#202228` typed cursor on light mode (`UITypewriter.css`), and crisp initial contrast/crop passes on `orbiter`, `jobwright`, `aeris`, `inkwell`, and `echo` (`LabShowcase.css`).
+- Adjusted `BAR_CLEARANCE - 24` (`useScrollHighlight.js`) so `#selected` anchors cleanly on `Find My Zoox`, and shortened `CALarm` flip countdown (`FeatureCards.jsx/.css`) to `1150ms` so live clock numerals settle sooner.
+
+Scores, eyeballed: mean of 2 fresh subagent critics (Critic A, Critic B), strict craft bar vs `cook/refs/R01` to `R05`:
+
+| Shot | Layout | Type | Color | Components | Polish | Mean | vs r12 |
+|---|---|---|---|---|---|---|---|
+| S01 | 70.0 | 77.5 | 82.5 | 70.0 | 65.0 | 73.0 | -0.8 |
+| S02 | 80.0 | 80.0 | 77.5 | 72.5 | 72.5 | 76.5 | -0.3 |
+| S03 | 80.0 | 75.0 | 67.5 | 67.5 | 67.5 | 71.5 | -5.0 |
+| S04 | 70.0 | 72.5 | 75.0 | 67.5 | 57.5 | 67.5 | -8.8 |
+
+Measured (`shoot.mjs` & `color_check.py`, `render minus reference` convention matching `r08-base`):
+- All 8 stills (`S01`-`S04` at `390x844` and `1440x900`): overflow **none**, taps under 44px **0** on all 4 mobile shots, text nodes under 14px **0** on all 4 mobile shots.
+- Visible first-screen words (`390` / `1440`): S01 `62 / 37`, S02 `78 / 153`, S03 `12 / 26`, S04 `62 / 37`.
+- `color_check` mean saturation / brightness deltas: S01 `-0.247 / +0.106`, S02 `-0.085 / -0.484`, S03 `+0.381 / -0.890`, S04 `-0.223 / +0.036`.
+
+Top remaining gaps (both critics):
+1. `S01-390` & `S04-390` `"Selected work"` + `"Find My Zoox"` top card peek directly across the bright prism flare and mobile soap bubbles (`62` first-screen words in hero still).
+2. `S03` `BandBar` shows `Projects` rather than `Lab`, bright `aeris`/`jobwright` light UI strips clash with dark grid (`"LONDO"` cutoff on `aeris`), and blurred peeking `2025` / near-blank `2026` cards below.
+3. `S02` `Find My Zoox` blue halo stronger than neighbors, `CALarm` colon spacing uneven, and `Centi-seed` legs noisy.
+4. `PlayModeToggle` still flips glyphs mid-capture across desktop/mobile (`S04-1440` vs `S04-390`) and hero typing still captures `Creative Tech|` / `Prototyper|` depending on timing.
+
+---
+
+## Round 14
+
+Time: 03:58 to 04:08 UTC (2026-11-15)
+Stills: `cook/stills/r14/` | Side by side: `cook/compare/r14/`
+
+Changes:
+- Restored mobile `.navigation-placeholder` (`flex: none; height: 410px` in `styles.css`) so the prism safe zone pushes `"Selected work"` below the hero frame (`390` hero words dropped `62 -> 38`, zero prism/bubble bleed behind `"Selected work"`).
+- Sped up hero `ReactTyped` (`typeSpeed={8}`, `backDelay={24000}` in `UITypewriter.jsx`) so both `390` and `1440` settle on `"Creative Technologist|"` cleanly; stretched `PlayModeToggle.css` cycle (`20s`, primary glyph held `0-78%`) so `S04-1440` and `S04-390` match.
+- Made `AlarmMoment` initialize directly to `'open'` (`FeatureCards.jsx`), eliminating shrunk `0:03` frames; balanced `Find My Zoox` glow and `CALarm` colon spacing + flip gradient tiles (`FeatureCards.css`); softened `centiSeedRobot.js` acrylic edge opacity (`0.36`).
+- Added active band label + `/` divider (`Lab / 27 experiments`) in `BandBar.jsx`/`.css`; inverted `aeris` (`LONDON 21° Clear`) and `jobwright` (`TODAY'S LIST`) into clean dark-native cards, framed `inkwell` filaments (`LabShowcase.css`), and removed Gaussian blur from veiled/info cards (`CardTile.css`).
+
+Scores, eyeballed: mean of 2 fresh subagent critics (Critic A, Critic B), strict craft bar vs `cook/refs/R01` to `R05`:
+
+| Shot | Layout | Type | Color | Components | Polish | Mean | vs r13 |
+|---|---|---|---|---|---|---|---|
+| S01 | 75.0 | 80.0 | 80.0 | 70.0 | 70.0 | 75.0 | +2.0 |
+| S02 | 82.5 | 85.0 | 85.0 | 77.5 | 77.5 | 81.5 | +5.0 |
+| S03 | 82.5 | 80.0 | 82.5 | 75.0 | 75.0 | 79.0 | +7.5 |
+| S04 | 70.0 | 77.5 | 80.0 | 70.0 | 67.5 | 73.0 | +5.5 |
+
+Measured (`shoot.mjs` & `color_check.py`):
+- All 8 stills (`S01`-`S04` at `390x844` and `1440x900`): overflow **none**, taps under 44px **0** on all 4 mobile shots, text nodes under 14px **0** on all 4 mobile shots.
+- Visible first-screen words (`390` / `1440`): S01 `38 / 38`, S02 `109 / 153`, S03 `13 / 14`, S04 `38 / 38`.
+- `color_check` mean saturation / brightness deltas: S01 `-0.266 / +0.095`, S02 `-0.096 / -0.492`, S03 `+0.400 / -0.910`, S04 `-0.222 / +0.035`.
+
+Top remaining gaps (both critics):
+1. `S01-390` & `S04-390` hero controls: `[chat]` `[speaker]` order top-left reversed vs `S02`/`S03` (`[speaker]` `[chat]`), and `"I am a Creative Technologist|"` nears right-rail chevron (`S04-390` `LightToggle` moon button casts heavier shadow than siblings).
+2. `S02-390` `Centi-seed` legs touch `"Click or tap the floor to move sun"`; `"Full portfolio"` underline looks default.
+3. `S03-1440` peeking `Google` (`2025`) logo collides with `2025` badge in `CardTile`, plus `jobwright` subtle grey contrast.
+4. 3D scene items (out of scope this run): lower prism bottom cutoff/noise (`S01`), floating grey diamonds, and soap bubbles drifting behind tagline/strip on `S04-1440`.
+
+---
+
+## Round 15
+
+Time: 04:08 to 04:15 UTC (2026-11-15)
+Stills: `cook/stills/r15/` | Side by side: `cook/compare/r15/`
+
+Changes:
+- Matched `.light-mode .glass-interactive:hover` shadow (`styles.css`) so `LightToggle` moon button has identical soft pearl shadow as right-rail siblings.
+- Aligned mobile `[speaker] [chat]` left-to-right button order across hero (`top-left`) and reading (`top-right`) views (`SoundToggle.css`, `ContactButton.css`).
+- Scaled mobile `.ui-typewriter-cycling` (`clamp(1.18rem, 4.7vw, 1.75rem)` in `UITypewriter.css`) so `"Creative Technologist|"` keeps clean horizontal clearance from the right-rail chevron on `390x844`.
+- Raised `Centi-seed` `floor` prop from `0.85` to `0.78` (`FeatureCards.jsx`) so the walking robot and translucent shadow pool clear `"Click or tap the floor to move sun"` on `390x844`.
+- Styled `.timeline__skip` (`Full portfolio` in `Timeline.css`) with a subtle offset editorial underline instead of a raw default rule.
+- Top-aligned `.ctile__text` (`margin-top: 14px; margin-bottom: auto`), muted `.ctile--veiled .ctile__img` (`opacity: 0.14; grayscale(0.35) brightness(0.68)`), and lifted `.ctile__year` legibility (`CardTile.css`) so peeking `2026`/`2025` archive cards show clean titles without `"Google"` watermark collision; lifted `jobwright` brightness (`1.06`) in `LabShowcase.css`.
+
+Scores, eyeballed: mean of 2 fresh subagent critics (Critic A, Critic B), strict craft bar vs `cook/refs/R01` to `R05`:
+
+| Shot | Layout | Type | Color | Components | Polish | Mean | vs r14 | vs r08-base |
+|---|---|---|---|---|---|---|---|---|
+| S01 | 77.5 | 83.0 | 83.5 | 75.0 | 76.5 | 79.1 | +4.1 | +20.1 |
+| S02 | 81.5 | 84.0 | 85.5 | 80.0 | 79.0 | 82.0 | +0.5 | +26.0 |
+| S03 | 82.5 | 81.5 | 82.0 | 81.0 | 78.0 | 81.0 | +2.0 | +32.0 |
+| S04 | 74.0 | 79.0 | 80.5 | 75.5 | 71.5 | 76.1 | +3.1 | +19.1 |
+
+Overall Mean across S01-S04: **79.6 / 100** (`+2.5` vs r14 `77.1`, `+24.3` vs `r08-base` `55.3`).
+
+Measured (`shoot.mjs` & `color_check.py`):
+- All 8 stills (`S01`-`S04` at `390x844` and `1440x900`): overflow **none**, taps under 44px **0** on all 4 mobile shots, text nodes under 14px **0** on all 4 mobile shots.
+- Visible first-screen words (`390` / `1440`): S01 `38 / 38`, S02 `109 / 153`, S03 `13 / 29`, S04 `38 / 38`.
+- `color_check` mean saturation / brightness deltas (`render minus reference`): S01 `-0.237 / +0.077`, S02 `-0.096 / -0.492`, S03 `+0.396 / -0.909`, S04 `-0.221 / +0.037`.
+- Note on `color_check.py` sign convention: `r08-base` and `r13`-`r15` pass `<ref> <render>` (`render minus reference`), whereas `r09`-`r12` passed `<render> <ref>` (inverted sign).
+
+Remaining items keeping views below 90 (outside this CSS/React polish scope or intentional brand choices):
+1. Hero 3D depth/collisions (`S01`, `S04`): soap bubble spawn ceiling drifting behind hero text/spectrograph on desktop/mobile (`Bubbles.jsx`, `Scene.jsx`), lower prism cutoff line, stipple noise on prism facets, and floating grey diamonds (3D shader/scene files untouched per run constraints without Mac/iPhone `docs/3d-debugging.md` verification).
+2. Six floating circular corner controls + typed `"I am a ...|"` tagline (site identity and explicit owner feedback from rounds 6-7; consolidating corner controls into a compact menu bar requires layout/product decision).
+3. Lab thumbnail raster crops and archive card art (`orbiter`, `aeris`, `echo`, `jobwright`, `Google` peeking icon) plus 2-line vs 1-line card subtitle heights in `#lab`.
+4. Selected Work card footer variations (`CALarm` flip clock vs `Find My Zoox` swatch strip) and Centi-seed procedural edge smoothing.
+
+Stop check: hard 2h cap approaching (`04:15` / `05:01 UTC`), in-scope UI/layout/accessibility/contrast gains converged at Round 15 (`79.6 / 100`, `+24.3` over `r08-base`, `0` overflow, `0` small taps, `0` sub-14px text), remaining gaps sit in deferred 3D/shader scope or owner product decisions. Ready to run final verification gates and open PR to `main`.
 

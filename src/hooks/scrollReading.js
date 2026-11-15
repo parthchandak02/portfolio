@@ -42,8 +42,9 @@ export const barIsStuck = ({ scrollTop, stage }) => {
  * drawers: open tile details, { top, bottom, owner, category, title } in page order, or a function
  *   that returns them. Read only when no card crosses the line. The first drawer the line crosses
  *   counts, and only when it has its tile (owner).
- * selected: { top, bottom }, or a function returning that or null. Read only when the line is in a
- *   gap and the card so far is not Selected work.
+ * selected: { top, bottom }, or a function returning that or null. While its top is still just under
+ *   the bar, a Selected work card names the first Selected work card; when the line is in a gap and
+ *   the card so far is not Selected work, the bar says Selected work.
  */
 export const cardOnLine = ({ items, scroll, line, drawers, selected }) => {
   let category = 'all';
@@ -95,11 +96,21 @@ export const cardOnLine = ({ items, scroll, line, drawers, selected }) => {
     title = above ? null : edge.title;
   }
 
-  // In the gaps around Selected work's large cards, and on the lanes after them, the bar keeps saying
-  // Selected work; once a card reaches the reading line, the bar names that card.
-  if (selected && category !== 'selected' && !onLine) {
+  // In the gaps around Selected work's large cards, and while landed at the top of Selected work,
+  // keep the bar aligned to the first card (Find My Zoox) instead of jumping straight to row 2.
+  // On the lanes after them, the bar keeps saying Selected work until a card reaches the reading line.
+  if (selected) {
     const box = typeof selected === 'function' ? selected() : selected;
-    if (box && box.top < line && box.bottom > scroll.top + BAR_CLEARANCE + 60) {
+    if (box && category === 'selected' && box.top >= scroll.top + BAR_CLEARANCE - 24) {
+      const first = items.find((item) => item.category === 'selected');
+      if (first) title = first.title;
+    } else if (
+      box &&
+      category !== 'selected' &&
+      !onLine &&
+      box.top < line &&
+      box.bottom > scroll.top + BAR_CLEARANCE + 60
+    ) {
       category = 'selected';
       title = null;
     }

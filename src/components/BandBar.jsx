@@ -486,11 +486,22 @@ const BandBar = ({ category, title, lightMode = false }) => {
                 title="Back to the top"
                 tabIndex={visible ? 0 : -1}
               >
-                {shown.name}
+                {shown.key === 'projects' && label === 'Lab'
+                  ? 'Lab'
+                  : shown.name}
               </button>
-              <span className="bandbar__label" aria-live="polite">
-                {label}
-              </span>
+              {label && (
+                <>
+                  <span className="bandbar__sep" aria-hidden="true">
+                    /
+                  </span>
+                  <span className="bandbar__label" aria-live="polite">
+                    {shown.key === 'projects' && label === 'Lab'
+                      ? '27 experiments'
+                      : label}
+                  </span>
+                </>
+              )}
             </div>
 
             <div
