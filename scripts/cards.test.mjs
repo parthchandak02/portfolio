@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { after, describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { loadCards } from './cards.mjs';
+import { endOf, loadCards, startOf } from './cards.mjs';
 import { SECTIONS } from '../src/data/sections.js';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
@@ -138,6 +138,33 @@ describe('loadCards: the order cards come back in', () => {
       bySection.awards.map((c) => c.title),
       ['Written first', 'Written second']
     );
+  });
+
+  it('puts the longer or ongoing card first when two cards share a start date', () => {
+    const { bySection } = loadCards(
+      fixture({
+        cards: {
+          'awards/a.md': card("title: Single year\ndate: '2016'"),
+          'awards/b.md': card('title: Multi-year\ndate: 2016 - 2018'),
+          'experience/a.md': card('title: Single month\ndate: May 2018'),
+          'experience/b.md': card('title: Summer span\ndate: May 2018 - August 2018'),
+          'experience/c.md': card('title: Ongoing\ndate: May 2018 - Present')
+        }
+      })
+    );
+    assert.deepEqual(
+      bySection.awards.map((c) => c.title),
+      ['Multi-year', 'Single year']
+    );
+    assert.deepEqual(
+      bySection.experience.map((c) => c.title),
+      ['Ongoing', 'Summer span', 'Single month']
+    );
+    assert.equal(endOf('October 2023'), startOf('October 2023'));
+    assert.equal(endOf('May 2018 - August 2018'), startOf('August 2018'));
+    assert.equal(endOf('2016 - 2018'), 2018.5);
+    assert.equal(endOf('February 2022 - Present'), Infinity);
+    assert.equal(endOf(''), 0);
   });
 
   it('sorts each section on its own', () => {
