@@ -8,6 +8,7 @@ import {
   reducedMotion,
 } from '../hooks/glassMotion';
 import { glassSound } from '../hooks/glassSound';
+import { cancelMoltenClose, startMoltenClose } from './moltenMotion';
 import './Molten.css';
 
 /**
@@ -72,9 +73,7 @@ const Molten = ({
   useLayoutEffect(() => {
     const o = outer.current;
     if (!open || !o) return;
-    closing.current?.cancel();
-    closing.current = null;
-    const from = height.current;
+    const from = cancelMoltenClose(closing, o) ?? height.current;
     glassSound(from ? 'switch' : 'open');
     flowing.current?.cancel();
     flow(fit(), from);
@@ -138,25 +137,10 @@ const Molten = ({
       onClosedRef.current?.();
       return undefined;
     }
-    inner.current?.animate(CONDENSE.slice().reverse(), {
-      duration: CLOSE_MS,
-      easing: GLASS_CLOSE_EASE,
-      fill: 'forwards',
+    startMoltenClose(closing, o, inner.current, from, () => {
+      setMounted(false);
+      onClosedRef.current?.();
     });
-    const a = o.animate(
-      [
-        { height: `${from}px`, opacity: 1 },
-        { height: '0px', opacity: 0 },
-      ],
-      { duration: CLOSE_MS, easing: GLASS_CLOSE_EASE, fill: 'forwards' }
-    );
-    closing.current = a;
-    a.onfinish = () => {
-      if (closing.current === a) {
-        setMounted(false);
-        onClosedRef.current?.();
-      }
-    };
     return undefined;
   }, [open, mounted]);
 
