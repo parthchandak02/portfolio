@@ -101,7 +101,11 @@ export const cardOnLine = ({ items, scroll, line, drawers, selected }) => {
   // On the lanes after them, the bar keeps saying Selected work until a card reaches the reading line.
   if (selected) {
     const box = typeof selected === 'function' ? selected() : selected;
-    if (box && category === 'selected' && box.top >= scroll.top + BAR_CLEARANCE - 24) {
+    if (
+      box &&
+      category === 'selected' &&
+      box.top >= scroll.top + BAR_CLEARANCE - 24
+    ) {
       const first = items.find((item) => item.category === 'selected');
       if (first) title = first.title;
     } else if (
