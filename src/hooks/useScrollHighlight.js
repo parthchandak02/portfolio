@@ -1,23 +1,24 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import {
+  STICK_AT,
+  readingLineFromRect,
+  glideReadingLine,
+  rowHeightOf,
+  barIsStuck,
+  cardOnLine,
+  scrollTopForCard,
+} from './scrollReading';
+
+export { STICK_AT };
 
 /**
  * Custom hook to track the visible category for sidebar highlighting
  * (decoupled from card expansion logic for better performance)
  */
-// The hero strip hands over to the band bar once its top reaches this many px below the top of the screen.
-// At 43 the strip's hairline sits exactly on the bar's, so the hand-off morph moves lines along one line.
-export const STICK_AT = 43;
+export const readingLineOf = (scroller) =>
+  readingLineFromRect(scroller.getBoundingClientRect());
 
-// The card you are on is the one in the middle of what you can see: between the band bar (with its veil)
-// and the bottom of the screen.
-const BAR_CLEARANCE = 110;
-export const readingLineOf = (scroller) => {
-  const r = scroller.getBoundingClientRect();
-  return (r.top + BAR_CLEARANCE + r.bottom) / 2;
-};
-
-// Scroll so a card sits on the reading line and is the one lit. Tiles side by side share the line in turn,
-// left to right (see measure below), so a tile is brought to its own share of the row.
+// Scroll so a card sits on the reading line and is the one lit.
 export const scrollCardToLine = (target, scroller) => {
   const rect = target.getBoundingClientRect();
   const row = Array.from(
@@ -25,27 +26,21 @@ export const scrollCardToLine = (target, scroller) => {
   )
     .map((el) => ({ el, r: el.getBoundingClientRect() }))
     .filter((x) => x.r.height && Math.abs(x.r.top - rect.top) < 2)
-    .sort((a, b) => a.r.left - b.r.left);
-  const n = Math.max(1, row.length);
-  const k = Math.max(
-    0,
-    row.findIndex((x) => x.el === target)
-  );
-  const top = Math.min(rect.top, ...row.map((x) => x.r.top));
-  const bottom = Math.max(rect.bottom, ...row.map((x) => x.r.bottom));
-  // A block taller than most of the screen (the Lab) is brought in by its top, just under the bar, rather
-  // than centred on the reading line, which would land in its middle
+    .sort((a, b) => a.r.left - b.r.left)
+    .map((x) => ({
+      top: x.r.top,
+      bottom: x.r.bottom,
+      isTarget: x.el === target,
+    }));
   const view = scroller.getBoundingClientRect();
-  if (bottom - top > (view.height - BAR_CLEARANCE) * 0.7) {
-    scroller.scrollTo({
-      top: Math.max(0, scroller.scrollTop + top - (view.top + BAR_CLEARANCE)),
-      behavior: 'smooth',
-    });
-    return;
-  }
-  const anchor = top + ((bottom - top) * (k + 0.5)) / n;
   scroller.scrollTo({
-    top: Math.max(0, scroller.scrollTop + anchor - readingLineOf(scroller)),
+    top: scrollTopForCard({
+      rect,
+      row,
+      view,
+      scrollTop: scroller.scrollTop,
+      line: readingLineOf(scroller),
+    }),
     behavior: 'smooth',
   });
 };
@@ -71,32 +66,29 @@ const useScrollHighlight = (activeFilter) => {
 
     const containerRect = scrollContainer.getBoundingClientRect();
     // The card on the reading line, mid-screen, is the one you are on. Jumps land cards on it too.
-    let readingLine = readingLineOf(scrollContainer);
-    // The last cards can never scroll up to that line, so over the final stretch the line glides down
-    // to meet them, reaching the last card just as the page bottoms out
     const remaining =
       scrollContainer.scrollHeight -
       scrollContainer.clientHeight -
       scrollContainer.scrollTop;
-    const target =
-      timelineItems[timelineItems.length - 1].getBoundingClientRect().bottom -
-      remaining -
-      12;
-    if (target > readingLine && remaining < target - readingLine)
-      readingLine = target - remaining;
+    const readingLine = glideReadingLine(
+      readingLineOf(scrollContainer),
+      remaining,
+      timelineItems[timelineItems.length - 1].getBoundingClientRect().bottom
+    );
 
-    // The bar takes over from the hero strip at the strip's own spot: while the strip is still on its way
-    // up the bar stays away, and scrolling back up hands the spot back to the strip. With the lanes open,
-    // the hand-off waits for the last lane, so the bar and the lanes are never on screen together.
     const stage = document.querySelector('.spectro__stage');
-    let stuck = scrollContainer.scrollTop > 40;
-    if (stage) {
-      const rowH =
-        parseFloat(getComputedStyle(stage).getPropertyValue('--row-h')) || 46;
-      stuck =
-        stage.getBoundingClientRect().bottom - rowH <=
-        containerRect.top + STICK_AT;
-    }
+    const stuck = barIsStuck({
+      scrollTop: scrollContainer.scrollTop,
+      stage: stage
+        ? {
+            bottom: stage.getBoundingClientRect().bottom,
+            rowH: rowHeightOf(
+              getComputedStyle(stage).getPropertyValue('--row-h')
+            ),
+            containerTop: containerRect.top,
+          }
+        : null,
+    });
     if (!stuck) {
       setVisible((prev) =>
         prev.category === 'all' ? prev : { category: 'all', title: null }
@@ -105,95 +97,48 @@ const useScrollHighlight = (activeFilter) => {
       return;
     }
 
-    const timelineRect = (line) =>
-      timelineItems[0].getBoundingClientRect().top > line;
-    let centermostCategory = 'all';
-    let centermostTitle = null;
-    let smallestDistance = Infinity;
-    const crossing = [];
-
-    timelineItems.forEach((item) => {
+    const items = Array.from(timelineItems).map((item) => {
       const rect = item.getBoundingClientRect();
-      if (rect.top <= readingLine && rect.bottom >= readingLine)
-        crossing.push({ item, rect });
-
-      // Otherwise (the line is in a gap) fall back to the closest card
-      const distance = Math.abs(rect.top + rect.height * 0.5 - readingLine);
-      const itemVisibleHeight =
-        Math.min(rect.bottom, containerRect.bottom) -
-        Math.max(rect.top, containerRect.top);
-      if (
-        itemVisibleHeight / rect.height > 0.15 &&
-        distance < smallestDistance
-      ) {
-        smallestDistance = distance;
-        centermostCategory = item.getAttribute('data-category') || 'all';
-        centermostTitle = item.getAttribute('data-title');
-      }
+      return {
+        category: item.getAttribute('data-category'),
+        title: item.getAttribute('data-title'),
+        top: rect.top,
+        bottom: rect.bottom,
+        left: rect.left,
+        height: rect.height,
+      };
+    });
+    const { category, title } = cardOnLine({
+      items,
+      scroll: { top: containerRect.top, bottom: containerRect.bottom },
+      line: readingLine,
+      drawers: () =>
+        Array.from(document.querySelectorAll('.tile-drawer')).map((d) => {
+          const r = d.getBoundingClientRect();
+          const owner = d.parentElement?.querySelector(
+            '.timeline__item.is-open[data-category]'
+          );
+          return {
+            top: r.top,
+            bottom: r.bottom,
+            owner: Boolean(owner),
+            category: owner && owner.getAttribute('data-category'),
+            title: owner && owner.getAttribute('data-title'),
+          };
+        }),
+      selected: () => {
+        const el = document.getElementById('selected');
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { top: r.top, bottom: r.bottom };
+      },
     });
 
-    // Tiles side by side cross the line together. Hand the row's height out among them, left to right,
-    // so scrolling through the row walks the highlight across it and every tile gets its turn.
-    let onLine = null;
-    if (crossing.length === 1) onLine = crossing[0].item;
-    else if (crossing.length > 1) {
-      crossing.sort((a, b) => a.rect.left - b.rect.left);
-      const top = Math.min(...crossing.map((c) => c.rect.top));
-      const bottom = Math.max(...crossing.map((c) => c.rect.bottom));
-      const progress = (readingLine - top) / Math.max(1, bottom - top);
-      onLine =
-        crossing[
-          Math.min(crossing.length - 1, Math.floor(progress * crossing.length))
-        ].item;
-    }
-
-    // Reading an opened tile's details, under its row: the tile they belong to stays the one you are on
-    if (!onLine) {
-      const drawer = Array.from(document.querySelectorAll('.tile-drawer')).find(
-        (d) => {
-          const r = d.getBoundingClientRect();
-          return r.top <= readingLine && r.bottom >= readingLine;
-        }
-      );
-      const owner = drawer?.parentElement?.querySelector(
-        '.timeline__item.is-open[data-category]'
-      );
-      if (owner) onLine = owner;
-    }
-
-    if (onLine) {
-      centermostCategory = onLine.getAttribute('data-category') || 'all';
-      centermostTitle = onLine.getAttribute('data-title');
-    } else if (centermostCategory === 'all') {
-      // Above the first card (still in the hero) show the first band; below the last card keep the last
-      const edge = timelineRect(readingLine)
-        ? timelineItems[0]
-        : timelineItems[timelineItems.length - 1];
-      centermostCategory = edge.getAttribute('data-category') || 'all';
-      centermostTitle = timelineRect(readingLine)
-        ? null
-        : edge.getAttribute('data-title');
-    }
-
-    // In the gaps around Selected work's large cards, and on the lanes after them, the bar keeps saying Selected
-    // work; once a card reaches the reading line, the bar names that card.
-    const selected = document.getElementById('selected');
-    if (selected && centermostCategory !== 'selected' && !onLine) {
-      const r = selected.getBoundingClientRect();
-      if (
-        r.top < readingLine &&
-        r.bottom > containerRect.top + BAR_CLEARANCE + 60
-      ) {
-        centermostCategory = 'selected';
-        centermostTitle = null;
-      }
-    }
-
     // Only update if category changed (reduce unnecessary re-renders)
-    const key = `${centermostCategory}|${centermostTitle}`;
+    const key = `${category}|${title}`;
     if (key !== lastKeyRef.current) {
       lastKeyRef.current = key;
-      setVisible({ category: centermostCategory, title: centermostTitle });
+      setVisible({ category, title });
     }
   }, []);
 
