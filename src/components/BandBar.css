@@ -215,6 +215,14 @@
     left: 14px;
     right: 126px;
   }
+  .bandbar__track::before {
+    background: linear-gradient(
+      to right,
+      var(--edge) 0%,
+      var(--edge) 86%,
+      transparent 100%
+    );
+  }
 }
 
 /* Content fades out as it nears the bar, so it never runs underneath it */

@@ -395,6 +395,40 @@ Top remaining gaps (both critics):
 4. Left-edge stray horizontal hairline behind card rows (`S02-1440`, `S03-1440`, `S03-390`); faint white oval halo behind light-mode role (`S04-1440`).
 5. `CALarm` `0 : 0 0` reads like placeholder zero state; `BandBar` mobile track stops abruptly mid-header; `aeris`/`jobwright`/`inkwell` cropped edge text/blur and missing logos on 2026 peek cards; right-rail hover label appears on single button after click.
 
+---
+
+## Round 12
+
+Time: 03:44 to 03:52 UTC (2026-11-15)
+Stills: `cook/stills/r12/` | Side by side: `cook/compare/r12/`
+
+Changes:
+- Terminated orphaned preview server (`pid 418299`) holding stale assets on port 8839 and switched `shoot` verification to fresh build output.
+- Raised `.scroll-veil` (`z-index: 6`, `0.985..0.996` dark opacity) in `styles.css` above `#boot` (`z-index: 5`), completely removing the left-edge horizontal `.boot__beam` hairline behind `#selected` and `#lab`.
+- Ran `measure()` immediately with `ResizeObserver` in `useScrollHighlight.js`, hid `.spectro-toggle` alongside `.light-toggle`/`.lock-toggle`/`.play-mode-toggle` when `.layout__ui--reading` is active (`Layout.css`), and restricted `.ui-hint` labels to keyboard `:focus-visible` and playground exit mode.
+- Sped up cycling `ReactTyped` (`UITypewriter.jsx`), tightened mobile cycling text width/size (`UITypewriter.css`), removed orange bloom halo and light-mode role oval halo, and deepened light-mode diamond/tick contrast (`SelectedMark.css`, `Spectrograph.css`).
+- Set `Centi-seed` `floor: 0.85` + initial pointer settle guard (`FeatureCards.jsx`), added `aria-pressed` active pill highlight (`FeatureCards.css`), feathered mobile `BandBar` right hairline (`BandBar.css`), and tightened `aeris`/`jobwright`/`inkwell`/`echo`/`orbiter` Lab crops (`LabShowcase.css`) and ghost opacity (`CardTile.css`).
+
+Scores, eyeballed: mean of 2 fresh subagent critics (Critic A, Critic B), strict craft bar vs `cook/refs/R01` to `R05`:
+
+| Shot | Layout | Type | Color | Components | Polish | Mean | vs r11 |
+|---|---|---|---|---|---|---|---|
+| S01 | 72 | 78 | 78 | 74 | 68 | 73.8 | -1.8 |
+| S02 | 71 | 81 | 84 | 79 | 70 | 76.8 | -3.7 |
+| S03 | 83 | 78 | 79 | 73 | 71 | 76.5 | -0.6 |
+| S04 | 74 | 79 | 81 | 75 | 73 | 76.3 | +0.8 |
+
+Measured (`shoot.mjs` & `color_check.py`):
+- All 8 stills (`S01`-`S04` at `390x844` and `1440x900`): overflow **none**, taps under 44px **0** on all 4 mobile shots, text nodes under 14px **0** on all 4 mobile shots.
+- `color_check` mean saturation / brightness deltas: S01 `+0.192 / -0.088`, S02 `+0.096 / +0.486`, S03 `-0.387 / +0.882`, S04 `+0.223 / -0.036`.
+
+Top remaining gaps (both critics):
+1. `S02-390` right-rail controls (`Lock`, `Prism`, `Chevron`) still mid-fade overlapping `"Full portfolio"` (`"lio"`) and upper-right corner of `"Find My Zoox"` when cold fonts settle around 3.3s.
+2. `S03` Lab crops: `orbiter` slices `"14:29:19"` at top-left corner; `jobwright` and `aeris` retain cropped UI text labels along edges; `inkwell` reads soft/blown-out yellow-white; `echo` `"Tap to start listening"` is dim.
+3. `S02-1440` `BandBar` names `"Audio prioritization"` instead of first row `"Find My Zoox"` on initial `#selected` landing; `CALarm` still caught in `0:03` countdown frame (`useFirstSight` delay).
+4. `S04-1440` vertical typing cursor `|` is pale grey on pearl white (`Selected work` / hero light contrast).
+
+
 
 
 

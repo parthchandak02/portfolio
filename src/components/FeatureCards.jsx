@@ -147,7 +147,10 @@ const RobotMoment = ({ card, lightMode }) => {
         import('./centiSeedRobot').then(({ createCentiSeed }) => {
           if (!live) return;
           try {
-            robot.current = createCentiSeed(el, { lightMode: light.current });
+            robot.current = createCentiSeed(el, {
+              lightMode: light.current,
+              floor: 0.85,
+            });
           } catch {
             return;
           } // no WebGL: the card still reads without it
@@ -177,11 +180,13 @@ const RobotMoment = ({ card, lightMode }) => {
 
   useEffect(() => {
     const el = card.current;
+    const mountedAt = performance.now();
     const move = (e) => {
       if (
         !robot.current ||
+        performance.now() - mountedAt < 1500 ||
         e.pointerType === 'touch' ||
-        (e.movementX === 0 && e.movementY === 0)
+        (!e.movementX && !e.movementY)
       )
         return;
       const r = el.getBoundingClientRect();
@@ -352,14 +357,16 @@ const AudioMoment = ({ card, lightMode }) => {
         <span className="fcard__actions">
           <button
             type="button"
-            className="fcard__action"
+            className={`fcard__action${mode === 'nav' ? ' is-active' : ''}`}
+            aria-pressed={mode === 'nav'}
             onClick={() => hear('nav')}
           >
             Navigation prompt
           </button>
           <button
             type="button"
-            className="fcard__action"
+            className={`fcard__action${mode === 'urgent' ? ' is-active' : ''}`}
+            aria-pressed={mode === 'urgent'}
             onClick={() => hear('urgent')}
           >
             Urgent alert
@@ -387,10 +394,10 @@ const AlarmMoment = ({ card }) => {
     const at = (ms, fn) => timers.current.push(setTimeout(fn, ms));
     setPhase('pill');
     setDigits(['0', '03']);
-    at(800, () => setPhase('open'));
-    at(1500, () => setDigits(['0', '02']));
-    at(2200, () => setDigits(['0', '01']));
-    at(2900, () => {
+    at(300, () => setPhase('open'));
+    at(700, () => setDigits(['0', '02']));
+    at(1100, () => setDigits(['0', '01']));
+    at(1500, () => {
       setDigits(['0', '00']);
       setPhase('ring');
       glassNotes(
@@ -401,7 +408,7 @@ const AlarmMoment = ({ card }) => {
         { gain: 0.04, decay: 0.4, from: 1 }
       );
     });
-    at(4300, () => {
+    at(2500, () => {
       setPhase('rest');
       setDigits(clockNow());
     });

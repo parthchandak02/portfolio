@@ -497,11 +497,14 @@
 
 /* Light mode: deepen hues slightly with a soft pearl halo so ticks read vividly over iridescent bubbles */
 .spectro--light .spectro__line:not(.spectro__line--future) {
-  background: color-mix(in srgb, var(--hue) 68%, #141418);
-  opacity: 0.96;
+  background: color-mix(in srgb, var(--hue) 60%, #141418);
+  opacity: 1;
   box-shadow: 0 0 0 0.5px rgba(244, 245, 247, 0.5);
 }
+.spectro--light .spectro__line--future {
+  border-color: color-mix(in srgb, var(--hue) 60%, #141418);
+}
 .spectro--light .spectro__line.spectro__line--on:not(.spectro__line--future) {
-  background: color-mix(in srgb, var(--hue) 80%, #141418);
+  background: color-mix(in srgb, var(--hue) 74%, #141418);
   opacity: 1;
 }

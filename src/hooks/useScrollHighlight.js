@@ -152,35 +152,40 @@ const useScrollHighlight = (activeFilter) => {
     // Reset when not in 'all' mode
     if (activeFilter !== 'all') {
       setVisible({ category: activeFilter, title: null });
-      return;
+      return undefined;
     }
 
-    // Small delay to ensure DOM is ready
-    const timeout = setTimeout(() => {
-      const scrollContainer = document.querySelector('.main-content-scroll');
-      if (!scrollContainer) {
-        return;
-      }
+    const scrollContainer = document.querySelector('.main-content-scroll');
+    if (!scrollContainer) {
+      return undefined;
+    }
 
-      // Add scroll listener
-      scrollContainer.addEventListener('scroll', updateVisibleCategory);
+    scrollContainer.addEventListener('scroll', updateVisibleCategory, {
+      passive: true,
+    });
+    window.addEventListener('resize', updateVisibleCategory);
+    measure();
+    const t1 = setTimeout(measure, 80);
+    const t2 = setTimeout(measure, 220);
 
-      // Add resize listener in case viewport changes
-      window.addEventListener('resize', updateVisibleCategory);
-    }, 100);
+    const timeline = document.querySelector('.timeline');
+    const ro =
+      typeof ResizeObserver !== 'undefined' && timeline
+        ? new ResizeObserver(updateVisibleCategory)
+        : null;
+    if (ro) ro.observe(timeline);
 
     // Cleanup
     return () => {
-      clearTimeout(timeout);
-      const scrollContainer = document.querySelector('.main-content-scroll');
-      if (scrollContainer) {
-        scrollContainer.removeEventListener('scroll', updateVisibleCategory);
-      }
+      clearTimeout(t1);
+      clearTimeout(t2);
+      scrollContainer.removeEventListener('scroll', updateVisibleCategory);
       window.removeEventListener('resize', updateVisibleCategory);
+      if (ro) ro.disconnect();
       if (frameRef.current) cancelAnimationFrame(frameRef.current);
       frameRef.current = 0;
     };
-  }, [activeFilter, updateVisibleCategory]);
+  }, [activeFilter, updateVisibleCategory, measure]);
 
   return {
     visibleCategory: visible.category,

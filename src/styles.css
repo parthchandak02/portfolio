@@ -511,10 +511,10 @@ html.is-shifting * {
 .scroll-veil {
   position: fixed;
   inset: 0;
-  z-index: 2;
+  z-index: 6;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.45s ease;
+  transition: opacity 0.25s ease;
 }
 .scroll-veil.is-active {
   opacity: 1;
@@ -522,15 +522,15 @@ html.is-shifting * {
 .scroll-veil--dark {
   background: radial-gradient(
     ellipse 88% 68% at 50% 46%,
-    rgba(5, 6, 9, 0.94),
-    rgba(3, 4, 6, 0.98)
+    rgba(5, 6, 9, 0.985),
+    rgba(3, 4, 6, 0.996)
   );
 }
 .scroll-veil--light {
   background: radial-gradient(
     ellipse 85% 65% at 50% 45%,
-    rgba(244, 245, 247, 0.8),
-    rgba(244, 245, 247, 0.94)
+    rgba(244, 245, 247, 0.84),
+    rgba(244, 245, 247, 0.96)
   );
 }
 
@@ -544,7 +544,7 @@ html.is-shifting * {
 }
 @media (max-width: 560px) {
   .navigation-placeholder {
-    height: 515px;
+    height: 568px;
     min-height: 0;
     margin-bottom: 1.5rem;
   }

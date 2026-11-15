@@ -88,17 +88,22 @@
     ); /* Ultra-conservative spacing for very small phones like iPhone SE */
   }
 }
-/* The light, lock and play buttons belong to the top screen; they step aside once reading starts */
+/* The light, lock, play and chevron buttons belong to the top screen; they step aside once reading starts */
 .layout__ui--reading .light-toggle,
 .layout__ui--reading .lock-toggle,
-.layout__ui--reading .play-mode-toggle {
+.layout__ui--reading .play-mode-toggle,
+.layout__ui--reading .spectro-toggle {
   opacity: 0;
   transform: translateX(12px);
   pointer-events: none;
   visibility: hidden;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease,
+    visibility 0.12s;
 }
 
-/* Each round button names what it does: on hover or keyboard focus, and briefly after the opening */
+/* Each round button names what it does: on keyboard focus, and in the prism playground */
 .light-toggle,
 .lock-toggle,
 .play-mode-toggle {
@@ -129,14 +134,6 @@
 .light-mode .ui-hint {
   color: rgba(20, 20, 24, 0.72);
   text-shadow: 0 1px 8px rgba(255, 255, 255, 0.95);
-}
-@media (hover: hover) {
-  .light-toggle:hover > .ui-hint,
-  .lock-toggle:hover > .ui-hint,
-  .play-mode-toggle:hover > .ui-hint {
-    opacity: 1;
-    transform: translate(0, -50%);
-  }
 }
 .light-toggle:focus-visible > .ui-hint,
 .lock-toggle:focus-visible > .ui-hint,

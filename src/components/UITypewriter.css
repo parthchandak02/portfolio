@@ -111,20 +111,14 @@
 
 /* Orange styling for title parts in dark mode */
 .ui-typewriter-cycling.ui-typewriter--dark .title-part {
-  color: #ff6b35 !important; /* Vibrant orange matching the prism spectrum */
-  text-shadow: 0 0 8px rgba(255, 107, 53, 0.4) !important; /* Subtle orange glow */
-  filter: drop-shadow(
-    0 2px 4px rgba(255, 107, 53, 0.1)
-  ); /* Subtle orange depth */
+  color: #ff6b35 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45) !important;
 }
 
 /* Orange styling for title parts in light mode */
 .ui-typewriter-cycling.ui-typewriter--light .title-part {
-  color: #e55a2b !important; /* Darker orange for better contrast on light backgrounds */
-  text-shadow: 0 0 6px rgba(229, 90, 43, 0.2) !important; /* Lighter glow for light mode */
-  filter: drop-shadow(
-    0 1px 2px rgba(229, 90, 43, 0.1)
-  ); /* Subtle orange shadow for light mode */
+  color: #dc4c1d !important;
+  text-shadow: none !important;
 }
 
 /* Text container */
@@ -429,26 +423,25 @@
   margin-top: 0.35em;
 }
 
-/* Light mode: subtle pearl halo keeps hero text legible where 3D bubbles drift behind it */
+/* Light mode: subtle pearl crispness without creating an oval smudge behind the role line */
 .ui-typewriter--light {
-  text-shadow:
-    0 1px 14px rgba(244, 245, 247, 0.96),
-    0 0 26px rgba(244, 245, 247, 0.85);
+  text-shadow: 0 1px 4px rgba(244, 245, 247, 0.55);
 }
 .ui-typewriter-role.ui-typewriter--light {
   opacity: 0.9;
+  text-shadow: none;
 }
 
 @media (max-width: 560px) {
   .ui-typewriter-container {
     margin: 68px auto var(--space-100) auto;
-    max-width: calc(100vw - 116px);
+    max-width: calc(100vw - 124px);
   }
   .ui-typewriter-container .ui-typewriter-name {
     font-size: clamp(1.85rem, 8vw, 2.3rem);
   }
   .ui-typewriter-container .ui-typewriter-cycling {
-    font-size: clamp(0.98rem, 4.1vw, 1.18rem);
+    font-size: clamp(0.95rem, 3.8vw, 1.12rem);
     letter-spacing: -0.005em;
     margin-top: 0.25em;
   }

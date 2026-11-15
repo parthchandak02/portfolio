@@ -350,12 +350,22 @@
 .fcard__action:hover {
   background: rgba(255, 255, 255, 0.18);
 }
+.fcard__action.is-active {
+  border-color: rgba(255, 110, 96, 0.72);
+  background: rgba(255, 90, 82, 0.2);
+  color: #fff;
+}
 .lab--light .fcard__action {
   border-color: rgba(20, 20, 24, 0.14);
   background: rgba(20, 20, 24, 0.08);
 }
 .lab--light .fcard__action:hover {
   background: rgba(20, 20, 24, 0.15);
+}
+.lab--light .fcard__action.is-active {
+  border-color: rgba(220, 76, 29, 0.65);
+  background: rgba(229, 90, 43, 0.14);
+  color: #141418;
 }
 
 /* CALarm: calendar trigger pill + flip clock, framed symmetrically */
