@@ -32,11 +32,19 @@ const Card = z.strictObject({
 
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 // "February 2022 - Present" -> 2022.08, "2016 - 2018" -> 2016.5 (as in data/spectrum.js)
-const startOf = (date) => {
+export const startOf = (date = '') => {
   const first = date.split(' - ')[0];
   const year = Number((first.match(/\d{4}/) || [])[0]);
+  if (!year) return 0;
   const month = MONTHS.indexOf(first.slice(0, 3).toLowerCase());
   return month === -1 ? year + 0.5 : year + month / 12;
+};
+
+// "February 2022 - Present" -> Infinity; "2016 - 2018" -> 2018.5; single dates end where they start
+export const endOf = (date = '') => {
+  if (/present/i.test(date)) return Infinity;
+  const parts = date.split(' - ');
+  return startOf(parts[parts.length - 1]);
 };
 
 const FRONT = /^---\n([\s\S]*?)\n---\n?([\s\S]*)$/;
@@ -87,7 +95,9 @@ export const loadCards = (root) => {
   if (errors.length) throw new Error(`The portfolio's cards have problems:\n  ${errors.join('\n  ')}`);
   all.forEach((c) => { delete c._file; });
   // Newest first within a section, as the page shows them; ties keep the files' alphabetical order
-  Object.values(bySection).forEach((list) => list.sort((a, b) => startOf(b.date) - startOf(a.date)));
+  Object.values(bySection).forEach((list) =>
+    list.sort((a, b) => startOf(b.date) - startOf(a.date) || endOf(b.date) - endOf(a.date))
+  );
   return { bySection, files };
 };
 
