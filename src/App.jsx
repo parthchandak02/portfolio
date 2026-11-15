@@ -234,8 +234,12 @@ export default function App() {
         />
 
         {/* One contact button, always on screen */}
-        <ContactButton lightMode={lightMode} away={isPlayMode} />
-        <SoundToggle away={isPlayMode} />
+        <ContactButton
+          lightMode={lightMode}
+          away={isPlayMode}
+          reading={handedOver}
+        />
+        <SoundToggle away={isPlayMode} reading={handedOver} />
 
         {/* UI Overlay Layer */}
         <div

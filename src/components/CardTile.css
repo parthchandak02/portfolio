@@ -45,7 +45,7 @@
 .ctile__meta {
   font-family: var(--font-family-numeric);
   font-variant-numeric: tabular-nums;
-  font-size: 0.72rem;
+  font-size: 0.875rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -72,7 +72,7 @@
   }
 }
 .ctile__note {
-  font-size: 0.74rem;
+  font-size: 0.875rem;
   opacity: 0.72;
 }
 .ctile__year {
@@ -82,10 +82,10 @@
   z-index: 1;
   font-family: var(--font-family-numeric);
   font-variant-numeric: tabular-nums;
-  font-size: 0.72rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  opacity: 0.72; /* the same on every tile (cook round 6) */
+  letter-spacing: 0.02em;
+  opacity: 0.76; /* the same on every tile (cook round 6) */
 }
 .ctile--photo .ctile__year {
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);

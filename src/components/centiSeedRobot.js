@@ -19,7 +19,7 @@ const HIPS = [
   [1.55, -1],
 ]; // along the body, and which side
 const STRIDE = 1.5; // how far a foot sweeps, front to back
-const SPEED = 3.2; // units a second
+const SPEED = 4.2; // units a second
 const smooth = (t) => t * t * (3 - 2 * t);
 const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
 
@@ -498,7 +498,7 @@ export const createCentiSeed = (
   const draw = () => renderer.render(scene, camera);
 
   const tick = (now) => {
-    const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
+    const dt = Math.min(0.15, (now - last) / 1000 || 0.016);
     last = now;
     sunShown += (sunX - sunShown) * Math.min(1, dt * 5);
     let busy = Math.abs(sunX - sunShown) > 0.02;
@@ -519,7 +519,7 @@ export const createCentiSeed = (
       state = 'rest';
     }
     if (state === 'growing') {
-      grow = Math.min(1, grow + dt / 1.1);
+      grow = Math.min(1, grow + dt / 0.85);
       if (grow === 1) state = 'rest';
       busy = true;
     }
@@ -547,7 +547,7 @@ export const createCentiSeed = (
     const tilt = 0.17; // looking a little down at it
     const mid = unitsTall * (floor - 0.5); // how far above the floor line the camera looks
     camera.position.set(
-      2.2,
+      1.6,
       mid + Math.sin(tilt) * distance,
       Math.cos(tilt) * distance
     );
@@ -574,14 +574,14 @@ export const createCentiSeed = (
     walkIn() {
       cancelAnimationFrame(frame);
       frame = 0;
-      x = -Math.min(halfWidth * 0.45, 4.6);
+      x = -2.0;
       target = 0;
       sunX = 0;
       sunShown = 0;
       heading = 0;
       aim = 0;
       travelled = 0;
-      grow = 0.18;
+      grow = 0.45;
       state = 'walking';
       go();
     },

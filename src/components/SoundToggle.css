@@ -66,11 +66,21 @@ body:has(.contact__shell.is-open) .sound-toggle {
   }
 }
 
-/* Phone: sound sits beside the contact button instead of above it, so the pair takes one row at the bottom
-   rather than a column over the cards (cook round 5) */
+/* Phone: dock beside the contact toggle in top corner (hero top-left, reading top-right) so cards stay unobstructed */
 @media (max-width: 560px) {
   .sound-toggle {
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-    right: calc(16px + 44px + 10px + env(safe-area-inset-right, 0px));
+    top: calc(16px + env(safe-area-inset-top, 0px));
+    left: calc(16px + 44px + 8px + env(safe-area-inset-left, 0px));
+    right: auto;
+    bottom: auto;
+  }
+  .sound-toggle.sound-toggle--reading {
+    top: calc(14px + env(safe-area-inset-top, 0px));
+    right: calc(16px + 44px + 8px + env(safe-area-inset-right, 0px));
+    left: auto;
+    bottom: auto;
+  }
+  .sound-toggle > .ui-hint {
+    display: none;
   }
 }

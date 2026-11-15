@@ -203,6 +203,19 @@
   gap: 16px;
   margin: 0 0 12px;
 }
+.timeline--dark .timeline__selected-head {
+  text-shadow:
+    0 2px 16px rgba(0, 0, 0, 0.96),
+    0 0 8px rgba(0, 0, 0, 0.8);
+}
+.timeline--light .timeline__selected-head {
+  text-shadow:
+    0 2px 14px rgba(244, 245, 247, 0.96),
+    0 0 10px rgba(244, 245, 247, 0.9);
+}
+.timeline__items > .lab {
+  margin-bottom: 44px;
+}
 .timeline__skip {
   display: inline-flex;
   align-items: center;

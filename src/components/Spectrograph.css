@@ -262,16 +262,20 @@
 }
 @media (max-width: 560px) {
   .spectro {
+    max-width: calc(100vw - 44px);
+    padding: 4px 6px;
     margin-bottom: var(--space-150);
   }
   .spectro__line {
-    width: 1.25px;
-    opacity: 0.85;
+    width: 1.1px;
+    height: calc(var(--row-h) - 20px);
+    opacity: 0.84;
   }
   .spectro__line--featured,
   .spectro__line--on,
   .spectro__line--future {
     width: 2px;
+    height: calc(var(--row-h) - 16px);
   }
   .spectro__label {
     font-size: 0.72rem;
@@ -486,12 +490,18 @@
   border: 0;
 }
 
-/* Light mode: step band hues slightly toward obsidian ink so amber and cyan ticks read clearly on pearl white */
+/* Dark mode: subtle dark edge shadow keeps orange ticks readable over the bright prism beam */
+.spectro--dark .spectro__line:not(.spectro__line--future) {
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.55);
+}
+
+/* Light mode: deepen hues slightly with a soft pearl halo so ticks read vividly over iridescent bubbles */
 .spectro--light .spectro__line:not(.spectro__line--future) {
-  background: color-mix(in srgb, var(--hue) 78%, #141418);
-  opacity: 0.94;
+  background: color-mix(in srgb, var(--hue) 68%, #141418);
+  opacity: 0.96;
+  box-shadow: 0 0 0 0.5px rgba(244, 245, 247, 0.5);
 }
 .spectro--light .spectro__line.spectro__line--on:not(.spectro__line--future) {
-  background: color-mix(in srgb, var(--hue) 86%, #141418);
+  background: color-mix(in srgb, var(--hue) 80%, #141418);
   opacity: 1;
 }

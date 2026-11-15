@@ -324,4 +324,42 @@ Top remaining gaps (both critics):
 5. Mobile bottom-right speaker/chat buttons overlapping card borders and `inkwell` caption (`S03-390`).
 6. Sparse 2026/2025 preview cards below Lab, and stray faint lines/diamonds.
 
+---
+
+## Round 10
+
+Time: 03:21 to 03:31 UTC (2026-11-15)
+Stills: `cook/stills/r10/` | Side by side: `cook/compare/r10/`
+
+Changes:
+- Sped up hero `ReactTyped` typing (`UITypewriter.jsx`, `UITypewriter.css`) so full name and rotating roles finish typing early and hold steady before 8s; refined mobile container width, light pearl halo, and responsive margins.
+- Docked mobile `ContactButton` and `SoundToggle` top-left on hero and top-right while reading (`App.jsx`, `ContactButton.css`, `SoundToggle.css`, `BandBar.css`), clearing card content cleanly on `390x844`.
+- Tightened mobile `.spectro` padding/ticks (`Spectrograph.css`) and anchored dark/light strip line shadows and pearl halos.
+- Equalized desktop Selected Work card height (`304px`) in `FeatureCards.css` so all four cards + `"The full portfolio"` fit cleanly in `1440x900`; brighter `CALarm` coral numerals and darker `.scroll-veil--dark` scrim (`styles.css`).
+- Adjusted `centiSeedRobot.js` `walkIn()` start (`x = -2.0`, `grow = 0.45`) and `dt` clamp (`0.15`) so the robot walks to center spotlight and sprouts its plant cleanly.
+- Calibrated `LabShowcase.css` crops (`echo`, `aeris`, `jobwright`, `inkwell`), equalized subtitle line height (`min-height: 2.6em`) across 1-line and 2-line tags, and bumped `CardTile.css` metadata to `0.875rem`.
+
+Scores, eyeballed: mean of 2 fresh subagent critics (Critic A, Critic B), strict craft bar vs `cook/refs/R01` to `R05`:
+
+| Shot | Layout | Type | Color | Components | Polish | Mean | vs r09 |
+|---|---|---|---|---|---|---|---|
+| S01 | 73 | 80 | 80 | 77 | 74 | 77 | +6 |
+| S02 | 80 | 80 | 82 | 79 | 77 | 79 | +0 |
+| S03 | 80 | 77 | 78 | 76 | 75 | 77 | +3 |
+| S04 | 74 | 81 | 81 | 77 | 73 | 77 | +5 |
+
+Measured (`shoot.mjs` & `color_check.py`):
+- `S01-390`, `S02-390`, `S04-390`: overflow none, taps under 44px **0**, text nodes under 14px **0**.
+- `S03-390`: overflow none, taps under 44px **0**, text nodes under 14px **2** (`CardTile` `.ctile__name` on 560px).
+- `color_check` mean saturation / brightness deltas: S01 `+0.234 / -0.098`, S02 `+0.108 / +0.471`, S03 `-0.327 / +0.857`, S04 `+0.222 / -0.044`.
+
+Top remaining gaps (both critics):
+1. Mobile sticky `BandBar` still receives inline `left`/`width` in `BandBar.jsx`, overriding mobile `right: 120px` and colliding with top-right `Sound`/`Contact` buttons (`S02-390`, `S03-390`).
+2. `S02-1440` & `S02-390` `"Selected work"` heading sits inside `BandBar`'s top-fade ramp and renders dimmed (~50% alpha) vs `"The full portfolio"` below.
+3. Mobile hero compression (`390x844`): `"I am a Creative Technologist|"` nears right chevron, `.spectro` ticks crowd without desktop's varied cadence, and `"Selected work"` pulls up into the prism glow / bubbles (`S01-390`, `S04-390`).
+4. `Centi-seed` says `"Tap below to lead it."` without an explicit floor tap cue/beacon; `CALarm` desktop card has dead space above small flip clock.
+5. `S03` Lab card title baselines still bounce (name floats above 2-line vs 1-line subtitle, though aligned at card bottom, visual baseline shifts), plus edge text leaks in `aeris`, `wc26`, `jobwright`, and blur on `inkwell` / `2025`.
+6. Right-rail permanent labels (`Light mode`, `Play with prism` only) asymmetric vs Lock/Chevron buttons (`S01-1440`, `S04-1440`).
+
+
 

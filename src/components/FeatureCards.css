@@ -65,7 +65,7 @@
   margin: 0;
   font-family: var(--font-family-primary);
   font-weight: 800;
-  font-size: clamp(1.55rem, 6.2cqi, 2.35rem);
+  font-size: clamp(1.45rem, 5.5cqi, 2.1rem);
   line-height: 1.06;
   letter-spacing: -0.022em;
   text-wrap: balance;
@@ -273,14 +273,14 @@
   z-index: 3;
   order: 2;
   display: grid;
-  gap: 10px;
-  flex: 1;
-  grid-template-rows: minmax(90px, 1fr) auto;
+  gap: 8px;
+  margin-top: auto;
+  grid-template-rows: 74px auto;
   pointer-events: none;
 }
 .fcard__wave {
   width: 100%;
-  height: 100%;
+  height: 74px;
   min-height: 0;
   display: block;
 }
@@ -288,13 +288,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px 12px;
   flex-wrap: wrap;
 }
 .fcard__level {
   font-family: var(--font-family-numeric);
   font-size: 0.875rem;
-  opacity: 0.78;
+  opacity: 0.82;
 }
 .fcard__actions {
   display: flex;
@@ -331,16 +331,15 @@
   z-index: 1;
   order: 2;
   width: fit-content;
-  margin: auto auto 2px;
+  margin: auto auto 4px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 16px;
-  border-radius: 20px;
-  background: #0d0e13;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: #13141b;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.44);
-  color: #ff736b;
+  color: #ff8278;
   font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
   font-variant-numeric: tabular-nums;
   transform-origin: 50% 50%;
@@ -351,18 +350,18 @@
 }
 .fcard__clock i {
   font-style: normal;
-  font-size: clamp(1.5rem, 6cqi, 2.6rem);
+  font-size: clamp(1.5rem, 6cqi, 2.5rem);
 }
 .fcard__flip {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: clamp(42px, 12cqi, 68px);
-  height: clamp(58px, 17cqi, 92px);
+  width: clamp(46px, 13cqi, 72px);
+  height: clamp(62px, 17cqi, 96px);
   border-radius: 10px;
-  background: #23242a;
-  font-size: clamp(1.9rem, 8.5cqi, 3.6rem);
+  background: #23252e;
+  font-size: clamp(2rem, 8.8cqi, 3.6rem);
 }
 .fcard__flip::after {
   content: '';
@@ -371,7 +370,7 @@
   right: 0;
   top: 50%;
   height: 1px;
-  background: #0d0e13;
+  background: #13141b;
 }
 .fcard__clock.is-pill {
   transform: scale(0.32);
@@ -412,17 +411,19 @@
   color: rgba(20, 20, 24, 0.88);
 }
 
-/* Desktop 2x2: calibrated height so all four Selected work cards fit in 1440x900 without clipping row 2 */
+/* Desktop 2x2: equalized height so every card aligns cleanly and clears 1440x900 bottom edge */
 @media (min-width: 900px) {
   .fcard {
-    min-height: clamp(286px, 34vh, 324px);
-    --pad: 22px;
+    height: 304px;
+    min-height: 304px;
+    --pad: 20px;
+    gap: 10px;
   }
 }
 
 @media (max-width: 560px) {
   .fcard {
-    min-height: 310px;
+    min-height: 300px;
   }
   .fcard__action {
     flex: 1;
