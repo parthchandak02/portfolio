@@ -165,7 +165,7 @@ export default function App() {
           const scroller = document.querySelector('.main-content-scroll');
           // The section's first card lands mid-screen, on the reading line, so it is the one lit
           if (!cancelled && target && scroller)
-            scrollCardToLine(target, scroller);
+            scrollCardToLine(target, scroller, 'auto');
         }),
       150
     );
@@ -226,6 +226,12 @@ export default function App() {
             focusHue={litBand?.hue ?? null}
           />
         </Suspense>
+
+        {/* Quiet full-bleed backdrop veil once reading begins, softening the raw 3D beam behind cards */}
+        <div
+          className={`scroll-veil${handedOver ? ' is-active' : ''} ${lightMode ? 'scroll-veil--light' : 'scroll-veil--dark'}`}
+          aria-hidden="true"
+        />
 
         {/* One contact button, always on screen */}
         <ContactButton lightMode={lightMode} away={isPlayMode} />

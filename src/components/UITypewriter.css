@@ -277,9 +277,8 @@
 
 @media (max-width: 480px) {
   .ui-typewriter-container {
-    /* On a phone the headline starts below the column of round buttons, so a long role like
-       "Creative Technologist" never runs under them */
-    margin: calc(var(--space-400) + 134px) auto var(--space-300) auto;
+    /* Keep hero + strip cleanly in the upper canvas above the 3D prism without colliding */
+    margin: var(--space-500) auto var(--space-150) auto;
     gap: var(--space-075);
   }
 
@@ -399,9 +398,9 @@
   margin: 0;
   font-family: var(--font-family-primary);
   font-weight: 800;
-  font-size: clamp(2.7rem, 11vw, 6.4rem);
-  line-height: 0.98;
-  letter-spacing: -0.035em;
+  font-size: clamp(2.45rem, 10.5vw, 6.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.024em;
   white-space: nowrap;
   position: relative;
 }
@@ -422,5 +421,5 @@
 
 /* Light mode: the role line one step darker on the pearl page (cook round 6) */
 .ui-typewriter-role.ui-typewriter--light {
-  opacity: 0.84;
+  opacity: 0.88;
 }

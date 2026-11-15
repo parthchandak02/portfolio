@@ -244,12 +244,12 @@
   pointer-events: none;
   font-family: var(--font-family-label);
   font-weight: 600;
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.01em;
+  text-transform: none;
   white-space: nowrap;
   color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000);
-  opacity: 0.72;
+  opacity: 0.76;
 }
 .spectro__label.is-on {
   opacity: 1;
@@ -261,9 +261,21 @@
   opacity: 0;
 }
 @media (max-width: 560px) {
+  .spectro {
+    margin-bottom: var(--space-150);
+  }
+  .spectro__line {
+    width: 1.25px;
+    opacity: 0.85;
+  }
+  .spectro__line--featured,
+  .spectro__line--on,
+  .spectro__line--future {
+    width: 2px;
+  }
   .spectro__label {
-    font-size: 0.58rem;
-    letter-spacing: 0.05em;
+    font-size: 0.72rem;
+    letter-spacing: 0;
   }
 }
 
@@ -413,9 +425,9 @@
 } /* keep the space so selecting a line does not shift the page */
 .spectro__kicker {
   font-family: var(--font-family-label);
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.01em;
+  text-transform: none;
   color: color-mix(in srgb, var(--hue) calc((1 - var(--ink)) * 100%), #000);
   font-weight: 700;
 }
@@ -438,7 +450,7 @@
 .spectro__meta {
   font-family: var(--font-family-numeric);
   font-variant-numeric: tabular-nums;
-  font-size: 0.78rem;
+  font-size: 0.875rem;
   color: var(--mute);
   display: flex;
   align-items: center;
@@ -449,8 +461,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  min-height: 32px;
-  padding: 0 2px;
+  min-height: 44px;
+  padding: 0 4px;
   color: #ff6b35;
   font-weight: 600;
   text-decoration: none;
@@ -474,10 +486,12 @@
   border: 0;
 }
 
-/* Light mode: the strip's lines go soft, mixed toward the pearl page rather than toward black (cook round 6) */
+/* Light mode: step band hues slightly toward obsidian ink so amber and cyan ticks read clearly on pearl white */
 .spectro--light .spectro__line:not(.spectro__line--future) {
-  background: color-mix(in srgb, var(--hue) 84%, var(--page-light, #f4f5f7));
-} /* round 7: 64% read too faint */
+  background: color-mix(in srgb, var(--hue) 78%, #141418);
+  opacity: 0.94;
+}
 .spectro--light .spectro__line.spectro__line--on:not(.spectro__line--future) {
-  background: var(--hue);
+  background: color-mix(in srgb, var(--hue) 86%, #141418);
+  opacity: 1;
 }

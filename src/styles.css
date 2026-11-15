@@ -507,8 +507,35 @@ html.is-shifting * {
   transition: none !important;
 }
 
-/* Room under the hero for the prism and rainbow. On a phone it is shorter, so the top of Selected work peeks
-   in under the prism and the screen reads as the start of something (cook round 6) */
+/* Calm full-bleed backdrop behind cards once reading starts, keeping a soft ambient glow without harsh beams */
+.scroll-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.scroll-veil.is-active {
+  opacity: 1;
+}
+.scroll-veil--dark {
+  background: radial-gradient(
+    ellipse 85% 65% at 50% 45%,
+    rgba(6, 7, 10, 0.72),
+    rgba(4, 5, 8, 0.9)
+  );
+}
+.scroll-veil--light {
+  background: radial-gradient(
+    ellipse 85% 65% at 50% 45%,
+    rgba(244, 245, 247, 0.78),
+    rgba(244, 245, 247, 0.92)
+  );
+}
+
+/* Room under the hero for the prism and rainbow. On a phone it leaves the full prism clear of the strip while
+   Selected work still peeks neatly in at the bottom of the screen. */
 .navigation-placeholder {
   width: 100%;
   height: 400px;
@@ -517,8 +544,8 @@ html.is-shifting * {
 }
 @media (max-width: 560px) {
   .navigation-placeholder {
-    height: 96px;
+    height: 235px;
     min-height: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
   }
 }

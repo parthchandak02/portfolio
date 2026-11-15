@@ -4,7 +4,7 @@ import { glassNotes, glassPad } from '../hooks/glassSound';
 import SelectedMark from './SelectedMark';
 import './FeatureCards.css';
 
-// Calls back once, the first time most of the card is on screen. Each moment plays only then, once per visit.
+// Calls back once, the first time part of the card is on screen. Each moment plays only then, once per visit.
 const useFirstSight = (ref, onSight) => {
   const fn = useRef(onSight);
   fn.current = onSight;
@@ -17,7 +17,7 @@ const useFirstSight = (ref, onSight) => {
         io.disconnect();
         fn.current();
       },
-      { threshold: 0.55 }
+      { threshold: 0.25 }
     );
     io.observe(el);
     return () => io.disconnect();
@@ -63,11 +63,11 @@ const SWATCHES = [
   },
 ];
 const PULSE = [
-  { opacity: 0 },
+  { opacity: 0.25 },
   { opacity: 1, offset: 0.2 },
-  { opacity: 0.3, offset: 0.4 },
+  { opacity: 0.4, offset: 0.4 },
   { opacity: 1, offset: 0.6 },
-  { opacity: 0.3, offset: 0.8 },
+  { opacity: 0.4, offset: 0.8 },
   { opacity: 1 },
 ];
 
@@ -76,10 +76,12 @@ const PULSE = [
 const LightMoment = ({ card }) => {
   const [hue, setHue] = useState(SWATCHES[0]);
   const glow = useRef(null);
+  const beacon = useRef(null);
   const call = (swatch) => {
     glassNotes(swatch.notes, { gain: 0.035, decay: 0.8 });
     if (reducedMotion()) return;
     glow.current?.animate(PULSE, { duration: 1500, easing: 'ease-in-out' });
+    beacon.current?.animate(PULSE, { duration: 1500, easing: 'ease-in-out' });
   };
   useFirstSight(card, () => call(SWATCHES[0]));
   return (
@@ -90,24 +92,34 @@ const LightMoment = ({ card }) => {
         style={{ '--light': hue.hue }}
         aria-hidden="true"
       />
-      <span className="fcard__note">
-        Example light and chime, not the real ones
+      <span
+        ref={beacon}
+        className="fcard__beacon"
+        style={{ '--light': hue.hue }}
+        aria-hidden="true"
+      >
+        <i />
+        <i />
+        <i />
       </span>
-      <div className="fcard__swatches" role="group" aria-label="Try a color">
-        {SWATCHES.map((s) => (
-          <button
-            key={s.name}
-            type="button"
-            className="fcard__swatch"
-            style={{ '--swatch': s.hue }}
-            aria-label={s.name}
-            aria-pressed={hue === s}
-            onClick={() => {
-              setHue(s);
-              call(s);
-            }}
-          />
-        ))}
+      <div className="fcard__light-bar">
+        <span className="fcard__note">Simulated light and chime</span>
+        <div className="fcard__swatches" role="group" aria-label="Try a color">
+          {SWATCHES.map((s) => (
+            <button
+              key={s.name}
+              type="button"
+              className="fcard__swatch"
+              style={{ '--swatch': s.hue }}
+              aria-label={s.name}
+              aria-pressed={hue === s}
+              onClick={() => {
+                setHue(s);
+                call(s);
+              }}
+            />
+          ))}
+        </div>
       </div>
     </>
   );
@@ -141,6 +153,7 @@ const RobotMoment = ({ card, lightMode }) => {
           } // no WebGL: the card still reads without it
           el.dataset.ready = '';
           if (seen.current) start();
+          else robot.current.rest();
         });
       },
       { rootMargin: '400px 0px' }

@@ -19,7 +19,7 @@ const HIPS = [
   [1.55, -1],
 ]; // along the body, and which side
 const STRIDE = 1.5; // how far a foot sweeps, front to back
-const SPEED = 2.5; // units a second
+const SPEED = 3.2; // units a second
 const smooth = (t) => t * t * (3 - 2 * t);
 const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
 
@@ -173,7 +173,7 @@ const studio = (renderer, lightMode) => {
     m.lookAt(0, 0, 0);
     scene.add(m);
   };
-  const glow = lightMode ? 1.2 : 5;
+  const glow = lightMode ? 1.5 : 6.2;
   panel(new THREE.Color(0xfff0d8).multiplyScalar(glow * 1.6), 8, 8, 2, 11, 6);
   panel(new THREE.Color(0xbcd4ff).multiplyScalar(glow * 0.5), 6, 10, -11, 3, 4);
   [
@@ -442,9 +442,9 @@ export const createCentiSeed = (
     env?.dispose();
     env = studio(renderer, light);
     scene.environment = env;
-    edgeLine.color.set(light ? 0x6f8094 : 0xffffff);
-    edgeLine.opacity = light ? 0.75 : 0.6;
-    acrylic.opacity = light ? 0.3 : 0.2;
+    edgeLine.color.set(light ? 0x5c6b7e : 0xffffff);
+    edgeLine.opacity = light ? 0.86 : 0.82;
+    acrylic.opacity = light ? 0.34 : 0.25;
     pool.visible = !light;
     shadow.material.opacity = light ? 0.34 : 1;
   };
@@ -519,7 +519,7 @@ export const createCentiSeed = (
       state = 'rest';
     }
     if (state === 'growing') {
-      grow = Math.min(1, grow + dt / 1.6);
+      grow = Math.min(1, grow + dt / 1.1);
       if (grow === 1) state = 'rest';
       busy = true;
     }
@@ -540,7 +540,7 @@ export const createCentiSeed = (
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     // The robot keeps one size on the screen (about 170 px long, smaller on a phone) however wide the card is
-    const robotPx = clamp(w * 0.36, 170, 300);
+    const robotPx = clamp(w * 0.36, 170, 270);
     const unitsTall = (h / robotPx) * 7.4;
     const distance =
       unitsTall / 2 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
@@ -574,14 +574,14 @@ export const createCentiSeed = (
     walkIn() {
       cancelAnimationFrame(frame);
       frame = 0;
-      x = -halfWidth - 6;
+      x = -Math.min(halfWidth * 0.45, 4.6);
       target = 0;
       sunX = 0;
       sunShown = 0;
       heading = 0;
       aim = 0;
       travelled = 0;
-      grow = 0.12;
+      grow = 0.18;
       state = 'walking';
       go();
     },

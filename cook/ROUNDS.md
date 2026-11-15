@@ -249,3 +249,79 @@ Gate: review page updated; waiting for Parth's approval. Stop check: bar no | ca
 - Live check: parthchandak.info hero (390, 1440) and #lab (1440) shot with shoot.mjs and matched the round 7 stills.
 - Open for Parth: ?perf check on a real Mac and phone (mirror blocks are a 3D change); whether the Centi-seed robot shows at rest (never rendered headless).
 Stop check: bar no (84/80/78/81 against a 99 stretch) | stills approved yes | final deployed and checked yes.
+
+---
+
+## Round 08 (resumed baseline, r08-base)
+
+Time: 03:01 to 03:09 UTC (2026-11-15)
+Stills: `cook/stills/r08-base/` | Side by side: `cook/compare/r08-base/`
+
+Scores, eyeballed: mean of 2 fresh subagent critics (Critic A, Critic B), strict craft bar vs `cook/refs/R01` to `R05`:
+
+| Shot | Layout | Type | Color | Components | Polish | Mean |
+|---|---|---|---|---|---|---|
+| S01 | 58 | 64 | 68 | 55 | 48 | 59 |
+| S02 | 59 | 63 | 55 | 54 | 48 | 56 |
+| S03 | 63 | 40 | 53 | 49 | 40 | 49 |
+| S04 | 60 | 62 | 61 | 52 | 49 | 57 |
+
+Measured (shoot.mjs & color_check.py):
+- `S01-390`: overflow none, 38 first-screen words, 8 taps under 44px (`Blue/Pink/Teal/Amber` 26x26 swatches, `Navigation prompt` 132x40), 1 text node under 14px.
+- `S01-1440`: overflow none, 25 words; saturation delta -0.216, brightness delta +0.056 vs R01.
+- `S02-390`: overflow none, 82 words, 9 taps under 44px, 5 text nodes under 14px.
+- `S02-1440`: overflow none, 130 words; saturation delta -0.209, brightness delta -0.310 vs R03.
+- `S03-390`: overflow none, 12 words, 9 taps under 44px, 4 text nodes under 14px.
+- `S03-1440`: overflow none, 48 words; saturation delta +0.209, brightness delta -0.839 vs R05.
+- `S04-390`: overflow none, 37 words, 8 taps under 44px, 1 text node under 14px.
+- `S04-1440`: overflow none, 26 words; saturation delta -0.222, brightness delta +0.045 vs R04.
+
+Top gaps (both critics agree):
+1. `S03-1440` sticky `BandBar` overlaps `Judging` on top of `Projects` during `#lab` scroll settle.
+2. `S03` Lab tiles overlay white titles directly on top of baked-in grey HUD text inside screenshots, plus low contrast on bright `aeris`/`jobwright`/`inkwell` tiles and clipped right edges.
+3. `S02` `Centi-seed` robot missing (off-screen/still walking from `-halfWidth - 6` at 3.5s), `Find My Zoox` mostly empty void with 11px note, row 2 (`Audio` and `CALarm`) clipped at bottom on `1440x900`, inconsistent card anatomy, and prism beam bleeding harshly through card gutters and `CALarm`.
+4. `S01`/`S04` mobile (`390x844`): spectrograph slices 3D prism in half, compressed ticks read like a solid neon barcode, `Play with prism`/`Play with bubbles` floats mid-screen, and bottom-right FABs sit over card copy and pick up harsh background colors. Light mode strip lines look too faint.
+5. Hero typewriter captured mid-word (`Prototype|`) on `S04-390`, overly tight tracking on `Parth Chandak`, and `4` small swatch/button taps (`26x26`, `132x40`) + `<14px` text nodes on mobile.
+
+Next focus: Round 09 addressing S03 Lab + BandBar collision, S02 Centi-seed/cards/beam bleed/fit-in-viewport, and S01/S04 mobile composition, light-strip contrast, tap targets & font sizes.
+
+---
+
+## Round 09
+
+Time: 03:10 to 03:21 UTC (2026-11-15)
+Stills: `cook/stills/r09/` | Side by side: `cook/compare/r09/`
+
+Changes:
+- Removed `BandBar` transition overlap (`is-leaving` 0.14s out before `is-entering` 0.16s delay) and bumped `BandBar` tap height (`44px`) and labels (`>=14px`).
+- Added instant hash navigation (`scrollCardToLine(..., 'auto')`) and `.scroll-veil` scrim behind `.layout__ui` once reading starts to tame raw prism/beam bleed behind grids.
+- Unified Selected Work cards (`FeatureCards.css`) with top-left headers, smoked obsidian/pearl glass surfaces, a sculptural Zoox light beacon + 44x44 swatch hitboxes, compact 2x2 desktop heights (`clamp(286px, 34vh, 324px)`), and centered `CALarm` flip clock.
+- Tuned `centiSeedRobot.js` walk-in start position, acrylic edge/studio brightness, and instant `rest()` render on WebGL init so Centi-seed is visible at settle.
+- Refined `LabShowcase.css` portrait vs landscape crops, deeper bottom fog scrims, calm grades for bright UI tiles (`aeris`, `jobwright`, `atmos`), and `14px` tile tags.
+- Tightened `Spectrograph.css` mobile strip widths (`1.25px`), stronger light-mode tick anchor (`#141418` mix), `14px` readout labels, and hidden mobile `.ui-hint` labels; frosted FAB backing (`ContactButton.css`, `SoundToggle.css`); removed the en dash in `CompanyCard.jsx`.
+
+Scores, eyeballed: mean of 2 fresh subagent critics (Critic A, Critic B), strict craft bar vs `cook/refs/R01` to `R05`:
+
+| Shot | Layout | Type | Color | Components | Polish | Mean | vs r08-base |
+|---|---|---|---|---|---|---|---|
+| S01 | 72 | 64 | 80 | 74 | 67 | 71 | +12 |
+| S02 | 76 | 83 | 85 | 76 | 74 | 79 | +23 |
+| S03 | 81 | 69 | 79 | 73 | 68 | 74 | +25 |
+| S04 | 68 | 74 | 78 | 74 | 68 | 72 | +15 |
+
+Measured (`shoot.mjs` & `color_check.py`):
+- `S01-390`: overflow none, 61 words, taps under 44px **0** (was 8), text nodes under 14px **0** (was 1).
+- `S02-390`: overflow none, 80 words, taps under 44px **0** (was 9), text nodes under 14px **0** (was 5).
+- `S03-390`: overflow none, 12 words, taps under 44px **0** (was 9), text nodes under 14px **2** (was 4).
+- `S04-390`: overflow none, 61 words, taps under 44px **0** (was 8), text nodes under 14px **0** (was 1).
+- `color_check` mean saturation / brightness deltas: S01 `+0.229 / -0.073`, S02 `+0.172 / +0.456`, S03 `-0.326 / +0.847`, S04 `+0.223 / -0.048`.
+
+Top remaining gaps (both critics):
+1. `S01-390` mid-typing freeze (`"Parth Cha"` / `"I am a|"`) and `S04-390` headline `"k"` touching the top-right rail.
+2. `S01-390` `"Selected work"` colliding with bright prism apex; `S04-390`/`S04-1440` bubble halos behind hero/strip text.
+3. `S03` thumbnail edge text (`jobwright` `"wright"`, `echo` `"mplitude 0"`, `aeris` sliced temps) and uneven title baselines between 1-line and 2-line card subtitles.
+4. `S02-1440` `"Audio prioritization"` row taller than `"CALarm"` and bottom pills clipped 6px at viewport edge; `Centi-seed` robot sitting left of spotlight pool.
+5. Mobile bottom-right speaker/chat buttons overlapping card borders and `inkwell` caption (`S03-390`).
+6. Sparse 2026/2025 preview cards below Lab, and stray faint lines/diamonds.
+
+

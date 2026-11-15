@@ -127,14 +127,14 @@
   align-items: center;
   justify-content: center;
   margin: 14px auto 0;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 20px;
   border: 0;
   border-radius: 999px;
   cursor: pointer;
   font-family: var(--font-family-label);
   font-weight: 600;
-  font-size: 0.82rem;
+  font-size: 0.875rem;
   background: var(--glass-bg-base);
   -webkit-backdrop-filter: var(--glass-blur-subtle);
   backdrop-filter: var(--glass-blur-subtle);
@@ -142,10 +142,10 @@
   transition: background 0.25s ease;
 }
 .timeline__more--dark {
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(255, 255, 255, 0.88);
 }
 .timeline__more--light {
-  color: rgba(20, 20, 24, 0.86);
+  color: rgba(20, 20, 24, 0.88);
 }
 .timeline__more--dark:hover {
   background: rgba(44, 44, 50, 0.92);
@@ -174,7 +174,7 @@
 
 /* Selected work, ahead of the bands */
 .timeline__selected {
-  margin-bottom: 56px;
+  margin-bottom: 52px;
 }
 .timeline__selected-title {
   display: flex;
@@ -183,15 +183,15 @@
   margin: 0;
   font-family: var(--font-family-primary);
   font-weight: 700;
-  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
 .timeline--dark .timeline__selected-title {
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.94);
 }
 .timeline--light .timeline__selected-title {
-  color: rgba(20, 20, 24, 0.78);
+  color: rgba(20, 20, 24, 0.92);
 }
 .timeline__selected-mark {
   --d: 8px;
@@ -201,7 +201,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin: 0 0 16px;
+  margin: 0 0 12px;
 }
 .timeline__skip {
   display: inline-flex;
@@ -211,7 +211,7 @@
   font-weight: 600;
   font-size: 0.9rem;
   color: inherit;
-  opacity: 0.82;
+  opacity: 0.86;
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
@@ -230,13 +230,13 @@
 .timeline__selected .lab__grid,
 .timeline__selected .timeline__tiles .lab__grid {
   grid-template-columns: minmax(0, 1fr);
-  gap: 20px;
+  gap: 16px;
 }
 @media (min-width: 900px) {
   .timeline__selected .lab__grid,
   .timeline__selected .timeline__tiles .lab__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+    gap: 14px;
   }
 }
 .timeline__tiles .timeline__item {

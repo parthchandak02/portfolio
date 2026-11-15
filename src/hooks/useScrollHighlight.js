@@ -19,7 +19,7 @@ export const readingLineOf = (scroller) =>
   readingLineFromRect(scroller.getBoundingClientRect());
 
 // Scroll so a card sits on the reading line and is the one lit.
-export const scrollCardToLine = (target, scroller) => {
+export const scrollCardToLine = (target, scroller, behavior = 'smooth') => {
   const rect = target.getBoundingClientRect();
   const row = Array.from(
     document.querySelectorAll('.timeline__item[data-category]')
@@ -41,7 +41,7 @@ export const scrollCardToLine = (target, scroller) => {
       scrollTop: scroller.scrollTop,
       line: readingLineOf(scroller),
     }),
-    behavior: 'smooth',
+    behavior,
   });
 };
 

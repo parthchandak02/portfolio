@@ -73,10 +73,10 @@ const UITypewriter = ({ lightMode }) => {
             }
             return sentence;
           })}
-          typeSpeed={80}
-          backSpeed={50}
-          backDelay={2500}
-          startDelay={1900} // Start once the name has typed in
+          typeSpeed={48}
+          backSpeed={36}
+          backDelay={3400}
+          startDelay={1100} // Start once the name has typed in
           loop={true}
           showCursor={true}
           smartBackspace={true}
