@@ -4,10 +4,9 @@ import { timelineDataByCategory } from '../data/timelineData';
 import { featuredName } from '../data/featured';
 import { useWidth } from './Spectrograph';
 import { scrollCardToLine } from '../hooks/useScrollHighlight';
+import { layout } from './bandPlace';
 import './BandBar.css';
 
-const EDGE = 6;
-const MIN_GAP = 6; // px between neighbouring ticks
 const LAB_TITLES = new Set(
   timelineDataByCategory.lab.map((card) => card.title)
 );
@@ -51,24 +50,6 @@ const scrollToCard = (card, selected = false) => {
     const shown = elementFor(card, selected);
     if (shown && scroller) scrollCardToLine(shown, scroller);
   }, 80);
-};
-
-// Lay one band's items out by date between its first and last item, then keep them apart
-const layout = (items, width) => {
-  const sorted = [...items].sort((a, b) => a.t - b.t);
-  const first = sorted[0].t;
-  const span = sorted[sorted.length - 1].t - first || 1;
-  const pos = sorted.map(
-    (item) => EDGE + ((item.t - first) / span) * (width - EDGE * 2)
-  );
-  for (let i = 1; i < pos.length; i += 1) {
-    if (pos[i] < pos[i - 1] + MIN_GAP) pos[i] = pos[i - 1] + MIN_GAP;
-  }
-  for (let i = pos.length - 1; i >= 0; i -= 1) {
-    const limit = i === pos.length - 1 ? width - EDGE : pos[i + 1] - MIN_GAP;
-    if (pos[i] > limit) pos[i] = limit;
-  }
-  return sorted.map((item, i) => ({ item, x: pos[i] }));
 };
 
 // The hand-off between the hero strip and the bar is one motion: the band's lines lift out of the strip
