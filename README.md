@@ -164,7 +164,7 @@ The eight bands, each with its own colour on the strip and the bar:
 
 ## Run it
 
-Requires Node 22.12 or newer (`.node-version` pins the one Cloudflare uses).
+Requires Node 22.23.4 or newer (`.node-version` pins the one Cloudflare uses).
 
 ```bash
 git clone https://github.com/parthchandak02/portfolio.git
@@ -288,7 +288,7 @@ The build is a plain static folder, so Vercel or Netlify work too (build `npm ru
 |---|---|
 | Build runs out of memory | `NODE_OPTIONS=--max-old-space-size=4096 npm run build` |
 | 3D scene is blank | Check the console for WebGL errors and that `public/gltf/prism.glb` exists |
-| Cloudflare build fails on the Node version | `.node-version` must name Node 22.12 or newer |
+| Cloudflare build fails on the Node version | `.node-version` must name Node 22.23.4 or newer. Astro 7.4.2 and later exit if Node is older. |
 | Cloudflare build fails | Keep only `package-lock.json` as a lockfile; build command `npm run build` |
 
 </details>
