@@ -1,49 +1,9 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import CardDetail from './CardDetail';
+import { companyLength, roleFill, roleLength } from './companySpan';
 import Molten from './Molten';
 import './CompanyCard.css';
-
-const MONTHS = [
-  'jan',
-  'feb',
-  'mar',
-  'apr',
-  'may',
-  'jun',
-  'jul',
-  'aug',
-  'sep',
-  'oct',
-  'nov',
-  'dec',
-];
-// "October 2018" -> months since year 0; "Present" -> now; anything without a month -> null
-const monthOf = (s = '') => {
-  if (/present/i.test(s)) {
-    const d = new Date();
-    return d.getFullYear() * 12 + d.getMonth();
-  }
-  const m = s.trim().match(/^([a-z]{3})[a-z]*\.?\s+(\d{4})$/i);
-  const i = m ? MONTHS.indexOf(m[1].toLowerCase()) : -1;
-  return i < 0 ? null : Number(m[2]) * 12 + i;
-};
-// How long, LinkedIn-style ("3 yrs 4 mos"), counting both end months; only for dates with months
-const lengthOf = (from, to) => {
-  const a = monthOf(from);
-  const b = monthOf(to);
-  if (a == null || b == null || b < a) return null;
-  const n = b - a + 1;
-  const y = Math.floor(n / 12);
-  const m = n % 12;
-  return [y && `${y} yr${y > 1 ? 's' : ''}`, m && `${m} mo${m > 1 ? 's' : ''}`]
-    .filter(Boolean)
-    .join(' ');
-};
-const ends = (date = '') => {
-  const [a, b] = date.split(' - ');
-  return [a, b || a];
-};
 
 /**
  * One organisation in the timeline, with its roles inside it, newest first, so a run of roles at one company
@@ -69,28 +29,7 @@ const CompanyCard = ({ roles, childrenOf = {}, lightMode = false }) => {
     .find((l) => typeof l === 'string');
   const company = first.company;
   const place = first.location !== company ? first.location : null;
-  const from = ends(roles[roles.length - 1].item.date)[0];
-  const to = ends(first.date)[1];
-  const total = roles.length > 1 ? lengthOf(from, to) : null;
-  // Where a role sits across the company's years, as a share of the card's width
-  const start = monthOf(from);
-  const stop = monthOf(to);
-  const reach = (date) => {
-    const [a, b] = ends(date).map(monthOf);
-    if (
-      roles.length === 1 ||
-      a == null ||
-      b == null ||
-      start == null ||
-      !(stop > start)
-    )
-      return { left: '0%', width: '100%' };
-    const left = Math.min(94, ((a - start) / (stop - start + 1)) * 100);
-    return {
-      left: `${left}%`,
-      width: `${Math.max(6, ((b - a + 1) / (stop - start + 1)) * 100)}%`,
-    };
-  };
+  const total = companyLength(roles);
 
   return (
     <div
@@ -115,8 +54,7 @@ const CompanyCard = ({ roles, childrenOf = {}, lightMode = false }) => {
       <ol className="company__roles">
         {roles.map(({ item, attrs, highlighted }) => {
           const isOpen = open.has(item.title);
-          const [a, b] = ends(item.date);
-          const length = item.date.includes(' - ') ? lengthOf(a, b) : null;
+          const length = roleLength(item.date);
           const current = /present/i.test(item.date);
           return (
             <li
@@ -132,7 +70,7 @@ const CompanyCard = ({ roles, childrenOf = {}, lightMode = false }) => {
               >
                 <span
                   className="company__fill"
-                  style={reach(item.date)}
+                  style={roleFill(roles, item.date)}
                   aria-hidden="true"
                 />
                 <span className="company__role-text">
