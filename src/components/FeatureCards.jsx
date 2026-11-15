@@ -152,7 +152,6 @@ const RobotMoment = ({ card, lightMode }) => {
       robot.current?.dispose();
       robot.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -305,7 +304,7 @@ const AudioMoment = ({ card, lightMode }) => {
   });
   useEffect(() => {
     requestAnimationFrame(draw);
-  }, [lightMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [lightMode]);
   useEffect(
     () => () => {
       clear();
