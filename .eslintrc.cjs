@@ -26,4 +26,13 @@ module.exports = {
     'react/jsx-uses-react': 'off',
     'react/react-in-jsx-scope': 'off', // Not needed with React 17+
   },
-}; 
+  overrides: [
+    {
+      // CLI scripts write usage errors and output summaries to stdout/stderr
+      files: ['scripts/logos/*.mjs'],
+      rules: {
+        'no-console': 'off',
+      },
+    },
+  ],
+};

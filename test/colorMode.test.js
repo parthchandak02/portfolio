@@ -43,7 +43,7 @@ const cases = [
 ];
 
 for (const item of cases) {
-  test(item.name, () => {
+  test(`resolveLight: ${item.name}`, () => {
     assert.equal(resolveLight(item.stored, item.systemLight), item.light);
   });
 }
