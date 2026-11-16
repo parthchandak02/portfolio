@@ -20,8 +20,17 @@ const HIPS = [
 ]; // along the body, and which side
 const STRIDE = 1.5; // how far a foot sweeps, front to back
 const SPEED = 4.2; // units a second
+const STEP = 0.05; // closer than this, the body has arrived
 const smooth = (t) => t * t * (3 - 2 * t);
 const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+
+// follow() turns the body around only when the sun is more than 0.6 away, so a
+// pointer resting near the robot does not spin it. The walk takes any gap past
+// STEP, which used to include a nearer sun behind the body: the robot slid
+// backward while still facing the way it had been going. Step only along the
+// facing (aim 0 is right, PI is left).
+export const shouldStep = (d, aim) =>
+  Math.abs(d) > STEP && Math.sign(d) === (aim === 0 ? 1 : -1);
 
 // A flat outline, rounded at its corners, as a solid plate of acrylic
 const plate = (shape, depth = 0.09) => {
@@ -507,7 +516,7 @@ export const createCentiSeed = (
       heading += clamp(aim - heading, -dt * 3.4, dt * 3.4);
       travelled += dt * 1.2; // shuffles round as it turns
       busy = true;
-    } else if (Math.abs(d) > 0.05) {
+    } else if (shouldStep(d, aim)) {
       const speed = SPEED * clamp(Math.abs(d) / 1.2, 0.4, 1);
       const step = Math.min(Math.abs(d), speed * dt);
       x += Math.sign(d) * step;
