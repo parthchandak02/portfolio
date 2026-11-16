@@ -94,6 +94,26 @@ test('only a range is given a tenure line', () => {
   assert.equal(roleLength('October 2026 - Present'), lengthOf('October 2026', 'Present'));
 });
 
+test('a later role that ended does not cut off an earlier role that ran longer', () => {
+  // Newest start is listed first, the way the timeline passes roles. That role
+  // can still finish before an earlier one, so the span is not "first end, last start".
+  const ended = roles(
+    'January 2024 - March 2024',
+    'June 2022 - December 2025',
+    'January 2020 - January 2021'
+  );
+  assert.equal(companyLength(ended), lengthOf('January 2020', 'December 2025'));
+  const glass = roleFill(ended, 'June 2022 - December 2025');
+  assert.ok(parseFloat(glass.left) >= 0);
+  assert.ok(parseFloat(glass.left) + parseFloat(glass.width) <= 100.000001);
+
+  const open = roles('March 2024 - June 2024', 'January 2020 - Present');
+  assert.equal(companyLength(open), lengthOf('January 2020', 'Present'));
+  const openGlass = roleFill(open, 'January 2020 - Present');
+  assert.equal(openGlass.left, '0%');
+  assert.equal(parseFloat(openGlass.width), 100);
+});
+
 test('one role fills the card and has no company total', () => {
   const tesla = roles('May 2018 - August 2018');
   assert.equal(companyLength(tesla), null);
