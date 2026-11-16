@@ -2,6 +2,7 @@
 import App from '../App.jsx';
 import { timelineData } from '../data/timelineData';
 import { spectrumBands, startOf, endOf } from '../data/spectrum';
+import { colorModeBoot, colorModeBodyBoot } from '../hooks/colorMode.js';
 
 const description =
   'Parth Chandak is a senior creative technologist at Zoox who builds prototyping systems for autonomous vehicles. Named inventor on a published patent application, peer reviewer for Springer Nature, hackathon judge and IEEE Senior Member.';
@@ -42,6 +43,7 @@ const record = spectrumBands
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="theme-color" content="#000000" />
+    <script is:inline set:html={colorModeBoot}></script>
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href="https://parthchandak.info/" />
@@ -76,6 +78,7 @@ const record = spectrumBands
     </script>
   </head>
   <body class="dark-mode">
+    <script is:inline set:html={colorModeBodyBoot}></script>
     <!-- Until the site has loaded: the cursor where the typing begins, and the light coming in to the prism -->
     <div id="boot" aria-hidden="true">
       <span class="boot__beam"></span>
@@ -141,6 +144,12 @@ const record = spectrumBands
     position: fixed; inset: 0; z-index: 5; pointer-events: none;
     background: #000;
     transition: opacity 0.8s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  /* A light visit must not paint this cover black before the page shows */
+  html.light-mode #boot { background: #f4f5f7; }
+  html.light-mode .boot__cursor {
+    color: rgba(0, 0, 0, 0.9);
+    text-shadow: none;
   }
   #boot.boot--done { opacity: 0; }
   /* The beam the prism splits, sliding in from the left to where the prism catches it */
