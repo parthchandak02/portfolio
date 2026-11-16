@@ -18,6 +18,7 @@ import ContactButton from './components/ContactButton';
 import SoundToggle from './components/SoundToggle';
 import UITypewriter from './components/UITypewriter';
 import useLightMode from './hooks/useLightMode';
+import { applyColorMode } from './hooks/colorMode';
 import { switchMode } from './hooks/modeShift';
 import useGlobalMouse from './hooks/useGlobalMouse';
 import useScrollHighlight, {
@@ -65,7 +66,7 @@ const markVisited = () => {
  * - Fast typewriter effect in UI layer
  */
 export default function App() {
-  const { lightMode, toggleLightMode } = useLightMode(false);
+  const { lightMode, toggleLightMode } = useLightMode();
   // Single source of truth for all mouse state
   const { isLocked, toggleLock, viewportPosition } = useGlobalMouse();
 
@@ -187,14 +188,8 @@ export default function App() {
   const litBand = handedOver ? bandForSection(visibleCategory) : focusBand;
 
   // Sync html and body background with light mode to prevent edge bleeding. Only the mode's own classes are
-  // touched: the playground and the mode switch keep theirs on the same element.
-  const paintMode = (light) => {
-    [document.documentElement, document.body].forEach((el) => {
-      el.classList.toggle('light-mode', light);
-      el.classList.toggle('dark-mode', !light);
-    });
-  };
-  useEffect(() => paintMode(lightMode), [lightMode]);
+  // touched: the playground and the mode switch keep theirs on the same element. The browser chrome follows.
+  useEffect(() => applyColorMode(lightMode), [lightMode]);
 
   // ?perf turns on a frame recorder for checking the site on a real device (see hooks/perfLog)
   useEffect(() => {
@@ -206,7 +201,7 @@ export default function App() {
   // changes while it is faded out, rendered in slices so the scene keeps its frames.
   const flipMode = () =>
     switchMode(!lightMode, () => {
-      paintMode(!lightMode);
+      applyColorMode(!lightMode);
       startTransition(toggleLightMode);
     });
 
