@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   STICK_AT,
   readingLineFromRect,
@@ -7,7 +7,7 @@ import {
   barIsStuck,
   cardOnLine,
   scrollTopForCard,
-} from './scrollReading';
+} from './scrollReading.js';
 
 export { STICK_AT };
 
@@ -45,22 +45,51 @@ export const scrollCardToLine = (target, scroller, behavior = 'smooth') => {
   });
 };
 
-const useScrollHighlight = (activeFilter) => {
-  const [visible, setVisible] = useState({ category: 'all', title: null });
-  const frameRef = useRef(0);
-  const lastKeyRef = useRef('all|');
+export const observeScrollHighlight = ({
+  activeFilter,
+  enabled = true,
+  setVisible,
+  lastKeyRef,
+}) => {
+  const resetToHero = () => {
+    lastKeyRef.current = 'all|';
+    setVisible((prev) =>
+      prev.category === 'all' && prev.title === null
+        ? prev
+        : { category: 'all', title: null }
+    );
+  };
 
-  const measure = useCallback(() => {
-    frameRef.current = 0;
+  if (!enabled) {
+    resetToHero();
+    return undefined;
+  }
+
+  // Reset when not in 'all' mode
+  if (activeFilter !== 'all') {
+    lastKeyRef.current = `${activeFilter}|null`;
+    setVisible((prev) =>
+      prev.category === activeFilter && prev.title === null
+        ? prev
+        : { category: activeFilter, title: null }
+    );
+    return undefined;
+  }
+
+  const scrollContainer = document.querySelector('.main-content-scroll');
+  if (!scrollContainer) {
+    return undefined;
+  }
+
+  let frame = 0;
+
+  const measure = () => {
+    frame = 0;
     const timelineItems = document.querySelectorAll(
       '.timeline__item[data-category]'
     );
     if (timelineItems.length === 0) {
-      return;
-    }
-
-    const scrollContainer = document.querySelector('.main-content-scroll');
-    if (!scrollContainer) {
+      resetToHero();
       return;
     }
 
@@ -90,10 +119,7 @@ const useScrollHighlight = (activeFilter) => {
         : null,
     });
     if (!stuck) {
-      setVisible((prev) =>
-        prev.category === 'all' ? prev : { category: 'all', title: null }
-      );
-      lastKeyRef.current = 'all|';
+      resetToHero();
       return;
     }
 
@@ -140,52 +166,55 @@ const useScrollHighlight = (activeFilter) => {
       lastKeyRef.current = key;
       setVisible({ category, title });
     }
-  }, []);
+  };
 
   // At most one measurement per frame, always of the latest scroll position. (Dropping events instead
   // left the bar showing at the top after a fast flick up: the event that reached the top was thrown away.)
-  const updateVisibleCategory = useCallback(() => {
-    if (!frameRef.current) frameRef.current = requestAnimationFrame(measure);
-  }, [measure]);
+  const updateVisibleCategory = () => {
+    if (!frame) frame = requestAnimationFrame(measure);
+  };
 
-  useEffect(() => {
-    // Reset when not in 'all' mode
-    if (activeFilter !== 'all') {
-      setVisible({ category: activeFilter, title: null });
-      return undefined;
-    }
+  scrollContainer.addEventListener('scroll', updateVisibleCategory, {
+    passive: true,
+  });
+  window.addEventListener('resize', updateVisibleCategory);
+  measure();
+  const t1 = setTimeout(measure, 80);
+  const t2 = setTimeout(measure, 220);
 
-    const scrollContainer = document.querySelector('.main-content-scroll');
-    if (!scrollContainer) {
-      return undefined;
-    }
+  const timeline = document.querySelector('.timeline');
+  const ro =
+    typeof ResizeObserver !== 'undefined' && timeline
+      ? new ResizeObserver(updateVisibleCategory)
+      : null;
+  if (ro) ro.observe(timeline);
 
-    scrollContainer.addEventListener('scroll', updateVisibleCategory, {
-      passive: true,
-    });
-    window.addEventListener('resize', updateVisibleCategory);
-    measure();
-    const t1 = setTimeout(measure, 80);
-    const t2 = setTimeout(measure, 220);
+  // Cleanup
+  return () => {
+    clearTimeout(t1);
+    clearTimeout(t2);
+    scrollContainer.removeEventListener('scroll', updateVisibleCategory);
+    window.removeEventListener('resize', updateVisibleCategory);
+    if (ro) ro.disconnect();
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+  };
+};
 
-    const timeline = document.querySelector('.timeline');
-    const ro =
-      typeof ResizeObserver !== 'undefined' && timeline
-        ? new ResizeObserver(updateVisibleCategory)
-        : null;
-    if (ro) ro.observe(timeline);
+const useScrollHighlight = (activeFilter, enabled = true) => {
+  const [visible, setVisible] = useState({ category: 'all', title: null });
+  const lastKeyRef = useRef('all|');
 
-    // Cleanup
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      scrollContainer.removeEventListener('scroll', updateVisibleCategory);
-      window.removeEventListener('resize', updateVisibleCategory);
-      if (ro) ro.disconnect();
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-      frameRef.current = 0;
-    };
-  }, [activeFilter, updateVisibleCategory, measure]);
+  useEffect(
+    () =>
+      observeScrollHighlight({
+        activeFilter,
+        enabled,
+        setVisible,
+        lastKeyRef,
+      }),
+    [activeFilter, enabled]
+  );
 
   return {
     visibleCategory: visible.category,

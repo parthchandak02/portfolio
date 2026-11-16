@@ -181,7 +181,10 @@ export default function App() {
   const [focusBand, setFocusBand] = useState(null);
 
   // Which section and card is in view, for the sticky band bar
-  const { visibleCategory, visibleTitle } = useScrollHighlight('all');
+  const { visibleCategory, visibleTitle } = useScrollHighlight(
+    'all',
+    !isPlayMode
+  );
   // Once the band bar takes over from the strip, the round buttons step aside; they belong to the top screen
   const handedOver = !isPlayMode && visibleCategory !== 'all';
   // The rainbow lights the band you are reading in the record, or the one picked on the strip above it
