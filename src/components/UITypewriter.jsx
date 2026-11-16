@@ -3,6 +3,11 @@ import { useRef, useEffect } from 'react';
 import { ReactTyped } from 'react-typed';
 import { useTypewriterHighlight } from '../contexts/TypewriterHighlightContext';
 import { timelineDataByCategory } from '../data/timelineData';
+import {
+  BACK_DELAY_MS,
+  clearHighlightTimers,
+  scheduleRoleHighlight,
+} from './typewriterTiming';
 import './UITypewriter.css';
 
 // The role held now, from its card, so this line stays current by itself
@@ -24,8 +29,7 @@ const UITypewriter = ({ lightMode }) => {
   // Cleanup timers on component unmount
   useEffect(() => {
     return () => {
-      if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
-      if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
+      clearHighlightTimers(highlightTimerRef, clearTimerRef);
     };
   }, []);
 
@@ -75,7 +79,7 @@ const UITypewriter = ({ lightMode }) => {
           })}
           typeSpeed={8}
           backSpeed={16}
-          backDelay={24000}
+          backDelay={BACK_DELAY_MS}
           startDelay={120} // Start right after the name settles in
           loop={true}
           showCursor={true}
@@ -83,34 +87,21 @@ const UITypewriter = ({ lightMode }) => {
           html={true} // Enable HTML parsing for spans
           onBegin={() => {
             // Clear highlighting when new typing begins (during deletion/new typing phase)
-            if (highlightTimerRef.current)
-              clearTimeout(highlightTimerRef.current);
-            if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
+            clearHighlightTimers(highlightTimerRef, clearTimerRef);
             updateCurrentPhrase('');
           }}
           onStringTyped={(arrayPos) => {
-            // Clear any existing timers
-            if (highlightTimerRef.current)
-              clearTimeout(highlightTimerRef.current);
-            if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
-
             const titleOnly = professionalTitles[arrayPos].title;
-
-            // Start highlighting after a brief delay (300ms) to ensure text is fully stable
-            highlightTimerRef.current = setTimeout(() => {
-              updateCurrentPhrase(titleOnly);
-
-              // Clear highlighting 300ms before deletion starts (backDelay: 2500ms - 300ms = 2200ms)
-              clearTimerRef.current = setTimeout(() => {
-                updateCurrentPhrase('');
-              }, 2200);
-            }, 300);
+            scheduleRoleHighlight({
+              title: titleOnly,
+              updateCurrentPhrase,
+              highlightTimerRef,
+              clearTimerRef,
+            });
           }}
           onDestroy={() => {
             // Clear all timers and highlighting when component unmounts
-            if (highlightTimerRef.current)
-              clearTimeout(highlightTimerRef.current);
-            if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
+            clearHighlightTimers(highlightTimerRef, clearTimerRef);
             updateCurrentPhrase('');
           }}
         />
