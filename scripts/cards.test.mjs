@@ -210,8 +210,24 @@ describe('loadCards: the problems it stops the build for', () => {
     assert.match(problems({ cards: { 'awards/a.md': 'Just a description.\n' } }), /awards\/a\.md: needs front matter between --- lines/);
   });
 
-  it('names a file whose front matter is not YAML', () => {
-    assert.match(problems({ cards: { 'awards/a.md': card('title: [unclosed\ndate: May 2016') } }), /awards\/a\.md: /);
+  it('names a file whose front matter is not YAML, with line and column', () => {
+    const message = problems({ cards: { 'awards/a.md': card('title: [unclosed\ndate: May 2016') } });
+    assert.match(message, /awards\/a\.md: front matter YAML is invalid at line \d+, column \d+:/);
+    assert.match(message, /missed comma between flow collection entries|incomplete|bad indentation|unidentified alias/);
+  });
+
+  it('rejects empty front matter instead of a vague zod object error', () => {
+    assert.match(
+      problems({ cards: { 'awards/a.md': '---\n\n---\nWhat it was.\n' } }),
+      /awards\/a\.md: front matter is empty; add fields like title and date between the --- lines/
+    );
+  });
+
+  it('rejects front matter that is a YAML list, not a mapping of fields', () => {
+    assert.match(
+      problems({ cards: { 'awards/a.md': '---\n- title: A\n- date: May 2016\n---\nWhat it was.\n' } }),
+      /awards\/a\.md: front matter must be a mapping of fields \(got a list\)/
+    );
   });
 
   it('rejects a field that is not one of the card fields', () => {

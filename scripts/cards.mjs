@@ -77,7 +77,34 @@ export const loadCards = (root) => {
       const m = fs.readFileSync(file, 'utf8').match(FRONT);
       if (!m) { errors.push(`${rel}: needs front matter between --- lines`); return; }
       let data;
-      try { data = yaml.load(m[1]); } catch (e) { errors.push(`${rel}: ${e.message.split('\n')[0]}`); return; }
+      try {
+        data = yaml.load(m[1]);
+      } catch (e) {
+        // js-yaml's first line is jargon ("missed comma between flow collection
+        // entries (2:1)") with 1-based coords in the text; mark is 0-based.
+        // Name the front matter and give one clear line:file place + reason.
+        const mark = e && e.mark;
+        const at =
+          mark && Number.isInteger(mark.line) && Number.isInteger(mark.column)
+            ? ` at line ${mark.line + 1}, column ${mark.column + 1}`
+            : '';
+        const reason = (e.reason || String(e.message || e).split('\n')[0]).trim();
+        errors.push(`${rel}: front matter YAML is invalid${at}: ${reason}`);
+        return;
+      }
+      if (data === null || data === undefined) {
+        errors.push(
+          `${rel}: front matter is empty; add fields like title and date between the --- lines`
+        );
+        return;
+      }
+      if (typeof data !== 'object' || Array.isArray(data)) {
+        const kind = Array.isArray(data) ? 'a list' : typeof data;
+        errors.push(
+          `${rel}: front matter must be a mapping of fields (got ${kind})`
+        );
+        return;
+      }
       const parsed = Card.safeParse(data);
       if (!parsed.success) {
         parsed.error.issues.forEach((i) => errors.push(`${rel}: ${i.path.join('.') || 'card'}: ${i.message}`));
