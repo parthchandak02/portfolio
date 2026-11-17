@@ -11,6 +11,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   endOf as cardsEndOf,
   loadCards,
+  newestFirst as cardsNewestFirst,
   startOf as cardsStartOf,
 } from '../scripts/cards.mjs';
 import { FEATURED } from '../src/data/featured.js';
@@ -55,6 +56,7 @@ const {
   SPECTRUM_START,
   bandForSection,
   endOf,
+  newestFirst,
   selectedBand,
   spectrumBands,
   spectrumTotal,
@@ -62,9 +64,6 @@ const {
 } = await import('../src/data/spectrum.js');
 
 const band = (key) => spectrumBands.find((entry) => entry.key === key);
-
-// Same comparison Timeline.jsx uses once two cards share a band.
-const newestFirst = (a, b) => startOf(b) - startOf(a) || endOf(b) - endOf(a);
 
 test('a dated line is placed by its month, and an open span has no end', () => {
   assert.equal(startOf('February 2022'), 2022 + 1 / 12);
@@ -108,6 +107,11 @@ test('the page and the build read every shipped date the same way', () => {
   for (const date of dates) {
     assert.equal(startOf(date), cardsStartOf(date), `startOf(${date})`);
     assert.equal(endOf(date), cardsEndOf(date), `endOf(${date})`);
+    assert.equal(
+      newestFirst(date, 'May 2018 - Present'),
+      cardsNewestFirst(date, 'May 2018 - Present'),
+      `newestFirst(${date}, May 2018 - Present)`
+    );
   }
 });
 
@@ -117,6 +121,10 @@ test('newest first, and a longer or ongoing span wins a shared start', () => {
   assert.ok(newestFirst('May 2018', 'May 2018 - August 2018') > 0);
   assert.ok(newestFirst('May 2018 - August 2018', 'May 2018 - Present') > 0);
   assert.equal(newestFirst('March 2020', 'March 2020'), 0);
+  // Two open spans with the same start both end at Infinity. Subtracting those
+  // used to yield NaN, which made Array.sort skip the documented tie.
+  assert.equal(newestFirst('May 2018 - Present', 'May 2018 - Present'), 0);
+  assert.equal(Number.isNaN(newestFirst('May 2018 - Present', 'May 2018 - Present')), false);
 });
 
 test('cards loaded onto a band keep their date, order, and parent', () => {

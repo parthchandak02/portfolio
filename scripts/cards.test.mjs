@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { after, describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { endOf, loadCards, startOf } from './cards.mjs';
+import { endOf, loadCards, newestFirst, startOf } from './cards.mjs';
 import { SECTIONS } from '../src/data/sections.js';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
@@ -165,6 +165,24 @@ describe('loadCards: the order cards come back in', () => {
     assert.equal(endOf('2016 - 2018'), 2018.5);
     assert.equal(endOf('February 2022 - Present'), Infinity);
     assert.equal(endOf(''), 0);
+    assert.equal(newestFirst('May 2018 - Present', 'May 2018 - Present'), 0);
+  });
+
+  it('keeps file order when two ongoing cards share a start date', () => {
+    // Both end at Present (Infinity). Infinity - Infinity is NaN, and that used
+    // to make the sort drop the alphabetical file-order tie.
+    const { bySection } = loadCards(
+      fixture({
+        cards: {
+          'experience/zebra.md': card('title: Later file\ndate: May 2018 - Present'),
+          'experience/alpha.md': card('title: Earlier file\ndate: May 2018 - Present')
+        }
+      })
+    );
+    assert.deepEqual(
+      bySection.experience.map((c) => c.title),
+      ['Earlier file', 'Later file']
+    );
   });
 
   it('sorts each section on its own', () => {

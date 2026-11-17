@@ -1,7 +1,7 @@
 ---
 import App from '../App.jsx';
 import { timelineData } from '../data/timelineData';
-import { spectrumBands, startOf, endOf } from '../data/spectrum';
+import { spectrumBands, newestFirst } from '../data/spectrum';
 import { colorModeBoot, colorModeBodyBoot } from '../hooks/colorMode.js';
 
 const description =
@@ -32,7 +32,7 @@ const record = spectrumBands
     name: band.name,
     cards: timelineData
       .filter((item) => band.sections.includes(item.category?.toLowerCase()))
-      .sort((a, b) => startOf(b.date) - startOf(a.date) || endOf(b.date) - endOf(a.date)),
+      .sort((a, b) => newestFirst(a.date, b.date)),
   }))
   .filter((band) => band.cards.length);
 ---

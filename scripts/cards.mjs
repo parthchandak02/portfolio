@@ -47,6 +47,18 @@ export const endOf = (date = '') => {
   return startOf(parts[parts.length - 1]);
 };
 
+// Newest start first; on a tie, the longer or still-open span wins. Equal ends
+// (including two Present dates) must return 0: Infinity - Infinity is NaN and
+// would leave Array.sort free to reorder a documented tie.
+export const newestFirst = (a = '', b = '') => {
+  const byStart = startOf(b) - startOf(a);
+  if (byStart) return byStart;
+  const endA = endOf(a);
+  const endB = endOf(b);
+  if (endA === endB) return 0;
+  return endB - endA;
+};
+
 const FRONT = /^---\n([\s\S]*?)\n---\n?([\s\S]*)$/;
 
 export const loadCards = (root) => {
@@ -96,7 +108,7 @@ export const loadCards = (root) => {
   all.forEach((c) => { delete c._file; });
   // Newest first within a section, as the page shows them; ties keep the files' alphabetical order
   Object.values(bySection).forEach((list) =>
-    list.sort((a, b) => startOf(b.date) - startOf(a.date) || endOf(b.date) - endOf(a.date))
+    list.sort((a, b) => newestFirst(a.date, b.date))
   );
   return { bySection, files };
 };

@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { endOf, loadCards, startOf } from '../scripts/cards.mjs';
+import { loadCards, newestFirst } from '../scripts/cards.mjs';
 import {
   companyLength,
   ends,
@@ -179,9 +179,7 @@ test('the portfolio roles keep the tenure and glass the page shows', () => {
           item.company === company &&
           !item.parent
       )
-      .sort(
-        (a, b) => startOf(b.date) - startOf(a.date) || endOf(b.date) - endOf(a.date)
-      )
+      .sort((a, b) => newestFirst(a.date, b.date))
       .map((item) => ({ item }));
 
   const zoox = at('experience', 'Zoox');
