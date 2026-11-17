@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { selectTopicNames } from '../scripts/logos/render-topics.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const makeLogo = path.join(root, 'scripts/logos/make-logo.mjs');
@@ -35,5 +36,29 @@ describe('card logos scripts (AGENTS.md)', () => {
     assert.match(previewSrc, /Usage: node scripts\/logos\/preview\.mjs <sheet\.png>/);
     assert.match(topicsSrc, /topic-\$\{name\}\.png/);
     assert.match(topicsSrc, /topics/);
+  });
+});
+
+describe('selectTopicNames: unknown names used to fail silently', () => {
+  it('returns every available name when none were asked for', () => {
+    assert.deepEqual(selectTopicNames(['robotics', 'haptics'], []), ['robotics', 'haptics']);
+  });
+
+  it('keeps the folder order when filtering to requested names', () => {
+    assert.deepEqual(selectTopicNames(['a', 'b', 'c'], ['c', 'a']), ['a', 'c']);
+  });
+
+  it('names the miss and lists the drawn SVGs when a requested topic is absent', () => {
+    assert.throws(
+      () => selectTopicNames(['robotics', 'haptics'], ['robotcs']),
+      /Unknown topic logo name\(s\): robotcs\. Drawn SVGs live in scripts\/logos\/topics\/ \(robotics, haptics\)/
+    );
+  });
+
+  it('lists every missing name in one error when several are absent', () => {
+    assert.throws(
+      () => selectTopicNames(['robotics'], ['robotics', 'nope', 'also-missing']),
+      /Unknown topic logo name\(s\): nope, also-missing/
+    );
   });
 });
