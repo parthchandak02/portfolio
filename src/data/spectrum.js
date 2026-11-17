@@ -42,6 +42,18 @@ export const endOf = (date = '') => {
 };
 export { startOf };
 
+// Newest start first; on a tie, the longer or still-open span wins. Equal ends
+// (including two Present dates) must return 0: Infinity - Infinity is NaN and
+// would leave Array.sort free to reorder a documented tie.
+export const newestFirst = (a = '', b = '') => {
+  const byStart = startOf(b) - startOf(a);
+  if (byStart) return byStart;
+  const endA = endOf(a);
+  const endB = endOf(b);
+  if (endA === endB) return 0;
+  return endB - endA;
+};
+
 // One line per card, placed by the card's own start date
 const fromCards = (categories) =>
   categories.flatMap((category) =>

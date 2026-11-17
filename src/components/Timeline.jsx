@@ -10,12 +10,7 @@ import { categoryOrder, timelineDataByCategory } from '../data/timelineData';
 import { sectionOf } from '../data/sections';
 import { FEATURED } from '../data/featured';
 import SelectedMark from './SelectedMark';
-import {
-  bandForSection,
-  spectrumBands,
-  startOf,
-  endOf,
-} from '../data/spectrum';
+import { bandForSection, newestFirst, spectrumBands } from '../data/spectrum';
 import { CLOSE_MS } from '../hooks/glassMotion';
 import './Timeline.css';
 
@@ -68,7 +63,7 @@ const Timeline = ({
           if (byCategory) return byCategory;
         }
       }
-      return startOf(b.date) - startOf(a.date) || endOf(b.date) - endOf(a.date);
+      return newestFirst(a.date, b.date);
     });
   }, [filteredData, activeFilters]);
 
