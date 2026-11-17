@@ -166,6 +166,18 @@ describe('loadCards: the order cards come back in', () => {
     assert.equal(endOf('February 2022 - Present'), Infinity);
     assert.equal(endOf(''), 0);
     assert.equal(newestFirst('May 2018 - Present', 'May 2018 - Present'), 0);
+    // Prose dates: find the month even when words come first, and use the
+    // last named month as the end when there is no " - " separator.
+    assert.equal(
+      startOf('Filed June 2024, published January 2026'),
+      2024 + 5 / 12
+    );
+    assert.equal(
+      endOf('Filed June 2024, published January 2026'),
+      2026 + 0 / 12
+    );
+    assert.equal(startOf('Feb 22, 2026'), 2026 + 1 / 12);
+    assert.equal(endOf('October 25, 2026'), startOf('October 25, 2026'));
   });
 
   it('keeps file order when two ongoing cards share a start date', () => {

@@ -79,12 +79,19 @@ test('a dated line is placed by its month, and an open span has no end', () => {
   // The end of a range keeps its own month. The old endOf kept only the year.
   assert.equal(endOf('May 2018 - August 2018'), startOf('August 2018'));
   assert.equal(endOf('May 2025 - Present'), Infinity);
-  // "Feb 22, 2026" is February: the month is the first three letters.
+  // "Feb 22, 2026" is February, even with a day between the month and year.
   assert.equal(startOf('Feb 22, 2026'), 2026 + 1 / 12);
-  // The patent card names two years without a range separator, so both ends
-  // follow the first year, at mid-year.
-  assert.equal(startOf('Filed June 2024, published January 2026'), 2024.5);
-  assert.equal(endOf('Filed June 2024, published January 2026'), 2024.5);
+  assert.equal(endOf('March 8, 2026'), startOf('March 8, 2026'));
+  // The patent card names filing and publication without a " - " range.
+  // Start is the first month named; end is the last (not mid-year of the first).
+  assert.equal(
+    startOf('Filed June 2024, published January 2026'),
+    2024 + 5 / 12
+  );
+  assert.equal(
+    endOf('Filed June 2024, published January 2026'),
+    2026 + 0 / 12
+  );
   assert.equal(startOf(''), 0);
   assert.equal(endOf(''), 0);
   assert.equal(startOf('no year here'), 0);
