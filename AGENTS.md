@@ -10,6 +10,57 @@ Markdown file in `src/content/cards/<section>/`, checked at build time by `scrip
 Never run `npm run dev` or `npm start` here: they free port 3000, which another service on this machine uses. Test
 with `npm run build` and `astro preview` on another port.
 
+## Card loader workflow
+
+`scripts/cards.mjs` is the Astro/Vite plugin that turns `src/content/cards/<section>/*.md` into the
+`virtual:cards` module the site imports. Field tables and writing tips live in
+[docs/content.md](docs/content.md); this section is how to run and check the loader itself.
+
+### Purpose
+
+When Parth adds or edits a card, the loader validates every Markdown file at build time (and on reload in
+dev) so a misspelt field, missing logo, unknown parent, or duplicate title fails with the file's name
+instead of shipping a broken page. `src/data/timelineData.js` and `src/data/spectrum.js` read
+`cardsBySection` from `virtual:cards`.
+
+### Entrypoints
+
+| Path | Role |
+| --- | --- |
+| `scripts/cards.mjs` | Vite plugin: `loadCards(root)`, date helpers, default export wired in `astro.config.mjs` |
+| `scripts/cards.test.mjs` | Fixture tests for valid cards, sort order, and every reject path |
+| `src/content/cards/<section>/*.md` | One card per file; sections come from `src/data/sections.js` (Lab stays in `src/data/lab.js`) |
+| `docs/content.md` | Front matter fields, tile vs timeline rules, and what the checks cover |
+
+### How to run
+
+The plugin is already registered in `astro.config.mjs`. Any build loads and checks every card:
+
+```bash
+npm run build
+```
+
+In a throwaway root (or from the real repo), call the loader directly:
+
+```bash
+node --input-type=module -e "import { loadCards } from './scripts/cards.mjs'; loadCards(process.cwd()); console.log('ok');"
+```
+
+A problem throws `The portfolio's cards have problems:` with one line per file. Editing a card while a
+dev server is up invalidates `virtual:cards` and triggers a full reload (do not use `npm run dev` on
+this machine; use `astro preview` on another port after a build, or run the loader check above).
+
+### How to test
+
+```bash
+npm test
+```
+
+That includes `scripts/cards.test.mjs` (temp fixtures plus a load of the real cards) and
+`test/cardLoaderDocs.test.js`, which checks that this section still names the plugin and
+`virtual:cards`. After adding a card, also skim [docs/content.md](docs/content.md) so public counts
+still match the EB-1A petition.
+
 ## Cook stills workflow
 
 `cook/` is this site's visual cook loop: a brief, a fixed shot list, a round ledger, and two scripts that
