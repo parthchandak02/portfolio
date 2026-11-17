@@ -49,6 +49,28 @@ test('a line is placed by its own date, not just spread out', () => {
   assert.equal(Math.round(placed[1].x), Math.round(EDGE + warp(2021) * (1000 - EDGE * 2)));
 });
 
+test('a date before the record starts at the left end, not off the track', () => {
+  // warp used to extrapolate past the first knot, so 2014 sat left of EDGE
+  // and the gap passes never pulled it back on.
+  assert.equal(warp(2014), 0);
+  assert.equal(warp(2010), 0);
+  assert.equal(warp(2015), 0);
+  assert.equal(warp(2028), 1);
+
+  const width = 880;
+  const placed = place(
+    [
+      { item: { t: 2014, title: 'before start' } },
+      { item: { t: 2020, title: 'mid' } },
+      { item: { t: 2026, title: 'late' } },
+    ],
+    width
+  );
+  assert.deepEqual(inside(placed, width), []);
+  assert.equal(Math.round(placed[0].x), EDGE);
+  assert.equal(placed[0].item.title, 'before start');
+});
+
 test('one line, or none, is no trouble', () => {
   assert.deepEqual(place([], 280), []);
   assert.deepEqual(inside(place(entries(1, 2015), 280), 280), []);
