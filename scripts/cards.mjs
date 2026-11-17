@@ -31,20 +31,36 @@ const Card = z.strictObject({
 });
 
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+// Month + year anywhere in a segment ("June 2024", "Feb 22, 2026", "Filed June 2024").
+// An optional day may sit between the month and the year.
+const MONTH_YEAR =
+  /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?(?:\s+\d{1,2},?)?\s+(\d{4})\b/gi;
+const monthYearsIn = (s) =>
+  [...s.matchAll(MONTH_YEAR)].map((m) => {
+    const month = MONTHS.indexOf(m[1].slice(0, 3).toLowerCase());
+    return Number(m[2]) + month / 12;
+  });
+const midYear = (s) => {
+  const year = Number((s.match(/\d{4}/) || [])[0]);
+  return year ? year + 0.5 : 0;
+};
+
 // "February 2022 - Present" -> 2022.08, "2016 - 2018" -> 2016.5 (as in data/spectrum.js)
+// "Filed June 2024, published January 2026" -> June 2024 (first month named)
 export const startOf = (date = '') => {
   const first = date.split(' - ')[0];
-  const year = Number((first.match(/\d{4}/) || [])[0]);
-  if (!year) return 0;
-  const month = MONTHS.indexOf(first.slice(0, 3).toLowerCase());
-  return month === -1 ? year + 0.5 : year + month / 12;
+  const months = monthYearsIn(first);
+  return months.length ? months[0] : midYear(first);
 };
 
 // "February 2022 - Present" -> Infinity; "2016 - 2018" -> 2018.5; single dates end where they start
+// "Filed June 2024, published January 2026" -> January 2026 (last month named)
 export const endOf = (date = '') => {
   if (/present/i.test(date)) return Infinity;
   const parts = date.split(' - ');
-  return startOf(parts[parts.length - 1]);
+  const last = parts[parts.length - 1];
+  const months = monthYearsIn(last);
+  return months.length ? months[months.length - 1] : midYear(last);
 };
 
 // Newest start first; on a tie, the longer or still-open span wins. Equal ends
