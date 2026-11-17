@@ -7,8 +7,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { after, describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { endOf, loadCards, newestFirst, startOf } from './cards.mjs';
+import cardsPlugin, { endOf, loadCards, newestFirst, startOf } from './cards.mjs';
 import { SECTIONS } from '../src/data/sections.js';
+
+const VIRTUAL_ID = 'virtual:cards';
+const RESOLVED_ID = `\0${VIRTUAL_ID}`;
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const temps = [];
@@ -360,5 +363,130 @@ describe('the cards this portfolio ships with', () => {
     const { bySection } = loadCards(repoRoot);
     const titles = new Set(bySection.research.map((c) => c.title));
     SECTIONS.find((s) => s.id === 'research').preview.forEach((t) => assert.ok(titles.has(t), `no research card titled "${t}"`));
+  });
+});
+
+// The Vite plugin is what turns a card edit into the page the visitor sees: it resolves
+// virtual:cards, serialises loadCards for the build, and in preview/dev watches the cards
+// folder so an add, change, or delete reloads the module.
+describe('cards Vite plugin: virtual:cards', () => {
+  it('names itself and resolves only virtual:cards', () => {
+    const plugin = cardsPlugin();
+    assert.equal(plugin.name, 'portfolio-cards');
+    assert.equal(plugin.resolveId(VIRTUAL_ID), RESOLVED_ID);
+    assert.equal(plugin.resolveId('virtual:other'), null);
+    assert.equal(plugin.resolveId('./src/data/sections.js'), null);
+  });
+
+  it('loads cards from the root configResolved set, watches each file, and ignores other ids', () => {
+    const root = fixture({
+      cards: {
+        'awards/a.md': card('title: Merit\ndate: May 2016\ncompanyLogo: /logos/ieee.png'),
+        'judging/b.md': card('title: Reviewer\ndate: May 2017')
+      },
+      assets: ['logos/ieee.png']
+    });
+    const plugin = cardsPlugin();
+    const watched = [];
+    plugin.configResolved({ root });
+    assert.equal(plugin.load.call({ addWatchFile: (f) => watched.push(f) }, 'other'), null);
+
+    const source = plugin.load.call({ addWatchFile: (f) => watched.push(f) }, RESOLVED_ID);
+    assert.match(source, /^export const cardsBySection = /);
+    const cardsBySection = JSON.parse(source.slice('export const cardsBySection = '.length, -1));
+    assert.deepEqual(
+      cardsBySection.awards.map((c) => c.title),
+      ['Merit']
+    );
+    assert.deepEqual(
+      cardsBySection.judging.map((c) => c.title),
+      ['Reviewer']
+    );
+    assert.equal(cardsBySection.awards[0].companyLogo, '/logos/ieee.png');
+    assert.equal(cardsBySection.awards[0].description, 'What it was.');
+    assert.deepEqual(
+      watched.map((f) => path.relative(root, f)).sort(),
+      [
+        path.join('src/content/cards/awards/a.md'),
+        path.join('src/content/cards/judging/b.md')
+      ]
+    );
+  });
+
+  it('reloads the page when a card under the watched folder changes, and ignores other paths', () => {
+    const root = fixture({
+      cards: { 'awards/a.md': card('title: Merit\ndate: May 2016') }
+    });
+    const plugin = cardsPlugin();
+    plugin.configResolved({ root });
+
+    const cardsDir = path.join(root, 'src/content/cards');
+    const handlers = {};
+    const watcherAdds = [];
+    let invalidated = false;
+    const sends = [];
+    const mod = { id: RESOLVED_ID };
+    const server = {
+      watcher: {
+        add: (dir) => watcherAdds.push(dir),
+        on: (event, fn) => {
+          handlers[event] = fn;
+        }
+      },
+      moduleGraph: {
+        getModuleById: (id) => (id === RESOLVED_ID ? mod : undefined),
+        invalidateModule: (m) => {
+          assert.equal(m, mod);
+          invalidated = true;
+        }
+      },
+      ws: { send: (msg) => sends.push(msg) }
+    };
+
+    plugin.configureServer(server);
+    assert.deepEqual(watcherAdds, [cardsDir]);
+    assert.deepEqual(Object.keys(handlers).sort(), ['add', 'change', 'unlink']);
+
+    handlers.change(path.join(root, 'README.md'));
+    assert.equal(invalidated, false);
+    assert.deepEqual(sends, []);
+
+    handlers.add(path.join(cardsDir, 'awards/new.md'));
+    assert.equal(invalidated, true);
+    assert.deepEqual(sends, [{ type: 'full-reload' }]);
+
+    invalidated = false;
+    sends.length = 0;
+    handlers.unlink(path.join(cardsDir, 'awards/a.md'));
+    assert.equal(invalidated, true);
+    assert.deepEqual(sends, [{ type: 'full-reload' }]);
+  });
+
+  it('still sends a full reload when virtual:cards is not yet in the module graph', () => {
+    const root = fixture({
+      cards: { 'awards/a.md': card('title: Merit\ndate: May 2016') }
+    });
+    const plugin = cardsPlugin();
+    plugin.configResolved({ root });
+    const cardsDir = path.join(root, 'src/content/cards');
+    const handlers = {};
+    const sends = [];
+    plugin.configureServer({
+      watcher: {
+        add: () => {},
+        on: (event, fn) => {
+          handlers[event] = fn;
+        }
+      },
+      moduleGraph: {
+        getModuleById: () => undefined,
+        invalidateModule: () => {
+          assert.fail('should not invalidate a missing module');
+        }
+      },
+      ws: { send: (msg) => sends.push(msg) }
+    });
+    handlers.change(path.join(cardsDir, 'awards/a.md'));
+    assert.deepEqual(sends, [{ type: 'full-reload' }]);
   });
 });
