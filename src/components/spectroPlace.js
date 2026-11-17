@@ -13,6 +13,9 @@ export const MIN_GAP = 3.5; // px between neighbouring lines
 export const EDGE = 4; // px kept free at each end of a track
 
 export const warp = (t) => {
+  // A date before the first knot used to extrapolate below 0, which put that
+  // line left of EDGE; the gap passes only push neighbours apart, so it stayed off.
+  if (t <= KNOTS[0][0]) return KNOTS[0][1];
   for (let i = 1; i < KNOTS.length; i += 1) {
     const [t1, f1] = KNOTS[i];
     if (t <= t1) {
