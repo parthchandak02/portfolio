@@ -3,6 +3,7 @@
 // until the reader has used the page. Run with `npm test`.
 import test, { afterEach, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import {
   glassNotes,
@@ -11,6 +12,8 @@ import {
   isMuted,
   setMuted,
 } from '../src/hooks/glassSound.js';
+
+const glassSoundUrl = new URL('../src/hooks/glassSound.js', import.meta.url).href;
 
 const MUTED_KEY = 'pc-muted';
 const COALESCE_MS = 40;
@@ -95,14 +98,19 @@ function installDom({
   active = null;
   plays.length = 0;
 
+  // Save the descriptor, not the value: reading globalThis.localStorage in Node
+  // triggers ExperimentalWarning when --localstorage-file was not provided.
   const saved = {
     window: globalThis.window,
     document: globalThis.document,
     navigator: Object.getOwnPropertyDescriptor(globalThis, 'navigator'),
-    localStorage: globalThis.localStorage,
+    localStorage: Object.getOwnPropertyDescriptor(globalThis, 'localStorage'),
   };
 
-  globalThis.window = { AudioContext: FakeAudioContext };
+  globalThis.window = {
+    AudioContext: FakeAudioContext,
+    localStorage: storage,
+  };
   globalThis.document = { hidden };
   Object.defineProperty(globalThis, 'navigator', {
     value: { userActivation: { hasBeenActive: userActive } },
@@ -110,7 +118,12 @@ function installDom({
     enumerable: true,
     writable: true,
   });
-  globalThis.localStorage = storage;
+  Object.defineProperty(globalThis, 'localStorage', {
+    value: storage,
+    configurable: true,
+    enumerable: true,
+    writable: true,
+  });
 
   active = {
     storage,
@@ -122,8 +135,9 @@ function installDom({
       if (saved.navigator)
         Object.defineProperty(globalThis, 'navigator', saved.navigator);
       else delete globalThis.navigator;
-      if (saved.localStorage === undefined) delete globalThis.localStorage;
-      else globalThis.localStorage = saved.localStorage;
+      if (saved.localStorage)
+        Object.defineProperty(globalThis, 'localStorage', saved.localStorage);
+      else delete globalThis.localStorage;
     },
   };
   return active;
@@ -140,6 +154,43 @@ test('setMuted remembers the choice the same way light mode does', () => {
   setMuted(false);
   assert.equal(isMuted(), false);
   assert.equal(env.storage.getItem(MUTED_KEY), '0');
+});
+
+test('importing glassSound in Node does not warn about localStorage', () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      '--input-type=module',
+      '-e',
+      `import ${JSON.stringify(glassSoundUrl)};`,
+    ],
+    { encoding: 'utf8' }
+  );
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stderr.includes('ExperimentalWarning'), false);
+  assert.equal(result.stderr.includes('localStorage'), false);
+});
+
+test('mute preference is read from window.localStorage when the module loads', () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      '--input-type=module',
+      '-e',
+      `
+        globalThis.window = {
+          localStorage: {
+            getItem: (key) => (key === ${JSON.stringify(MUTED_KEY)} ? '1' : null),
+            setItem() {},
+          },
+        };
+        const { isMuted } = await import(${JSON.stringify(glassSoundUrl)});
+        if (isMuted() !== true) process.exit(2);
+      `,
+    ],
+    { encoding: 'utf8' }
+  );
+  assert.equal(result.status, 0, result.stderr);
 });
 
 test('a blocked store keeps mute for this visit and does not throw', () => {

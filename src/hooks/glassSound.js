@@ -50,11 +50,17 @@ const SOUNDS = {
   close: (c, t) => note(c, t, 587, { gain: 0.035, decay: 0.6, from: 1.12 }),
 };
 
-// The reader can turn them off (see SoundToggle), and the choice stays for their next visit
+// The reader can turn them off (see SoundToggle), and the choice stays for their next visit.
+// Use window.localStorage (same as App visited-state): bare localStorage in Node is an
+// experimental getter that warns when tests import this module without --localstorage-file.
 const MUTED_KEY = 'pc-muted';
+const mutedStorage = () => {
+  if (typeof window === 'undefined') return null;
+  return window.localStorage;
+};
 let muted = (() => {
   try {
-    return localStorage.getItem(MUTED_KEY) === '1';
+    return mutedStorage()?.getItem(MUTED_KEY) === '1';
   } catch {
     return false;
   }
@@ -63,7 +69,7 @@ export const isMuted = () => muted;
 export const setMuted = (m) => {
   muted = m;
   try {
-    localStorage.setItem(MUTED_KEY, m ? '1' : '0');
+    mutedStorage()?.setItem(MUTED_KEY, m ? '1' : '0');
   } catch {
     /* kept for this visit only */
   }
