@@ -26,9 +26,7 @@ export const monthOf = (s = '') => {
     return d.getFullYear() * 12 + d.getMonth();
   }
   // Optional day between month and year, same shape spectrum and cards.mjs accept.
-  const m = s
-    .trim()
-    .match(/^([a-z]{3})[a-z]*\.?(?:\s+\d{1,2},?)?\s+(\d{4})$/i);
+  const m = s.trim().match(/^([a-z]{3})[a-z]*\.?(?:\s+\d{1,2},?)?\s+(\d{4})$/i);
   const i = m ? MONTHS.indexOf(m[1].toLowerCase()) : -1;
   return i < 0 ? null : Number(m[2]) * 12 + i;
 };
