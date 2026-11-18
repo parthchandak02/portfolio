@@ -79,6 +79,11 @@ test('a dated line is placed by its month, and an open span has no end', () => {
   // The end of a range keeps its own month. The old endOf kept only the year.
   assert.equal(endOf('May 2018 - August 2018'), startOf('August 2018'));
   assert.equal(endOf('May 2025 - Present'), Infinity);
+  // "present" inside another word is not an open span.
+  assert.equal(
+    endOf('Representation Award 2024'),
+    startOf('Representation Award 2024')
+  );
   // "Feb 22, 2026" is February, even with a day between the month and year.
   assert.equal(startOf('Feb 22, 2026'), 2026 + 1 / 12);
   assert.equal(endOf('March 8, 2026'), startOf('March 8, 2026'));
