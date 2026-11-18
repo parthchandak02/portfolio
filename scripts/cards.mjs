@@ -77,6 +77,40 @@ export const newestFirst = (a = '', b = '') => {
 
 const FRONT = /^---\n([\s\S]*?)\n---\n?([\s\S]*)$/;
 
+// Zod's "Invalid input: expected string, received number" is jargon for a content
+// author. YAML often turns bare years and true/false into numbers and booleans;
+// name the fix instead of the type checker.
+const receivedOf = (message = '') => {
+  const m = /received (\w+)/i.exec(message);
+  return m ? m[1] : 'something else';
+};
+
+export const formatCardIssue = (rel, issue) => {
+  const field = (issue.path && issue.path.length ? issue.path.join('.') : 'card');
+  if (issue.code === 'invalid_type') {
+    const received = receivedOf(issue.message);
+    const expected = issue.expected;
+    if (expected === 'string' && received === 'number') {
+      if (field === 'date') {
+        return `${rel}: date: must be text; quote a bare year (date: '2016')`;
+      }
+      return `${rel}: ${field}: must be text (YAML read this as a number; quote it)`;
+    }
+    if (expected === 'string' && received === 'boolean') {
+      return `${rel}: ${field}: must be text (YAML read this as true/false; quote it if you mean those words)`;
+    }
+    if (expected === 'array') {
+      return `${rel}: ${field}: must be a YAML list (one "- item" per line under the field)`;
+    }
+    return `${rel}: ${field}: must be ${expected === 'string' ? 'text' : expected} (got ${received})`;
+  }
+  if (issue.code === 'unrecognized_keys') {
+    const keys = (issue.keys || []).map((k) => `"${k}"`).join(', ');
+    return `${rel}: unknown field ${keys} (not a card field; check spelling)`;
+  }
+  return `${rel}: ${field}: ${issue.message}`;
+};
+
 export const loadCards = (root) => {
   const dir = path.join(root, 'src/content/cards');
   const errors = [];
@@ -123,14 +157,16 @@ export const loadCards = (root) => {
       }
       const parsed = Card.safeParse(data);
       if (!parsed.success) {
-        parsed.error.issues.forEach((i) => errors.push(`${rel}: ${i.path.join('.') || 'card'}: ${i.message}`));
+        parsed.error.issues.forEach((i) => errors.push(formatCardIssue(rel, i)));
         return;
       }
       const description = m[2].trim();
       if (!description) errors.push(`${rel}: needs a description below the front matter`);
       ['companyLogo', 'projectImage'].forEach((k) => {
         const p = parsed.data[k];
-        if (p && !fs.existsSync(path.join(root, 'public', p))) errors.push(`${rel}: ${k} ${p} isn't in public/`);
+        if (p && !fs.existsSync(path.join(root, 'public', p))) {
+          errors.push(`${rel}: ${k} ${p} isn't in public/ (looked for public${p})`);
+        }
       });
       bySection[id].push({ ...parsed.data, category: id, description, _file: rel });
     });

@@ -7,7 +7,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { after, describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import cardsPlugin, { endOf, loadCards, newestFirst, startOf } from './cards.mjs';
+import cardsPlugin, {
+  endOf,
+  formatCardIssue,
+  loadCards,
+  newestFirst,
+  startOf
+} from './cards.mjs';
 import { SECTIONS } from '../src/data/sections.js';
 
 const VIRTUAL_ID = 'virtual:cards';
@@ -220,6 +226,31 @@ describe('loadCards: the order cards come back in', () => {
   });
 });
 
+describe('formatCardIssue: turns Zod jargon into a fix the author can use', () => {
+  it('names the quote fix for a bare-year date', () => {
+    assert.equal(
+      formatCardIssue('src/content/cards/awards/a.md', {
+        code: 'invalid_type',
+        expected: 'string',
+        path: ['date'],
+        message: 'Invalid input: expected string, received number'
+      }),
+      "src/content/cards/awards/a.md: date: must be text; quote a bare year (date: '2016')"
+    );
+  });
+
+  it('keeps custom schema messages such as needs a year', () => {
+    assert.equal(
+      formatCardIssue('a.md', {
+        code: 'invalid_format',
+        path: ['date'],
+        message: 'needs a year'
+      }),
+      'a.md: date: needs a year'
+    );
+  });
+});
+
 describe('loadCards: the problems it stops the build for', () => {
   it('names a file with no front matter', () => {
     assert.match(problems({ cards: { 'awards/a.md': 'Just a description.\n' } }), /awards\/a\.md: needs front matter between --- lines/);
@@ -246,7 +277,10 @@ describe('loadCards: the problems it stops the build for', () => {
   });
 
   it('rejects a field that is not one of the card fields', () => {
-    assert.match(problems({ cards: { 'awards/a.md': card('title: A\ndate: May 2016\ncompnay: Typo') } }), /awards\/a\.md: .*compnay/);
+    assert.match(
+      problems({ cards: { 'awards/a.md': card('title: A\ndate: May 2016\ncompnay: Typo') } }),
+      /awards\/a\.md: unknown field "compnay" \(not a card field; check spelling\)/
+    );
   });
 
   it('rejects a date with no year', () => {
@@ -254,8 +288,25 @@ describe('loadCards: the problems it stops the build for', () => {
   });
 
   // YAML reads an unquoted 2016 as a number, so a year on its own has to be quoted or carry a month.
-  it('rejects a bare year that YAML turned into a number', () => {
-    assert.match(problems({ cards: { 'awards/a.md': card('title: A\ndate: 2016') } }), /awards\/a\.md: date: .*expected string/);
+  it('rejects a bare year that YAML turned into a number, and names the quote fix', () => {
+    assert.match(
+      problems({ cards: { 'awards/a.md': card('title: A\ndate: 2016') } }),
+      /awards\/a\.md: date: must be text; quote a bare year \(date: '2016'\)/
+    );
+  });
+
+  it('rejects a skills value that is not a YAML list, without Zod jargon', () => {
+    assert.match(
+      problems({ cards: { 'awards/a.md': card('title: A\ndate: May 2016\nskills: Engineering') } }),
+      /awards\/a\.md: skills: must be a YAML list \(one "- item" per line under the field\)/
+    );
+  });
+
+  it('rejects a note that YAML read as true/false, and says to quote it', () => {
+    assert.match(
+      problems({ cards: { 'awards/a.md': card('title: A\ndate: May 2016\nnote: true') } }),
+      /awards\/a\.md: note: must be text \(YAML read this as true\/false; quote it if you mean those words\)/
+    );
   });
 
   it('rejects a card with no title and one with no date', () => {
@@ -300,8 +351,14 @@ describe('loadCards: images and logos', () => {
         'awards/b.md': card('title: B\ndate: May 2016\nprojectImage: /images/missing.jpg')
       }
     });
-    assert.match(message, /awards\/a\.md: companyLogo \/logos\/missing\.png isn't in public\//);
-    assert.match(message, /awards\/b\.md: projectImage \/images\/missing\.jpg isn't in public\//);
+    assert.match(
+      message,
+      /awards\/a\.md: companyLogo \/logos\/missing\.png isn't in public\/ \(looked for public\/logos\/missing\.png\)/
+    );
+    assert.match(
+      message,
+      /awards\/b\.md: projectImage \/images\/missing\.jpg isn't in public\/ \(looked for public\/images\/missing\.jpg\)/
+    );
   });
 
   it('rejects an asset path that does not start at public/', () => {
