@@ -169,3 +169,70 @@ There is no automated pixel assert for a new logo. Open the preview sheet and ch
 louder nor quieter than its neighbours at 50 px on dark and light cards. `npm test` includes
 `test/logoScripts.test.js`, which checks that the three scripts exist, keep the documented CLI shapes,
 and that AGENTS.md still names them.
+
+## Lab projects workflow
+
+Lab side projects are not Markdown cards. Each one is an object in `src/data/lab.js`. Adding one object
+puts a portrait tile in the Lab section and a dated tick on the spectrograph. Field tables for ordinary
+cards stay in [docs/content.md](docs/content.md); this section is how to ship a Lab entry without guessing.
+
+### Purpose
+
+When Parth ships a new public experiment, the Lab is the fast path onto the page: no card loader front
+matter, no logo script. The same list feeds `timelineDataByCategory.lab` in `src/data/timelineData.js`,
+so the strip, the Lab grid, and the Projects band stay in sync from one file.
+
+### Entrypoints
+
+| Path | Role |
+| --- | --- |
+| `src/data/lab.js` | `labProjects` array: one object per experiment |
+| `src/data/sections.js` | Lab section `preview` titles (what shows before "Show all") |
+| `public/images/lab/<slug>.png` | Portrait still each tile loads via `projectImage` |
+| `src/components/LabShowcase.jsx` | Renders the Lab grid from those objects |
+| `src/data/timelineData.js` | Merges `lab: labProjects` into the page's card list |
+
+### How to run
+
+1. Drop a still at `public/images/lab/<slug>.png` (portrait crop; match the neighbours).
+2. Prepend an object to `labProjects` in `src/data/lab.js` (newest first):
+
+```js
+{
+  title: 'slug',
+  date: 'Nov 2026',
+  category: 'lab',
+  location: 'Short tagline',
+  description: 'One or two sentences for the fog reveal.',
+  url: 'https://example.com',
+  projectImage: '/images/lab/slug.png',
+  skills: ['TypeScript', 'Data'],
+}
+```
+
+`title` is the visible name and the React key. `location` is the short tag under the name. `url` is what
+the tile opens (GitHub or a live site). Keep `category: 'lab'`.
+
+3. If it should appear before "Show all", add its `title` to the Lab `preview` list in
+`src/data/sections.js`.
+
+4. Check without freeing port 3000:
+
+```bash
+npm test
+npm run build
+npx astro preview --host 127.0.0.1 --port 4321
+```
+
+Open `/#lab` and confirm the new tile and its link.
+
+### How to test
+
+```bash
+npm test
+```
+
+That includes `test/timelineData.test.js` (Lab preview titles must exist in `lab.js`, and featured picks
+must name real cards or Lab projects) and `test/labProjectsDocs.test.js`, which checks that this section
+still names `lab.js`, the Lab images folder, and the preview list. There is no pixel assert for a new
+still: compare it by eye next to the neighbouring Lab tiles.
