@@ -17,13 +17,18 @@ const MONTHS = [
   'dec',
 ];
 
-// "October 2018" -> months since year 0; "Present" -> now; anything without a month -> null
+// "October 2018" / "October 25, 2026" -> months since year 0; "Present" -> now;
+// anything without a month -> null. Match Present as its own word so
+// "Representation" is not treated as an open end.
 export const monthOf = (s = '') => {
-  if (/present/i.test(s)) {
+  if (/\bpresent\b/i.test(s)) {
     const d = new Date();
     return d.getFullYear() * 12 + d.getMonth();
   }
-  const m = s.trim().match(/^([a-z]{3})[a-z]*\.?\s+(\d{4})$/i);
+  // Optional day between month and year, same shape spectrum and cards.mjs accept.
+  const m = s
+    .trim()
+    .match(/^([a-z]{3})[a-z]*\.?(?:\s+\d{1,2},?)?\s+(\d{4})$/i);
   const i = m ? MONTHS.indexOf(m[1].toLowerCase()) : -1;
   return i < 0 ? null : Number(m[2]) * 12 + i;
 };

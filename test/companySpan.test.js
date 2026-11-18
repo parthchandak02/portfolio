@@ -40,6 +40,10 @@ test('a month and year become months since year 0', () => {
   assert.equal(monthOf('Oct 2018'), monthOf('October 2018'));
   assert.equal(monthOf('Oct. 2018'), monthOf('October 2018'));
   assert.equal(monthOf('  MAY 2018  '), 2018 * 12 + 4);
+  // A day between the month and year (same shape as judging cards and spectrum) still counts.
+  assert.equal(monthOf('October 25, 2026'), 2026 * 12 + 9);
+  assert.equal(monthOf('March 8, 2026'), 2026 * 12 + 2);
+  assert.equal(monthOf('Feb 22, 2026'), 2026 * 12 + 1);
   assert.equal(monthOf('2018'), null);
   assert.equal(monthOf('May 2018 extra'), null);
   assert.equal(monthOf(''), null);
@@ -49,6 +53,8 @@ test('Present is the current month', () => {
   const now = new Date();
   assert.equal(monthOf('Present'), now.getFullYear() * 12 + now.getMonth());
   assert.equal(monthOf('present'), monthOf('Present'));
+  // "present" only as its own word: Representation must not count as open-ended.
+  assert.equal(monthOf('Representation'), null);
 });
 
 test('a range splits on the spaced hyphen, and a single date is both ends', () => {
@@ -92,6 +98,15 @@ test('only a range is given a tenure line', () => {
   assert.equal(roleLength('May 2018'), null);
   assert.equal(roleLength('May 2018 - August 2018'), '4 mos');
   assert.equal(roleLength('October 2026 - Present'), lengthOf('October 2026', 'Present'));
+  // Day-precise ends match the same months as dates without a day.
+  assert.equal(
+    roleLength('October 25, 2026 - Present'),
+    lengthOf('October 2026', 'Present')
+  );
+  assert.equal(
+    roleLength('March 8, 2026 - August 15, 2026'),
+    lengthOf('March 2026', 'August 2026')
+  );
 });
 
 test('a later role that ended does not cut off an earlier role that ran longer', () => {

@@ -73,6 +73,16 @@ test('a video still, the card photo, and a logo that is not a trimmed file', () 
   assert.equal(tileFace({ date: 'May 2026', company: 'Zoox', location: 'Zoox' }).meta, 'May 2026');
 });
 
+test('the year corner says Now only for an open Present span', () => {
+  assert.equal(tileFace({ date: 'May 2025 - Present', company: 'X' }).year, 'Now');
+  assert.equal(tileFace({ date: 'October 25, 2026 - Present', company: 'X' }).year, 'Now');
+  // "present" inside another word must not flip the year to Now.
+  assert.equal(
+    tileFace({ date: 'Representation Award 2024', company: 'X' }).year,
+    '2024'
+  );
+});
+
 test('jobs and degrees stay wide cards, and every shipped tile follows the rules', () => {
   assert.equal(isTile(card('Creative Technologist')), false);
   assert.equal(isTile(card('Bachelor of Science: Mechanical Engineering')), false);
@@ -80,7 +90,9 @@ test('jobs and degrees stay wide cards, and every shipped tile follows the rules
   const wordmark = /\/(springer-nature|ieee|sigma-xi|buildon)-logo\.png$/;
   for (const item of all.filter(isTile)) {
     const face = tileFace(item);
-    const year = /present/i.test(item.date) ? 'Now' : (item.date.match(/\d{4}/g) || []).pop() || '';
+    const year = /\bpresent\b/i.test(item.date)
+      ? 'Now'
+      : (item.date.match(/\d{4}/g) || []).pop() || '';
     assert.equal(face.year, year, item.title);
     if (item.date.trim() === year) assert.equal(face.meta.includes(item.date), false, item.title);
     else assert.ok(face.meta.startsWith(item.date), item.title);

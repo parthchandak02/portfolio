@@ -50,7 +50,8 @@ const startOf = (date = '') => {
 // "February 2022 - Present" -> Infinity; "2016 - 2018" -> 2018.5; single dates end where they start
 // "Filed June 2024, published January 2026" -> January 2026 (last month named)
 export const endOf = (date = '') => {
-  if (/present/i.test(date)) return Infinity;
+  // Present as its own word only: "Representation" must not mean still open.
+  if (/\bpresent\b/i.test(date)) return Infinity;
   const parts = date.split(' - ');
   const last = parts[parts.length - 1];
   const months = monthYearsIn(last);

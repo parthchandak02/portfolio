@@ -17,9 +17,10 @@ export const isTile = (item) => layoutOf(item.category) === 'tiles';
 const venueOf = (item) =>
   (item.volume ? item.volume.split(',')[0] : item.company) || '';
 
-// The year a tile shows in its corner: when it ended, or Now
+// The year a tile shows in its corner: when it ended, or Now.
+// Present must be its own word so "Representation" does not become Now.
 const yearOf = (item) =>
-  /present/i.test(item.date)
+  /\bpresent\b/i.test(item.date)
     ? 'Now'
     : (item.date.match(/\d{4}/g) || []).pop() || '';
 
