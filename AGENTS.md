@@ -236,3 +236,67 @@ That includes `test/timelineData.test.js` (Lab preview titles must exist in `lab
 must name real cards or Lab projects) and `test/labProjectsDocs.test.js`, which checks that this section
 still names `lab.js`, the Lab images folder, and the preview list. There is no pixel assert for a new
 still: compare it by eye next to the neighbouring Lab tiles.
+
+## Selected work workflow
+
+Selected work (`/#selected`) opens the portfolio ahead of the eight bands: four large glass cards
+(`FEATURED` in `src/data/featured.js`), each marked with a small diamond on the spectrograph and
+carrying one interactive moment inside (`src/components/FeatureCards.jsx`).
+
+### Purpose
+
+When Parth promotes a new card to the top of the portfolio or updates one of the four featured picks,
+`src/data/featured.js` is the single list that drives the `#selected` cards, the diamond markers on the
+strip (`src/data/spectrum.js`), and the short label shown in the sticky band bar (`featuredName` in
+`src/components/BandBar.jsx`).
+
+### Entrypoints
+
+| Path | Role |
+| --- | --- |
+| `src/data/featured.js` | `FEATURED` array and `featuredName(title)` helper |
+| `src/components/FeatureCards.jsx` | Renders each large card and its `moment` (`light`, `robot`, `audio`, `alarm`), plus `PortfolioDoor` |
+| `src/components/centiSeedRobot.js` | Lazy-loaded 3D robot canvas for the `robot` moment |
+| `src/components/Timeline.jsx` | Matches `FEATURED` titles to cards and renders the `#selected` section |
+| `src/data/spectrum.js` | Marks one spectrum line per featured pick with `featured: true` and builds `selectedBand` |
+
+### How to run
+
+1. Make sure the underlying card already exists in `src/content/cards/<section>/*.md` (or `src/data/lab.js`)
+and has a matching dated line in `src/data/spectrum.js`.
+2. Edit or add the entry in `FEATURED` in `src/data/featured.js`:
+
+```js
+{
+  title: 'Exact card title',
+  name: 'Short card heading',
+  kind: 'Where or what · Year',
+  line: 'One short sentence for the large card; full story stays in the card details.',
+  moment: 'light', // 'light' | 'robot' | 'audio' | 'alarm'
+}
+```
+
+`title` must match the card's `title` exactly. `name` is the large card heading and what `BandBar` shows
+while reading `#selected`. `moment` selects the interactive widget in `src/components/FeatureCards.jsx`.
+
+3. Check without freeing port 3000:
+
+```bash
+npm test
+npm run build
+npx astro preview --host 127.0.0.1 --port 4321
+```
+
+Open `/#selected` and confirm the large card, its moment, its details drawer, and its diamond on the strip.
+
+### How to test
+
+```bash
+npm test
+```
+
+That includes `test/timelineData.test.js` (every `FEATURED` entry must name a real card and `featuredName`
+must return its short label), `test/spectrum.test.js` (each pick places one diamond on the strip and
+populates `selectedBand`), and `test/selectedWorkDocs.test.js`, which checks that this section still names
+`featured.js`, `FEATURED`, `FeatureCards.jsx`, and the supported moments.
+
