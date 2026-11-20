@@ -159,7 +159,7 @@ const sub = (ink, w, r) => {
 };
 
 // Split at the widest run of empty columns in the middle half, then put the second part under the first
-const stack = (ink, w, h) => {
+export const stack = (ink, w, h) => {
   const empty = (x) => { for (let y = 0; y < h; y += 1) if (ink[y * w + x] > 0.04) return false; return true; };
   let best = null;
   let run = null;
@@ -172,6 +172,7 @@ const stack = (ink, w, h) => {
       run = null;
     }
   }
+  if (run && (!best || run.end - run.start > best.end - best.start)) best = run;
   if (!best) throw new Error('--stack found no gap between words');
   const left = bounds(sub(ink, w, { x: 0, y: 0, w: best.start, h }), best.start, h);
   const rightX = best.end + 1;

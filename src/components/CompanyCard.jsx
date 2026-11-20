@@ -55,7 +55,7 @@ const CompanyCard = ({ roles, childrenOf = {}, lightMode = false }) => {
         {roles.map(({ item, attrs, highlighted }) => {
           const isOpen = open.has(item.title);
           const length = roleLength(item.date);
-          const current = /present/i.test(item.date);
+          const current = /\bpresent\b/i.test(item.date);
           return (
             <li
               key={item.title}

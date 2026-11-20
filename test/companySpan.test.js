@@ -243,3 +243,14 @@ test('the portfolio roles keep the tenure and glass the page shows', () => {
   );
   assert.equal(roleLength(at('education', 'WSU')[0].item.date), null);
 });
+
+test('CompanyCard and UITypewriter match Present as its own word', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  for (const rel of ['src/components/CompanyCard.jsx', 'src/components/UITypewriter.jsx']) {
+    const src = fs.readFileSync(path.join(root, rel), 'utf8');
+    assert.match(src, /\/\\bpresent\\b\/i/, rel);
+    assert.doesNotMatch(src, /\/present\/i/, rel);
+  }
+});
+
