@@ -27,22 +27,87 @@ import path from 'node:path';
 const CANVAS = 512;
 const SQUARE_MAX = 370;
 
-const args = process.argv.slice(2);
-const positional = args.filter((a, i) => !a.startsWith('--') && !(args[i - 1] || '').match(/^--(ink|crop|erase|box)$/));
-const flag = (name) => {
-  const i = args.indexOf(`--${name}`);
-  return i === -1 ? null : args[i + 1] ?? true;
+const VALID_FLAGS = ['--ink', '--crop', '--erase', '--stack', '--box'];
+const VALUE_FLAGS = new Set(['--ink', '--crop', '--erase', '--box']);
+const VALID_INKS = ['any', 'alpha', 'dark'];
+
+const parseRect = (name, raw) => {
+  const parts = String(raw).split(',').map(Number);
+  if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n)) || parts[2] <= 0 || parts[3] <= 0) {
+    throw new Error(
+      `Invalid --${name} "${raw}". Expected four numbers x,y,w,h with positive width and height (for example --${name} 0,0,1,0.6)`
+    );
+  }
+  return parts;
 };
 
-const [input, output] = positional;
-if (!input || !output) {
-  console.error('Usage: node scripts/logos/make-logo.mjs <input> <output.png> [--ink any|alpha|dark] [--crop x,y,w,h] [--erase x,y,w,h] [--stack] [--box w,h]');
-  process.exit(1);
+const parseBox = (raw) => {
+  const parts = String(raw).split(',').map(Number);
+  if (parts.length !== 2 || parts.some((n) => !Number.isFinite(n) || n <= 0)) {
+    throw new Error(
+      `Invalid --box "${raw}". Expected two positive numbers w,h in pixels (for example --box 430,380)`
+    );
+  }
+  return parts;
+};
+
+export const parseMakeLogoArgs = (argv = []) => {
+  const positional = [];
+  const flags = {};
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg.startsWith('--')) {
+      if (!VALID_FLAGS.includes(arg)) {
+        throw new Error(`Unknown option "${arg}". Valid options are: ${VALID_FLAGS.join(', ')}`);
+      }
+      if (VALUE_FLAGS.has(arg)) {
+        const val = argv[i + 1];
+        if (!val || val.startsWith('--')) throw new Error(`Option ${arg} is missing its value`);
+        flags[arg.slice(2)] = val;
+        i += 1;
+      } else {
+        flags[arg.slice(2)] = true;
+      }
+    } else {
+      positional.push(arg);
+    }
+  }
+  const [input, output] = positional;
+  if (!input || !output) {
+    throw new Error(
+      'Usage: node scripts/logos/make-logo.mjs <input> <output.png> [--ink any|alpha|dark] [--crop x,y,w,h] [--erase x,y,w,h] [--stack] [--box w,h]'
+    );
+  }
+  const inkMode = flags.ink || 'any';
+  if (!VALID_INKS.includes(inkMode)) {
+    throw new Error(`Unknown --ink mode "${inkMode}". Expected one of: ${VALID_INKS.join(', ')}`);
+  }
+  const crop = flags.crop ? parseRect('crop', flags.crop) : null;
+  const erase = flags.erase ? parseRect('erase', flags.erase) : null;
+  const [boxW, boxH] = flags.box ? parseBox(flags.box) : [430, 380];
+  return { input, output, inkMode, crop, erase, stackMark: Boolean(flags.stack), boxW, boxH };
+};
+
+const runningAsCli =
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname);
+
+let input;
+let output;
+let inkMode = 'any';
+let crop = null;
+let erase = null;
+let stackMark = false;
+let boxW = 430;
+let boxH = 380;
+if (runningAsCli) {
+  try {
+    ({ input, output, inkMode, crop, erase, stackMark, boxW, boxH } = parseMakeLogoArgs(process.argv.slice(2)));
+  } catch (e) {
+    console.error(e.message);
+    process.exit(1);
+  }
 }
-const inkMode = flag('ink') || 'any';
-const crop = flag('crop') ? flag('crop').split(',').map(Number) : null;
-const erase = flag('erase') ? flag('erase').split(',').map(Number) : null;
-const [boxW, boxH] = (flag('box') || '430,380').split(',').map(Number);
 
 // Render big enough that the final downscale is always clean
 const load = async () => {
@@ -125,6 +190,7 @@ const stack = (ink, w, h) => {
   return { ink: out, w: outW, h: outH };
 };
 
+if (runningAsCli) {
 const { data, info } = await load();
 let w = info.width;
 let h = info.height;
@@ -141,7 +207,7 @@ const box = bounds(ink, w, h);
 ink = sub(ink, w, box);
 w = box.w;
 h = box.h;
-if (flag('stack')) ({ ink, w, h } = stack(ink, w, h));
+if (stackMark) ({ ink, w, h } = stack(ink, w, h));
 
 // Fit inside the box; a near-square mark stops at SQUARE_MAX so it does not outweigh the wordmarks
 const aspect = w / h;
@@ -169,3 +235,4 @@ await sharp({ create: { width: CANVAS, height: CANVAS, channels: 4, background: 
   .toFile(output);
 
 console.log(`${output}: mark ${outW}x${outH} on ${CANVAS}x${CANVAS}`);
+}
