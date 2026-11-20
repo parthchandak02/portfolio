@@ -6,7 +6,7 @@ import path from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { selectTopicNames } from '../scripts/logos/render-topics.mjs';
-import { parseMakeLogoArgs } from '../scripts/logos/make-logo.mjs';
+import { parseMakeLogoArgs, stack } from '../scripts/logos/make-logo.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const makeLogo = path.join(root, 'scripts/logos/make-logo.mjs');
@@ -153,4 +153,50 @@ describe('parseMakeLogoArgs: rejects unknown flags and invalid option values cle
       /Invalid --box "430,-10"\. Expected two positive numbers w,h in pixels/
     );
   });
+
+  it('stacks a two-word mark even when the gap between words reaches 80% of the width', async () => {
+    const os = await import('node:os');
+    const { execFileSync } = await import('node:child_process');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'make-logo-stack-'));
+    try {
+      // A wide first word (x: 0..64) and a short second word (x: 82..100), so the gap
+      // runs across the 80% boundary of the trimmed 100 px mark.
+      const svg = path.join(dir, 'two-words.svg');
+      const out = path.join(dir, 'out.png');
+      fs.writeFileSync(
+        svg,
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20">' +
+          '<rect x="0" y="2" width="64" height="16" fill="#000"/>' +
+          '<rect x="82" y="2" width="18" height="16" fill="#000"/>' +
+          '</svg>'
+      );
+      execFileSync(process.execPath, [makeLogo, svg, out, '--stack'], {
+        cwd: root,
+        stdio: 'pipe'
+      });
+      assert.equal(fs.existsSync(out), true);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('picks the widest word gap even when that gap runs to the 80% scan boundary', () => {
+    // 100 x 10 mark: a narrow intra-word gap at x=30..31 (2 px), and the real word gap at x=70..79 (10 px).
+    const w = 100;
+    const h = 10;
+    const ink = new Float32Array(w * h);
+    for (let y = 0; y < h; y += 1) {
+      for (let x = 0; x < w; x += 1) {
+        const inGap1 = x >= 30 && x <= 31;
+        const inGap2 = x >= 70 && x <= 79;
+        if (!inGap1 && !inGap2) ink[y * w + x] = 1;
+      }
+    }
+    const stacked = stack(ink, w, h);
+    // Split at x=70..79: left word is 70 px wide (0..69), right word is 20 px wide (80..99).
+    assert.equal(stacked.w, 70);
+    assert.ok(stacked.h > h * 2);
+  });
 });
+
+

@@ -12,7 +12,7 @@ import './UITypewriter.css';
 
 // The role held now, from its card, so this line stays current by itself
 const now = timelineDataByCategory.experience.find((c) =>
-  /present/i.test(c.date)
+  /\bpresent\b/i.test(c.date)
 );
 const currentRole = now && `${now.title} at ${now.company}`;
 
