@@ -22,6 +22,7 @@
  * tall ones about 380 px high, so no logo looks louder than its neighbours.
  */
 import sharp from 'sharp';
+import fs from 'node:fs';
 import path from 'node:path';
 
 const CANVAS = 512;
@@ -191,6 +192,38 @@ export const stack = (ink, w, h) => {
   return { ink: out, w: outW, h: outH };
 };
 
+// Info tiles load /logos/trim/<name>.png so the mark fills its 40 px box without the 512 x 512 margin.
+export const writeTrimmedLogo = async (logoPath) => {
+  const { data, info } = await sharp(logoPath).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  let x0 = info.width, y0 = info.height, x1 = -1, y1 = -1;
+  for (let y = 0; y < info.height; y += 1) {
+    for (let x = 0; x < info.width; x += 1) {
+      if (data[(y * info.width + x) * 4 + 3] > 0) {
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+    }
+  }
+  if (x1 < 0) return null;
+  const bw = x1 - x0 + 1;
+  const bh = y1 - y0 + 1;
+  const pad = Math.round(Math.max(bw, bh) * 0.03);
+  const left = Math.max(0, x0 - pad);
+  const top = Math.max(0, y0 - pad);
+  const width = Math.min(info.width - left, bw + 2 * pad);
+  const height = Math.min(info.height - top, bh + 2 * pad);
+  const trimDir = path.join(path.dirname(logoPath), 'trim');
+  fs.mkdirSync(trimDir, { recursive: true });
+  const trimPath = path.join(trimDir, path.basename(logoPath));
+  await sharp(data, { raw: info })
+    .extract({ left, top, width, height })
+    .png({ compressionLevel: 9 })
+    .toFile(trimPath);
+  return { trimPath, width, height };
+};
+
 if (runningAsCli) {
 const { data, info } = await load();
 let w = info.width;
@@ -234,6 +267,7 @@ await sharp({ create: { width: CANVAS, height: CANVAS, channels: 4, background: 
   .composite([{ input: mark, left: Math.round((CANVAS - outW) / 2), top: Math.round((CANVAS - outH) / 2) }])
   .png({ compressionLevel: 9 })
   .toFile(output);
+await writeTrimmedLogo(output);
 
 console.log(`${output}: mark ${outW}x${outH} on ${CANVAS}x${CANVAS}`);
 }

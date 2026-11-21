@@ -339,7 +339,35 @@ describe('loadCards: images and logos', () => {
   it('accepts an asset that is in public/', () => {
     assert.doesNotThrow(() =>
       loadCards(
-        fixture({ cards: { 'awards/a.md': card('title: A\ndate: May 2016\ncompanyLogo: /logos/ieee.png') }, assets: ['logos/ieee.png'] })
+        fixture({
+          cards: { 'awards/a.md': card('title: A\ndate: May 2016\ncompanyLogo: /logos/ieee.png') },
+          assets: ['logos/ieee.png', 'logos/trim/ieee.png']
+        })
+      )
+    );
+  });
+
+  it('names a tile card logo whose trimmed copy in public/logos/trim/ is missing', () => {
+    const message = problems({
+      cards: {
+        'awards/a.md': card('title: A\ndate: May 2016\ncompanyLogo: /logos/ieee.png')
+      },
+      assets: ['logos/ieee.png']
+    });
+    assert.match(
+      message,
+      /awards\/a\.md: companyLogo \/logos\/ieee\.png needs its trimmed tile copy in public\/ \(looked for public\/logos\/trim\/ieee\.png\)/
+    );
+    // Wide timeline cards (experience, education) and topic marks do not render /logos/trim/ on a tile.
+    assert.doesNotThrow(() =>
+      loadCards(
+        fixture({
+          cards: {
+            'experience/job.md': card('title: Engineer\ndate: May 2022\ncompanyLogo: /logos/zoox.png'),
+            'research/paper.md': card('title: Paper\ndate: May 2024\ncompanyLogo: /logos/topic-robotics.png')
+          },
+          assets: ['logos/zoox.png', 'logos/topic-robotics.png']
+        })
       )
     );
   });
@@ -441,7 +469,7 @@ describe('cards Vite plugin: virtual:cards', () => {
         'awards/a.md': card('title: Merit\ndate: May 2016\ncompanyLogo: /logos/ieee.png'),
         'judging/b.md': card('title: Reviewer\ndate: May 2017')
       },
-      assets: ['logos/ieee.png']
+      assets: ['logos/ieee.png', 'logos/trim/ieee.png']
     });
     const plugin = cardsPlugin();
     const watched = [];
