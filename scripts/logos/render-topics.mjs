@@ -14,6 +14,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { writeTrimmedLogo } from './make-logo.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const topics = path.join(here, 'topics');
@@ -54,6 +55,7 @@ if (runningAsCli) {
       .resize(512, 512)
       .png({ compressionLevel: 9 })
       .toFile(file);
+    await writeTrimmedLogo(file);
     console.log(path.relative(process.cwd(), file));
   }
 }

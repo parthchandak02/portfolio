@@ -165,8 +165,22 @@ export const loadCards = (root) => {
       if (!description) errors.push(`${rel}: needs a description below the front matter`);
       ['companyLogo', 'projectImage'].forEach((k) => {
         const p = parsed.data[k];
-        if (p && !fs.existsSync(path.join(root, 'public', p))) {
+        if (!p) return;
+        if (!fs.existsSync(path.join(root, 'public', p))) {
           errors.push(`${rel}: ${k} ${p} isn't in public/ (looked for public${p})`);
+          return;
+        }
+        // Info tiles load /logos/trim/<name>.png (see src/components/tileFace.js).
+        if (
+          k === 'companyLogo' &&
+          id !== 'experience' &&
+          id !== 'education' &&
+          /^\/logos\/(?!topic-)[^/]+\.png$/.test(p)
+        ) {
+          const trimmed = p.replace('/logos/', '/logos/trim/');
+          if (!fs.existsSync(path.join(root, 'public', trimmed))) {
+            errors.push(`${rel}: companyLogo ${p} needs its trimmed tile copy in public/ (looked for public${trimmed})`);
+          }
         }
       });
       bySection[id].push({ ...parsed.data, category: id, description, _file: rel });

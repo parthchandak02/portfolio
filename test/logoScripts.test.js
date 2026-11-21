@@ -198,6 +198,43 @@ describe('parseMakeLogoArgs: rejects unknown flags and invalid option values cle
     assert.equal(stacked.w, 70);
     assert.ok(stacked.h > h * 2);
   });
+
+  it('writes a margin-trimmed copy in trim/ so info tiles can load /logos/trim/<name>.png', async () => {
+    const os = await import('node:os');
+    const { execFileSync } = await import('node:child_process');
+    const sharp = (await import('sharp')).default;
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'make-logo-trim-'));
+    try {
+      const svg = path.join(dir, 'wide.svg');
+      const logosDir = path.join(dir, 'logos');
+      fs.mkdirSync(logosDir);
+      const out = path.join(logosDir, 'wide-logo.png');
+      const trimmed = path.join(logosDir, 'trim', 'wide-logo.png');
+      fs.writeFileSync(
+        svg,
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60">' +
+          '<rect x="10" y="10" width="180" height="40" fill="#000"/>' +
+          '</svg>'
+      );
+      execFileSync(process.execPath, [makeLogo, svg, out], {
+        cwd: root,
+        stdio: 'pipe'
+      });
+      assert.equal(fs.existsSync(out), true, '512x512 logo missing');
+      assert.equal(fs.existsSync(trimmed), true, 'trimmed tile logo missing in trim/');
+      const fullMeta = await sharp(out).metadata();
+      const trimMeta = await sharp(trimmed).metadata();
+      assert.equal(fullMeta.width, 512);
+      assert.equal(fullMeta.height, 512);
+      assert.ok(trimMeta.width < 512, 'trimmed width should cut off empty 512x512 margins');
+      assert.ok(trimMeta.height < 300, 'trimmed height should cut off empty vertical margins');
+      // 180 x 40 scaled to 430 px wide is 430 x 96; 3% pad on 430 is 13 px on each side -> 456 x 122.
+      assert.equal(trimMeta.width, 456);
+      assert.equal(trimMeta.height, 122);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
 });
 
 describe('preview: names missing sources, empty folders, and unreadable logos clearly', () => {
