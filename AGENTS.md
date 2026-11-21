@@ -10,6 +10,8 @@ Markdown file in `src/content/cards/<section>/`, checked at build time by `scrip
 Never run `npm run dev` or `npm start` here: they free port 3000, which another service on this machine uses. Test
 with `npm run build` and `astro preview` on another port.
 
+New dependency versions must be at least 7 days old (`.npmrc` sets `min-release-age=7`); for a security fix that needs a newer release, pass `--min-release-age=0` (or `--min-release-age-exclude=<pkg>`) to `npm install`.
+
 ## Card loader workflow
 
 `scripts/cards.mjs` is the Astro/Vite plugin that turns `src/content/cards/<section>/*.md` into the
