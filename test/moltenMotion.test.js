@@ -100,3 +100,33 @@ test('cancelMoltenClose returns null when not currently closing', () => {
   const closing = { current: null };
   assert.equal(cancelMoltenClose(closing, outer), null);
 });
+
+test('startMoltenClose finishes cleanly and cancels any previous close before starting a new one', () => {
+  const outer = makeElement(() => 100);
+  const inner = makeElement();
+  const closing = { current: null };
+  let finishedFirst = 0;
+  let finishedSecond = 0;
+
+  const first = startMoltenClose(closing, outer, inner, 100, () => {
+    finishedFirst += 1;
+  });
+  const second = startMoltenClose(closing, outer, inner, 60, () => {
+    finishedSecond += 1;
+  });
+
+  assert.equal(first.outer.cancelled, true);
+  assert.equal(first.inner.cancelled, true);
+  assert.equal(closing.current, second);
+
+  // Finishing the superseded animation must not clear closingRef or fire its callback.
+  first.outer.complete();
+  assert.equal(finishedFirst, 0);
+  assert.equal(closing.current, second);
+
+  // Finishing the current animation clears closingRef and runs onFinish.
+  second.outer.complete();
+  assert.equal(finishedSecond, 1);
+  assert.equal(closing.current, null);
+});
+
