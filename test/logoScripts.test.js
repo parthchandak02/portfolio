@@ -7,6 +7,7 @@ import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { selectTopicNames } from '../scripts/logos/render-topics.mjs';
 import { parseMakeLogoArgs, stack } from '../scripts/logos/make-logo.mjs';
+import { collectLogoFiles, renderPreviewSheet } from '../scripts/logos/preview.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const makeLogo = path.join(root, 'scripts/logos/make-logo.mjs');
@@ -199,4 +200,117 @@ describe('parseMakeLogoArgs: rejects unknown flags and invalid option values cle
   });
 });
 
+describe('preview: names missing sources, empty folders, and unreadable logos clearly', () => {
+  it('collects sorted png and svg logos from folders alongside direct files', async () => {
+    const os = await import('node:os');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'preview-collect-'));
+    try {
+      const folder = path.join(dir, 'logos');
+      fs.mkdirSync(folder);
+      fs.writeFileSync(path.join(folder, 'b.svg'), '<svg/>');
+      fs.writeFileSync(path.join(folder, 'a.png'), '');
+      fs.writeFileSync(path.join(folder, 'notes.txt'), 'ignored');
+      const extra = path.join(dir, 'extra.png');
+      fs.writeFileSync(extra, '');
+
+      assert.deepEqual(collectLogoFiles([folder, extra]), [
+        path.join(folder, 'a.png'),
+        path.join(folder, 'b.svg'),
+        extra
+      ]);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('names a missing source path instead of throwing a raw stat error', () => {
+    const missing = path.join(root, 'public/logos/does-not-exist-logo.png');
+    assert.throws(
+      () => collectLogoFiles([missing]),
+      new RegExp(`Logo source not found: ${missing.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`)
+    );
+  });
+
+  it('rejects a folder with no png or svg files instead of failing with zero width in sharp', async () => {
+    const os = await import('node:os');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'preview-empty-'));
+    try {
+      fs.writeFileSync(path.join(dir, 'readme.txt'), 'not a logo');
+      assert.throws(
+        () => collectLogoFiles([dir]),
+        /No \.png or \.svg logo files found in:/
+      );
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('names the failing logo file when sharp cannot decode it', async () => {
+    const os = await import('node:os');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'preview-bad-logo-'));
+    try {
+      const bad = path.join(dir, 'broken.png');
+      const out = path.join(dir, 'sheet.png');
+      fs.writeFileSync(bad, 'not valid image bytes');
+      await assert.rejects(
+        () => renderPreviewSheet(out, [bad]),
+        /Failed to load logo ".*broken\.png":/
+      );
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('names the output path when the preview sheet cannot be written', async () => {
+    const os = await import('node:os');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'preview-bad-out-'));
+    try {
+      const svg = path.join(dir, 'mark.svg');
+      fs.writeFileSync(
+        svg,
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="8" y="8" width="48" height="48" fill="#fff"/></svg>'
+      );
+      const badOut = path.join(dir, 'missing-dir', 'sheet.png');
+      await assert.rejects(
+        () => renderPreviewSheet(badOut, [svg]),
+        /Failed to write preview sheet ".*missing-dir\/sheet\.png":/
+      );
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('renders a preview sheet via CLI and exits cleanly with a clear stderr message on error', async () => {
+    const os = await import('node:os');
+    const { spawnSync } = await import('node:child_process');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'preview-cli-'));
+    try {
+      const svg = path.join(dir, 'mark.svg');
+      const sheet = path.join(dir, 'sheet.png');
+      fs.writeFileSync(
+        svg,
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="#fff"/></svg>'
+      );
+
+      const ok = spawnSync(process.execPath, [preview, sheet, svg], {
+        cwd: root,
+        encoding: 'utf8'
+      });
+      assert.equal(ok.status, 0, ok.stderr);
+      assert.equal(fs.existsSync(sheet), true);
+      assert.match(ok.stdout, /: 1 logos\n$/);
+
+      const missingDir = path.join(dir, 'empty');
+      fs.mkdirSync(missingDir);
+      const fail = spawnSync(process.execPath, [preview, sheet, missingDir], {
+        cwd: root,
+        encoding: 'utf8'
+      });
+      assert.equal(fail.status, 1);
+      assert.match(fail.stderr, /^No \.png or \.svg logo files found in:/);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
 
