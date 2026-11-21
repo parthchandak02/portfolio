@@ -302,3 +302,77 @@ must return its short label), `test/spectrum.test.js` (each pick places one diam
 populates `selectedBand`), and `test/selectedWorkDocs.test.js`, which checks that this section still names
 `featured.js`, `FEATURED`, `FeatureCards.jsx`, and the supported moments.
 
+## Spectrograph bands workflow
+
+The hero spectrograph (`src/components/Spectrograph.jsx`) and the sticky band bar
+(`src/components/BandBar.jsx`) both read `spectrumBands` from `src/data/spectrum.js`: eight coloured
+bands spanning `SPECTRUM_START` (2015) to `SPECTRUM_END` (2027), where every dated item is one tick
+that lights its band's wavelength in the rainbow and jumps to a card on the page.
+
+### Purpose
+
+Adding a Markdown card or Lab project is only half of shipping new work for bands that keep an explicit
+item list. `career` (`experience`, `education`), `impact`, `projects` (`lab`, `projects`), and the
+`media` half of `recognition` pull their ticks straight from cards via `fromCards`. The remaining bands
+(`patent`, `research`, `judging`, `memberships`, plus awards and talks in `recognition`) list each tick
+in `src/data/spectrum.js` so multiple milestones (such as three patent filings or nine peer reviews) can
+share one card or link to individual DOIs and proof pages.
+
+### Entrypoints
+
+| Path | Role |
+| --- | --- |
+| `src/data/spectrum.js` | `spectrumBands`, `SPECTRUM_START`, `SPECTRUM_END`, `startOf`, `endOf`, `newestFirst`, `bandForSection`, and card matching (`findCard`, `CARD_FOR_BAND`, `CARD_OVERRIDES`) |
+| `src/components/Spectrograph.jsx` | Hero tick strip, eight unfolded lanes, readout link labels, and prism wavelength glow |
+| `src/components/spectroPlace.js` | Piece-wise year `warp(t)` and pixel `place(entries, width)` for the hero strip |
+| `src/components/BandBar.jsx` | Sticky band bar that morphs ticks out of the strip and scrolls to `item.card` |
+| `src/components/bandPlace.js` | Linear date `layout(items, width)` for one band's ticks in the sticky bar |
+
+### How to run
+
+1. If the new card is in `experience`, `education`, `impact`, `media`, `projects`, or `src/data/lab.js`,
+`fromCards` adds its tick automatically from the card's `date`, `title`, `company`, `location`, `parent`,
+and `url`.
+2. If the new work is a paper (`research`), patent milestone (`patent`), judging or peer review
+(`judging`), award or talk (`recognition`), or society (`memberships`), add a line to that band's
+`items` array in `src/data/spectrum.js`:
+
+```js
+{
+  t: 2026.75,
+  when: 'Oct 2026',
+  title: 'Short line title for the strip readout',
+  meta: 'Journal, venue, or role',
+  url: 'https://doi.org/10.xxxx/example', // optional public proof link
+}
+```
+
+`t` is a decimal year between `SPECTRUM_START` and `SPECTRUM_END` (for example, `startOf('Oct 2026')` is
+`2026 + 9 / 12`). `spectrum.js` links each line's `card` field to a card title automatically when at
+least 75% of words over three letters match (`findCard`), when `meta` starts with `'Peer reviewer'`, or
+when the band is in `CARD_FOR_BAND`. If a line's title is too different from its card's `title`, add an
+entry to `CARD_OVERRIDES` in `src/data/spectrum.js` (or set `card` on the item).
+
+3. Check without freeing port 3000:
+
+```bash
+npm test
+npm run build
+npx astro preview --host 127.0.0.1 --port 4321
+```
+
+Hover or tap the new tick on the hero strip and in the sticky band bar to confirm its readout, proof link,
+and card jump.
+
+### How to test
+
+```bash
+npm test
+```
+
+That includes `test/spectrum.test.js` (every line sits inside `SPECTRUM_START..SPECTRUM_END`, resolves
+`item.card` to a real card or Lab project, and keeps `startOf`/`endOf`/`newestFirst` in sync with
+`scripts/cards.mjs`), `test/spectroPlace.test.js`, `test/bandPlace.test.js`, and
+`test/spectrographDocs.test.js`, which checks that this section still names `spectrum.js`,
+`spectrumBands`, `spectroPlace.js`, and `bandPlace.js`.
+
