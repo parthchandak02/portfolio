@@ -63,6 +63,39 @@ describe('selectTopicNames: unknown names used to fail silently', () => {
       /Unknown topic logo name\(s\): nope, also-missing/
     );
   });
+
+  it('renders a requested topic SVG via CLI into 512x512 and trimmed PNGs and rejects unknown names', async () => {
+    const { spawnSync } = await import('node:child_process');
+    const sharp = (await import('sharp')).default;
+    const full = path.join(root, 'public/logos/topic-robotics.png');
+    const trimmed = path.join(root, 'public/logos/trim/topic-robotics.png');
+    const origFull = fs.readFileSync(full);
+    const origTrim = fs.readFileSync(trimmed);
+    try {
+      const ok = spawnSync(process.execPath, [renderTopics, 'robotics'], {
+        cwd: root,
+        encoding: 'utf8'
+      });
+      assert.equal(ok.status, 0, ok.stderr);
+      assert.equal(ok.stdout.trim(), path.join('public', 'logos', 'topic-robotics.png'));
+      const fullMeta = await sharp(full).metadata();
+      const trimMeta = await sharp(trimmed).metadata();
+      assert.equal(fullMeta.width, 512);
+      assert.equal(fullMeta.height, 512);
+      assert.ok(trimMeta.width < 512);
+      assert.ok(trimMeta.height < 512);
+
+      const fail = spawnSync(process.execPath, [renderTopics, 'not-a-topic'], {
+        cwd: root,
+        encoding: 'utf8'
+      });
+      assert.notEqual(fail.status, 0);
+      assert.match(fail.stderr, /Unknown topic logo name\(s\): not-a-topic/);
+    } finally {
+      fs.writeFileSync(full, origFull);
+      fs.writeFileSync(trimmed, origTrim);
+    }
+  });
 });
 
 describe('parseMakeLogoArgs: rejects unknown flags and invalid option values clearly', () => {
@@ -231,6 +264,70 @@ describe('parseMakeLogoArgs: rejects unknown flags and invalid option values cle
       // 180 x 40 scaled to 430 px wide is 430 x 96; 3% pad on 430 is 13 px on each side -> 456 x 122.
       assert.equal(trimMeta.width, 456);
       assert.equal(trimMeta.height, 122);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('applies --crop, --erase, --ink alpha/dark, and rejects a blank mark via CLI', async () => {
+    const os = await import('node:os');
+    const { spawnSync } = await import('node:child_process');
+    const sharp = (await import('sharp')).default;
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'make-logo-opts-'));
+    try {
+      const logosDir = path.join(dir, 'logos');
+      fs.mkdirSync(logosDir);
+      // 100 x 100 SVG: top-left dark mark (10..50, 10..30), bottom tagline (10..90, 70..90),
+      // and a white square on the right (60..90, 10..40) on a light background.
+      const svg = path.join(dir, 'mark.svg');
+      fs.writeFileSync(
+        svg,
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+          '<rect x="0" y="0" width="100" height="50" fill="#e0e0e0"/>' +
+          '<rect x="10" y="10" width="40" height="20" fill="#111111"/>' +
+          '<rect x="60" y="10" width="30" height="20" fill="#ffffff"/>' +
+          '<rect x="10" y="70" width="80" height="20" fill="#111111"/>' +
+          '</svg>'
+      );
+
+      // --crop top half, --erase right side, --ink dark keeps only the 40x20 dark mark (2:1 aspect -> 430x215).
+      const darkOut = path.join(logosDir, 'dark-logo.png');
+      const darkRun = spawnSync(
+        process.execPath,
+        [makeLogo, svg, darkOut, '--ink', 'dark', '--crop', '0,0,1,0.5', '--erase', '0.55,0,0.45,1'],
+        { cwd: root, encoding: 'utf8' }
+      );
+      assert.equal(darkRun.status, 0, darkRun.stderr);
+      assert.match(darkRun.stdout, /mark 430x215 on 512x512/);
+
+      // --ink alpha on a white-on-transparent SVG keeps the 30x30 square mark (1:1 aspect -> capped at 370x370).
+      const whiteSvg = path.join(dir, 'white.svg');
+      const alphaOut = path.join(logosDir, 'alpha-logo.png');
+      fs.writeFileSync(
+        whiteSvg,
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+          '<rect x="20" y="20" width="30" height="30" fill="#ffffff"/>' +
+          '</svg>'
+      );
+      const alphaRun = spawnSync(
+        process.execPath,
+        [makeLogo, whiteSvg, alphaOut, '--ink', 'alpha'],
+        { cwd: root, encoding: 'utf8' }
+      );
+      assert.equal(alphaRun.status, 0, alphaRun.stderr);
+      assert.match(alphaRun.stdout, /mark 370x370 on 512x512/);
+      const alphaMeta = await sharp(path.join(logosDir, 'trim', 'alpha-logo.png')).metadata();
+      assert.equal(alphaMeta.width, 392);
+      assert.equal(alphaMeta.height, 392);
+
+      // Default --ink any on an all-white SVG finds no mark and exits non-zero.
+      const blankRun = spawnSync(
+        process.execPath,
+        [makeLogo, whiteSvg, path.join(logosDir, 'blank.png')],
+        { cwd: root, encoding: 'utf8' }
+      );
+      assert.notEqual(blankRun.status, 0);
+      assert.match(blankRun.stderr, /No mark found: try a different --ink mode/);
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }

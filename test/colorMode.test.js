@@ -10,8 +10,10 @@ import {
   applyColorMode,
   colorModeBodyBoot,
   colorModeBoot,
+  initialLight,
   readStoredMode,
   resolveLight,
+  systemPrefersLight,
   writeStoredMode,
 } from '../src/hooks/colorMode.js';
 
@@ -78,6 +80,13 @@ test('a blocked store is ignored and does not throw', () => {
   assert.equal(readStoredMode(storage), null);
   assert.doesNotThrow(() => writeStoredMode(true, storage));
   assert.equal(resolveLight(readStoredMode(storage), true), true);
+});
+
+test('systemPrefersLight and initialLight read matchMedia safely and fall back to dark when missing', () => {
+  assert.equal(systemPrefersLight({ matchMedia: () => ({ matches: true }) }), true);
+  assert.equal(systemPrefersLight({ matchMedia: () => ({ matches: false }) }), false);
+  assert.equal(systemPrefersLight({}), false);
+  assert.equal(initialLight(), false);
 });
 
 const classList = (initial) => {
