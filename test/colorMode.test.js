@@ -1,6 +1,7 @@
 // Light or dark for the next visit (src/hooks/colorMode.js). Run with `npm test`.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import vm from 'node:vm';
 import { readFileSync } from 'node:fs';
 import {
@@ -16,6 +17,8 @@ import {
   systemPrefersLight,
   writeStoredMode,
 } from '../src/hooks/colorMode.js';
+
+const colorModeUrl = new URL('../src/hooks/colorMode.js', import.meta.url).href;
 
 const cases = [
   {
@@ -87,6 +90,26 @@ test('systemPrefersLight and initialLight read matchMedia safely and fall back t
   assert.equal(systemPrefersLight({ matchMedia: () => ({ matches: false }) }), false);
   assert.equal(systemPrefersLight({}), false);
   assert.equal(initialLight(), false);
+});
+
+test('calling initialLight, readStoredMode, and writeStoredMode in Node does not warn about localStorage', () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      '--input-type=module',
+      '-e',
+      `
+        const { initialLight, readStoredMode, writeStoredMode } = await import(${JSON.stringify(colorModeUrl)});
+        if (readStoredMode() !== null) process.exit(2);
+        writeStoredMode(true);
+        if (initialLight() !== false) process.exit(3);
+      `,
+    ],
+    { encoding: 'utf8' }
+  );
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stderr.includes('ExperimentalWarning'), false);
+  assert.equal(result.stderr.includes('localStorage'), false);
 });
 
 const classList = (initial) => {
