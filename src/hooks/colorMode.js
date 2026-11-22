@@ -15,7 +15,12 @@ export const resolveLight = (stored, systemLight) => {
   return !!systemLight;
 };
 
-export const readStoredMode = (storage = globalThis.localStorage) => {
+// Use window.localStorage (same as glassSound.js): bare globalThis.localStorage in Node
+// is an experimental getter that warns when tests call these helpers without --localstorage-file.
+const defaultStorage = () =>
+  typeof window === 'undefined' ? null : window.localStorage;
+
+export const readStoredMode = (storage = defaultStorage()) => {
   try {
     const value = storage.getItem(LIGHT_KEY);
     return value === '1' || value === '0' ? value : null;
@@ -24,7 +29,7 @@ export const readStoredMode = (storage = globalThis.localStorage) => {
   }
 };
 
-export const writeStoredMode = (light, storage = globalThis.localStorage) => {
+export const writeStoredMode = (light, storage = defaultStorage()) => {
   try {
     storage.setItem(LIGHT_KEY, light ? '1' : '0');
   } catch {
